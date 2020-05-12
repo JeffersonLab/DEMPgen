@@ -9,7 +9,7 @@
    // "experiment" : "solid",
     "experiment" : "eic",
 
-    "file_name" : "DEMPGen_1000000_1",
+    "file_name" : "DEMPGen_1000000_3",
     "n_events" : 1000000,
     "output_file" : "RootFiles/Test.root",
 

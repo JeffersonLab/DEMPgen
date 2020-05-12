@@ -120,7 +120,8 @@ void eic(int event_number, int target_direction, int kinematics_type, TString fi
      // Proton in lab (collider) frame
      // ----------------------------------------------------
  
-     fProton_Theta_Col = 50.0e-3;
+     //fProton_Theta_Col = 50.0e-3; // JLEIC crossing angle?
+     fProton_Theta_Col = 25.0e-3; // eRHIC crossing angle  
      fProton_Phi_Col   = fPi; 
      fProton_Mom_Col   = fPBeam * 1e3; 
      fVertex_X         = 0.; 
