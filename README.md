@@ -93,9 +93,17 @@ Computes the effect of final state interaction between the produced pion and one
 
 This project uses [JsonCpp](https://github.com/open-source-parsers/jsoncpp "JsonCpp Github") to read in configuration options. The amalgamated sources for JsonCpp are redistributed with this project in compliance with the MIT license.
 
-### Process_EIC.csh - SJDK 09/02/22
+## Processing Scripts and json examples
 
-!!! NOTICE !!! - This script copies Config_EIC.json and formats a new file based upon this, DO NOT MODIFY Config_EIC.json if you want to use this script! - !!! NOTICE !!!
+- There are several shell scripts in the main directory that can be used to run the generator and produce some output, information on these scripts is provided below
+- To remove clutter from the main directory, example .json scripts were moved to a new folder
+  - json_examples
+
+### Process_EIC.csh
+
+!!! NOTICE !!!  
+This script copies Config_EIC.json and formats a new file based upon this, DO NOT MODIFY Config_EIC.json if you want to use this script!  
+!!! NOTICE !!!  
 
 - To facilitate the submission of batch jobs, I created a csh script to automatically construct .json config files and run them. This script can also be utilised to run the generator manually, without the need to go and edit a json file. 
 - The script requires 8 arguments (which is a lot, I know), but in the K+ case, it expects 9. They are as follows -  
@@ -116,7 +124,7 @@ This project uses [JsonCpp](https://github.com/open-source-parsers/jsoncpp "Json
   
 - You would run the generator for 18 GeV e- on 275 protons for ip6, throwing 100000 events with the K+/Lambda generator.
   
-### Batch_Submission_EIC.sh - SJDK 09/02/22
+### Batch_Submission_EIC.sh
 
 - This script creates and submits batch jobs. It is designed for use with the torque queueing system on Lark at the University of Regina. However, it could quickly be adapted for use on the JLab iFarm for example if desired.
 The jobs the script creates and submits all execute the Process_EIC.csh script described above. This script requries a very similar set of arguments -  
@@ -132,6 +140,29 @@ The jobs the script creates and submits all execute the Process_EIC.csh script d
 
 - The script automatically generates a random seed itself using the /dev/urandom function  
 
-### json_examples - SJDK 09/02/22
+### Process_EIC_iFarm.csh
 
-There were several .json files clogging up the main directory, many of these were very outdated. As such, I've moved them all to a subfolder, json_examples. This folder has .json config files for a variety of different conditions. However, due to several of them being quite outdated, the Config_EIC.json file in the main (the directory of this README) directory should be consulted to see the options that are actually availble.
+- This version is for use on the JLab iFarm/Farm
+- This script uses the same arguments as Process_EIC.csh
+- If you are processing interactively (i.e. on the iFarm), you will need to make sure that you have executed -
+  - module use /group/halla/modulefiles
+  - module load root
+- You should also check the path set at the top looks OK
+    - By default, /eic/users/${USER}/DEMPGen is assumed
+
+### JLab_Batch_Submission.sh
+
+- This version should be used to submit jobs to the Farm batch queueing system (swif2)
+- It uses the same arguments as Batch_Submission_EIC.sh
+- Before running, ensure you have a folder or sym link for LundFiles
+    - data/LundFiles 
+	- This must exist for output!
+- You should also check the paths set throughout the script look ok (for example, in the COMMAND: ... line)
+    - By default, /eic/users/${USER}/DEMPGen is assumed
+
+### json_examples
+
+- There were several .json files clogging up the main directory, many of these were very outdated. As such, I've moved them all to a subfolder -
+  - json_examples
+- This folder has .json config files for a variety of different conditions.
+  - Due to several of them being quite outdated, the Config_EIC.json file in the main (the directory of this README) directory should be consulted to see the options that are actually availble.
