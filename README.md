@@ -83,40 +83,40 @@ This project uses [JsonCpp](https://github.com/open-source-parsers/jsoncpp "Json
 
 !!! NOTICE !!! - This script copies Config_EIC.json and formats a new file based upon this, DO NOT MODIFY Config_EIC.json if you want to use this script! - !!! NOTICE !!!
 
-To facilitate the submission of batch jobs, I created a csh script to automatically construct .json config files and run them. This script can also be utilised to run the generator manually, without the need to go and edit a json file. 
-The script requires 8 arguments (which is a lot, I know), but in the K+ case, it expects 9. They are as follows -  
+- To facilitate the submission of batch jobs, I created a csh script to automatically construct .json config files and run them. This script can also be utilised to run the generator manually, without the need to go and edit a json file. 
+- The script requires 8 arguments (which is a lot, I know), but in the K+ case, it expects 9. They are as follows -  
 
-Arg 1 - FileNum -> For batch running, we typically run X files of Y events, this argument is just X, if you're running manually as a test, just input 1 or whatever you fancy  
-Arg 2 - NumEvents -> The number of events thrown for this file, set this to whatever you want to run. For reference, with the Pi+/K+ generator, 1B files takes ~1 hour  
-Arg 3 - EBeamE -> The electron beam energy, set this to whatever you want, typically, we use 5, 10 or 18 (the nominal max for the EIC)  
-Arg 4 - HBeamE -> The hadron beam energy, again, set this to whatevr you want. Typically we use 41, 100 or 275 (41 and 275 being the nominal min/max)  
-Arg 5 - RandomSeed -> The random seed, self explanatory. Set this however you like, the batch submission job randomly generates a random seed to feed in here  
-Arg 6 - OutputType -> The format of the output file, select from LUND, Pythia6 (for Fun4All) or HEPMC3 (for ATHENA), the default is Pythia6 if your choice is invalid  
-Arg 7 - InteractionPoint -> The interaction point, choose from ip6 or ip8. The default is ip6 if your choice is invalid  
-Arg 8 - Particle -> The produced particle (meson) in the reaction, choose from omega, pi+, pi0 or K+  
-Arg 9 - Hadron -> OPTIONAL - This only matters if you select K+ as the particle, in this case, choose from Lambda or Sigma0 here. If your choice is invalid (or you don't specify arg9), the default is Lambda  
+  - Arg 1 - FileNum -> For batch running, we typically run X files of Y events, this argument is just X, if you're running manually as a test, just input 1 or whatever you fancy  
+  - Arg 2 - NumEvents -> The number of events thrown for this file, set this to whatever you want to run. For reference, with the Pi+/K+ generator, 1B files takes ~1 hour  
+  - Arg 3 - EBeamE -> The electron beam energy, set this to whatever you want, typically, we use 5, 10 or 18 (the nominal max for the EIC)  
+  - Arg 4 - HBeamE -> The hadron beam energy, again, set this to whatevr you want. Typically we use 41, 100 or 275 (41 and 275 being the nominal min/max)  
+  - Arg 5 - RandomSeed -> The random seed, self explanatory. Set this however you like, the batch submission job randomly generates a random seed to feed in here  
+  - Arg 6 - OutputType -> The format of the output file, select from LUND, Pythia6 (for Fun4All) or HEPMC3 (for ATHENA), the default is Pythia6 if your choice is invalid  
+  - Arg 7 - InteractionPoint -> The interaction point, choose from ip6 or ip8. The default is ip6 if your choice is invalid  
+  - Arg 8 - Particle -> The produced particle (meson) in the reaction, choose from omega, pi+, pi0 or K+  
+  - Arg 9 - Hadron -> OPTIONAL - This only matters if you select K+ as the particle, in this case, choose from Lambda or Sigma0 here. If your choice is invalid (or you don't specify arg9), the default is Lambda  
   
-So as an example if you executed the following -  
+- So as an example if you executed the following -  
   
-./Process_EIC.csh 1 100000 18 275 24432 HEPMC3 ip6 K+ Lambda
+  - ./Process_EIC.csh 1 100000 18 275 24432 HEPMC3 ip6 K+ Lambda
   
-You would run the generator for 18 GeV e- on 275 protons for ip6, throwing 100000 events with the K+/Lambda generator.
+- You would run the generator for 18 GeV e- on 275 protons for ip6, throwing 100000 events with the K+/Lambda generator.
   
 ### Batch_Submission_EIC.sh - SJDK 09/02/22
 
-This script creates and submits batch jobs. It is designed for use with the torque queueing system on Lark at the University of Regina. However, it could quickly be adapted for use on the JLab iFarm for example if desired.
+- This script creates and submits batch jobs. It is designed for use with the torque queueing system on Lark at the University of Regina. However, it could quickly be adapted for use on the JLab iFarm for example if desired.
 The jobs the script creates and submits all execute the Process_EIC.csh script described above. This script requries a very similar set of arguments -  
 
-Arg 1 - NumFiles -> The batch script is designed to run X jobs of Y events, this number is just X, the number of files you want to run  
-Arg 2 - NumEvents -> The number of events thrown for this file, set this to whatever you want to run. For reference, with the Pi+/K+ generator, 1B files takes ~1 hour  
-Arg 3 - EBeamE -> The electron beam energy, set this to whatever you want, typically, we use 5, 10 or 18 (the nominal max for the EIC)  
-Arg 4 - HBeamE -> The hadron beam energy, again, set this to whatevr you want. Typically we use 41, 100 or 275 (41 and 275 being the nominal min/max)  
-Arg 5 - OutputType -> The format of the output file, select from LUND, Pythia6 (for Fun4All) or HEPMC3 (for ATHENA), the default is Pythia6 if your choice is invalid  
-Arg 6 - InteractionPoint -> The interaction point, choose from ip6 or ip8. The default is ip6 if your choice is invalid  
-Arg 7 - Particle -> The produced particle (meson) in the reaction, choose from omega, pi+, pi0 or K+  
-Arg 8 - Hadron -> OPTIONAL - This only matters if you select K+ as the particle, in this case, choose from Lambda or Sigma0 here. If your choice is invalid (or you don't specify arg9), the default is Lambda  
+    - Arg 1 - NumFiles -> The batch script is designed to run X jobs of Y events, this number is just X, the number of files you want to run  
+  - Arg 2 - NumEvents -> The number of events thrown for this file, set this to whatever you want to run. For reference, with the Pi+/K+ generator, 1B files takes ~1 hour  
+  - Arg 3 - EBeamE -> The electron beam energy, set this to whatever you want, typically, we use 5, 10 or 18 (the nominal max for the EIC)  
+  - Arg 4 - HBeamE -> The hadron beam energy, again, set this to whatevr you want. Typically we use 41, 100 or 275 (41 and 275 being the nominal min/max)  
+  - Arg 5 - OutputType -> The format of the output file, select from LUND, Pythia6 (for Fun4All) or HEPMC3 (for ATHENA), the default is Pythia6 if your choice is invalid  
+  - Arg 6 - InteractionPoint -> The interaction point, choose from ip6 or ip8. The default is ip6 if your choice is invalid  
+  - Arg 7 - Particle -> The produced particle (meson) in the reaction, choose from omega, pi+, pi0 or K+  
+  - Arg 8 - Hadron -> OPTIONAL - This only matters if you select K+ as the particle, in this case, choose from Lambda or Sigma0 here. If your choice is invalid (or you don't specify arg9), the default is Lambda  
 
-The script automatically generates a random seed itself using the /dev/urandom function  
+- The script automatically generates a random seed itself using the /dev/urandom function  
 
 ### json_examples - SJDK 09/02/22
 
