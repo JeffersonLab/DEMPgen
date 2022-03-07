@@ -1,7 +1,10 @@
 data/LundFiles/
 data/RootFiles/
+data/LundFiles
 *.root
 *.lund
 build/
 *_job.txt
 Config_EIC_*
+sjdkay_job.txt
+*#*

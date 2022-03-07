@@ -5,19 +5,31 @@
 #include <string>
 
 #include "TFile.h"
-#include <TLorentzVector.h>
+#include "TLorentzVector.h"
 #include "TTree.h"
 
 #include "TRandom.h"
 #include "TRandom2.h"
+#include "TRandom3.h"
 
 class pim {
 
   public:
-  void Initilize();
-  int CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, TLorentzVector P_pim, TLorentzVector P_pro);
-  void setrootfile(std::string myRootFile );
-  double fermiMomentum();
+  	pim(); 
+  	pim(int);
+
+  	void Initilize();
+  	int CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, TLorentzVector P_pim, TLorentzVector P_pro);
+  	int CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, TLorentzVector P_pim, TLorentzVector P_pro, double fdiff_E);
+  	void setrootfile(std::string myRootFile );
+  	double fermiMomentum();
+
+  private:
+	Int_t gen_seed = 0;
+	
+	std::string pParticle;
+	std::string pcharge;
+
   /* double correctedPhi(); */
   /* double correctedPhiS(); */
 
@@ -26,11 +38,24 @@ class pim {
 
 
 
-extern TRandom2 *fRandom;                    
+//extern TRandom2 *fRandom;                    
+
+extern TRandom3 *fRandom;                    
 
 extern TFile *f;
 
 extern TTree *t1;
+
+extern int gKinematics_type;
+extern TString gfile_name;
+extern TString gParticle;
+extern TString gHadron;
+extern bool gPi0_decay;
+extern std::string gDet_location;
+extern std::string gOutputType;
+extern float fProton_incidence_phi;
+
+extern int fSeed;
 
 extern bool allset;
 extern bool kCalcFermi;
@@ -43,18 +68,55 @@ extern bool kFSI;
 extern bool kMSele;
 extern bool kMS;
 
+extern double fKaon_Mass;
+extern double fKaon_Mass_GeV;
+
+extern double fLambda_Mass;                             
+extern double fLambda_Mass_GeV;
+
+extern double fSigma_Mass;
+extern double fSigma_Mass_GeV;
+
+extern double fOmega_Mass; 
+extern double fOmega_Mass_GeV; 
+
+extern double fOmega_Theta_Col; 
+extern double fOmega_Phi_Col; 
+
+extern double fOmega_Theta_I; 
+extern double fOmega_Theta_F; 
+
+extern double fOmega_Energy_CM;    
+extern double fOmega_Mom_CM;       
+extern double fOmega_Energy_CM_GeV;
+extern double fOmega_Mom_CM_GeV;   
+
+extern double fPhi_Omega_LeptonPlane_RF;
+extern double fCos_Phi_Omega_LeptonPlane_RF; 
+extern double fSin_Phi_Omega_LeptonPlane_RF;
+extern double fTheta_Omega_Photon_RF;
+
 extern int fWLessShell;
 extern int fWLess1P9;
 extern int fSDiff;
 
-extern long int fNEvents;
-extern long int fNRecorded;
-extern long int fNGenerated;
-extern long int fWSqNeg;
-extern long int fNMomConserve;
-extern long int fNSigmaNeg;
-extern long int fLundRecorded;
-extern long int fNFile;
+//extern long int fNEvents;
+
+extern unsigned long long int fNEvents;
+extern unsigned long long int fNRecorded;
+extern unsigned long long int fNGenerated;
+extern unsigned long long int fWSqNeg;
+extern unsigned long long int fNMomConserve;
+extern unsigned long long int fNSigmaNeg;
+
+extern unsigned long long int fNaN;
+extern unsigned long long int fConserve;
+
+extern unsigned long long int fNWeightUnphys;
+extern unsigned long long int fNWeightReject;
+
+extern unsigned long long int fLundRecorded;
+extern unsigned long long int fNFile;
 
 extern double fK;
 extern double fm;
@@ -360,6 +422,31 @@ extern double fPion_Corrected_MomY_Col_GeV;
 extern double fPion_Corrected_MomZ_Col_GeV;
 extern double fPion_Delta_Mom_Col_GeV;
 
+extern double fKaon_Theta_Col; 
+extern double fKaon_Phi_Col;
+extern double fKaon_Energy_Col;
+extern double fKaon_Mom_Col;
+extern double fKaon_MomZ_Col;
+extern double fKaon_MomX_Col;    
+extern double fKaon_MomY_Col;
+extern double fKaon_Energy_Col_GeV;
+extern double fKaon_Mom_Col_GeV;
+extern double fKaon_MomX_Col_GeV;
+extern double fKaon_MomY_Col_GeV;   
+extern double fKaon_MomZ_Col_GeV;
+extern double fScathad_Theta_Col;
+extern double fScathad_Phi_Col;
+extern double fScathad_Energy_Col;
+extern double fScathad_Mom_Col;
+extern double fScathad_MomZ_Col;
+extern double fScathad_MomX_Col;
+extern double fScathad_MomY_Col;
+extern double fScathad_Energy_Col_GeV;
+extern double fScathad_Mom_Col_GeV;
+extern double fScathad_MomX_Col_GeV;  
+extern double fScathad_MomY_Col_GeV; 
+extern double fScathad_MomZ_Col_GeV;
+
 extern double fNeutron_MS_Energy_Col;
 extern double fNeutron_MS_MomZ_Col;
 extern double fNeutron_MS_MomX_Col;
@@ -637,6 +724,8 @@ extern double fSig_VR;
 extern double fSig_L;
 extern double fSig_T;
 
+extern double fSig_fpi_6GeV;
+
 extern double fSigmaPhiS;
 extern double fSigmaPhi_Minus_PhiS;
 extern double fSigma2Phi_Minus_PhiS;
@@ -651,6 +740,8 @@ extern double fSig_3Phi_Minus_PhiS;
 extern double fSig_2Phi_Plus_PhiS;
 extern double fEventWeight;
 extern double fEventWeightMax;
+extern double fEventWeightCeil;  // SJDK 11/05/21 - This is the maximum value found with the old method that is used to get the new unit weight
+extern double fEventWeightRn;  // SJDK 11/05/21 - Random number to compare determined weight to
 extern double fZAWFactor;
 extern double fRR;
 extern double fPhaseSpaceWeight;
@@ -739,6 +830,10 @@ extern double fradical;
 extern double fMomentum[300];
 extern double fProb[300];
 
+extern double conserve;      // 16/06/21 AU -> New Variables for conservation law checks
+extern double ene;
+extern double mom;
+
 //extern double fProb[300] = {    
 //6.03456,    6.02429,    6.01155,    5.99636,    5.97873,    5.95869,    5.93626,    5.91147,    5.88435,    5.85493,
 //5.82325,    5.78935,    5.75326,    5.71504,    5.67472,    5.63235,    5.58799,    5.54169,     5.4935,    5.44347,		   
@@ -771,13 +866,5 @@ extern double fProb[300];
 //0.00344932, 0.00334321, 0.00324038, 0.00314073, 0.00304505,  0.0029524, 0.00286252, 0.00277533, 0.00269076, 0.00260872,			   
 //0.00252913, 0.00245194, 0.00237706, 0.00230444, 0.00223399, 0.00216566, 0.00209939, 0.00203512, 0.00197277, 0.00191231 };
 //
-
-
-
-
-
-
-
-
 
 #endif

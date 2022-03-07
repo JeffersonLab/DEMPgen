@@ -32,6 +32,11 @@ class CustomRand
   CustomRand(const char * fname,
              double VRange[6]);
 
+  CustomRand(const char * fname,
+             double ERange[2], double ThetaRange[2],
+             double PhiRange[2], int demp_seed);
+
+
 
   /* CustomRand(double ERange[2], double PhiRange[2], */
   /*            bouble PhiRange[2], */

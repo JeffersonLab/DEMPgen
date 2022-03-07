@@ -4,7 +4,6 @@ env = Environment()
 
 env['CXX'] = 'g++'
 
-
 # # lib_var = os.popen("root-config --libs").read()
 
 env['CCFLAGS'] = '-DLINUXVERS -g -Wall -DWITH_DEBUG' 

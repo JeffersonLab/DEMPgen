@@ -97,7 +97,7 @@ source ./runEIC.csh
 
 Note 1:
 fEventWeight is a negative number because of the phase space of scattered
-elecgron. 
+electron. 
 
 Note 2:
 Lets say you generate "N" dat files and then generate "N" root files using

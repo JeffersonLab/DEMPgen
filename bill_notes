@@ -22,9 +22,64 @@ Note Mar 5, 2020:
 2. Main function in eiv_evgen is modified to accept Config.json file
 
 
+/*--------------------------------------------------*/
+Note Mar 30, 2020:
+
+
+1. Coding structure changes:
+
+Old code: DEMP->EIC->PiPlus_production_routine
+
+New code: DEMP->EIC->Reaction_rountine->XXX_production_routine
+
+Note that at the Reaction_rountine, it takes care of determining which sub process is selected, and the particle type is now an option in the Json configuration file.
+
+The event loop is intentionally left at the each sub process level, since one may want to have a customized output or other actions at the end of the run (like as in the PiPlus case, Ahmed really wanted to know how many events at a certain Q2 or W cuts).
+
+2. Sub process subroutine dir added.
+
+Note that for all subroutines, the source files are stored under:
+
+DEMPgen/src/eic_evgen/process_routine/
+
+Note that we currently have Pi0_prod.cc, and PiPlus_prod.cc. The header file for the function is store in DEMPgen/src/eic_evgen/reaction_rountine.h.
+
+To create a new subroutine, one just have to declare the daughter class in reaction_rountine.h (with only process_reaction and customized Get_cross_section functions), add a if statement in the reaction_rountine.cc and create a new XXX_prod.cc file.
+
+3. The original PionPlus process routine (written by Ahmed) is now made to be generic. The code will determine which produced particle and which recoiled nucleon automatically.  Ahmed's code are now converted to the Mother process routine, which other sub process routine can give borrow its structure and functions.
+
+I compared the functionality of new generic form of the code and old, and yes, they are exactly the same (with the same set of parameter, the numerical calculated results are 100% match ). However, the distribution are not 100% same due to how the random number generator is defined. If Stephen can further validate this would be fantastic.
+
+4. Using the particleType.h (under include/) and naming the produced particle.
+
+particleType.h  is the particle data base used by GlueX analysis software, which has large data base of particle mass. The new code now uses the same naming convention as the GlueX.
+
+In terms of the particle naming in the Json file, it is extremely flexible. As an example: pi+, Pi+, piplus, PiPlus, Piplus, are all acceptable form of pi+. Same goes for all other changed particles such as k+, etc. pi, pi0, Pi0, PI0, Pion0, are all acceptable form of pi0. The code will standardize the names and get the particle mass from the library. 
 
 
 
+5. In terms of performance compared to the old code, the new code run quite a bit faster see performance comparison
 
+----------------------------------------
+
+New code test:
+Time : Real time 0:03:50, CP time 230.730
+Event: 100000000
+Recorded events: 1768
+Memory used: 0.2G
+
+---------------------------------------
+
+Org code test:
+Time : Real time 0:05:45, CP time 344.940
+Event: 100000000
+Recorded events: 1708
+Memory used: 0.1G
+
+----------------------------------------
+
+6: Random generator is now initiallied during the sub process routine initialiation, in the reaction class.
+
+7. Now, the recoil nucleon and produced particle X will assigned with the PDG type ID automatically when outputing the LUND files.
 
 

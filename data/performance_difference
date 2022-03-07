@@ -1,0 +1,14 @@
+New code test:
+Time : Real time 0:03:50, CP time 230.730
+Event: 100000000
+Recorded events: 1768
+Memory used: 0.2G 
+
+Org code test:
+Time : Real time 0:05:45, CP time 344.940
+Event: 100000000
+Recorded events: 1708
+Memory used: 0.1G 
+
+
+

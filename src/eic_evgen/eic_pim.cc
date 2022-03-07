@@ -11,25 +11,38 @@
 /// Comment: Feb 24, 2020: all declearation of the global variables 
 //            and all functions for pim class are moved there 
 
-
-
-
-
 #include "eic_pim.h"
 
 using namespace std;
 
-
-TRandom2 *fRandom;                    
+//TRandom2 *fRandom;                    
+TRandom3 *fRandom;                    
 
 TFile *f;                    
 TTree *t1;                    
 
+int gKinematics_type;
+bool gPi0_decay;
+string gDet_location;
+string gOutputType; // SJDK 12/01/22 - Added output type as a variable you can specify in the .json file
+float fProton_incidence_phi;
+
+TString gfile_name;
+
+int fSeed;
+
 bool allset, print, kCalcFermi, kCalcBremss, kCalcIon, kCalcBremssEle, kCalcIonEle, kSConserve, kFSI, kMSele, kMS;
 int fWLessShell, fWLess1P9, fSDiff;
-long int fNEvents, fNRecorded, fNGenerated, fWSqNeg, fNMomConserve, fNSigmaNeg, fLundRecorded, fNFile; 
+
+//long int fNEvents, fNRecorded, fNGenerated, fWSqNeg, fNMomConserve, fNSigmaNeg, fNWeightUnphys, fNWeightReject, fLundRecorded, fNFile; 
+
+unsigned long long int fNEvents, fNRecorded, fNGenerated, fWSqNeg, fNMomConserve, fNSigmaNeg, fNaN, fConserve, fNWeightUnphys, fNWeightReject, fLundRecorded, fNFile;
 
 double fK, fm, fElectron_Kin_Col_GeV, fElectron_Kin_Col, fRand, fLumi, fuBcm2, fPI, fDEG2RAD, fRAD2DEG, fEBeam, fPBeam, fScatElec_Theta_I, fScatElec_Theta_F, fPion_Theta_I, fPion_Theta_F, fScatElec_E_Hi, fScatElec_E_Lo, fPSF; 
+
+double fOmega_Theta_I, fOmega_Theta_F, fOmega_Theta_Col, fOmega_Phi_Col;
+
+double fDiff_E, conserve, ene, mom;     // 18/06/21 AU -> New variables to count envents passing/not passing conservation laws
 
 double fMandSConserve, fTop_Pion_Mom, fBot_Pion_Mom, fPion_Mom_Same, fEnergyConserve, fXMomConserve, fYMomConserve, fZMomConserve, fXMomConserve_RF, fYMomConserve_RF, fZMomConserve_RF, fEnergyConserve_RF; 
 
@@ -51,6 +64,12 @@ double fScatElec_Angle, fScatElec_Alpha_RF, fScatElec_Beta_RF;
 
 double fVertex_X, fVertex_Y, fVertex_Z, fProton_Kin_Col_GeV, fElectron_Mass, fElectron_Mass_GeV, fProton_Mass, fProton_Mass_GeV, fNeutron_Mass, fNeutron_Mass_GeV, fPion_Mass, fPion_Mass_GeV, fPiion_Phi, fAlpha, fPi, fMom_Ratio, fMom_Dif, fPionEnergyCMLess, fSNotEqual, fMode_Epsi, fRecoilProton_Mass, fRecoilProton_Mass_GeV;
 
+double fOmega_Mass, fOmega_Mass_GeV; 
+
+double f_Scat_hadron_Mass, f_Scat_hadron_Mass_GeV;
+
+double fKaon_Mass, fKaon_Mass_GeV, fLambda_Mass, fLambda_Mass_GeV, fSigma_Mass, fSigma_Mass_GeV;
+
 double fElectron_Energy_Col, fElectron_MomZ_Col, fElectron_MomX_Col, fElectron_MomY_Col, fElectron_Theta_Col, fElectron_Phi_Col, fElectron_Mom_Col;
 
 double fElectron_MS_Energy_Col, fElectron_MS_MomZ_Col, fElectron_MS_MomX_Col, fElectron_MS_MomY_Col, fElectron_MS_Theta_Col, fElectron_MS_Phi_Col, fElectron_MS_Mom_Col;
@@ -70,6 +89,10 @@ double fPion_TargWindow_Ion_Loss, fPion_Targ_Thickness, fPion_Targ_Thickness_Rad
 double fPion_MS_Energy_Col, fPion_MS_MomZ_Col, fPion_MS_MomX_Col, fPion_MS_MomY_Col, fPion_MS_Theta_Col, fPion_MS_Phi_Col, fPion_MS_Mom_Col;
 
 double fPion_Theta_Col, fPion_Phi_Col, fPion_Energy_Col, fPion_Mom_Col, fPion_MomZ_Col, fPion_MomX_Col, fPion_MomY_Col, fPion_Energy_Col_GeV, fPion_Mom_Col_GeV, fPion_MomX_Col_GeV, fPion_MomY_Col_GeV, fPion_MomZ_Col_GeV;
+
+double fKaon_Theta_Col, fKaon_Phi_Col, fKaon_Energy_Col, fKaon_Mom_Col, fKaon_MomZ_Col, fKaon_MomX_Col, fKaon_MomY_Col, fKaon_Energy_Col_GeV, fKaon_Mom_Col_GeV, fKaon_MomX_Col_GeV, fKaon_MomY_Col_GeV, fKaon_MomZ_Col_GeV;
+
+double fScathad_Theta_Col, fScathad_Phi_Col, fScathad_Energy_Col, fScathad_Mom_Col, fScathad_MomZ_Col, fScathad_MomX_Col, fScathad_MomY_Col, fScathad_Energy_Col_GeV, fScathad_Mom_Col_GeV, fScathad_MomX_Col_GeV, fScathad_MomY_Col_GeV, fScathad_MomZ_Col_GeV;
 
 double fPion_FSI_Theta_Col, fPion_FSI_Phi_Col, fPion_FSI_Energy_Col, fPion_FSI_Mom_Col, fPion_FSI_MomZ_Col, fPion_FSI_MomX_Col, fPion_FSI_MomY_Col, fPion_FSI_Energy_Col_GeV, fPion_FSI_Mom_Col_GeV, fPion_FSI_MomX_Col_GeV, fPion_FSI_MomY_Col_GeV, fPion_FSI_MomZ_Col_GeV;
 
@@ -110,7 +133,9 @@ double fWFactor, fA, fFlux_Factor_Col, fFlux_Factor_RF, fJacobian_CM, fJacobian_
 
 double fZASigma_UU, fRorySigma_UT, fSigma_Col, fSigma_UUPara, fSig_VR, fSig_L, fSig_T;
 
-double fSigmaPhiS, fSigmaPhi_Minus_PhiS, fSigma2Phi_Minus_PhiS, fSigma3Phi_Minus_PhiS, fSigmaPhi_Plus_PhiS, fSigma2Phi_Plus_PhiS, fSig_Phi_Minus_PhiS, fSig_PhiS, fSig_2Phi_Minus_PhiS, fSig_Phi_Plus_PhiS, fSig_3Phi_Minus_PhiS, fSig_2Phi_Plus_PhiS, fEventWeight, fEventWeightMax, fZAWFactor, fRR, fPhaseSpaceWeight, fPhaseShiftWeight, fWilliamsWeight, fDedrickWeight, fCatchenWeight, fPhi, fPhiS, fPhi_Corrected, fPhiS_Corrected;
+double fSig_fpi_6GeV;
+
+double fSigmaPhiS, fSigmaPhi_Minus_PhiS, fSigma2Phi_Minus_PhiS, fSigma3Phi_Minus_PhiS, fSigmaPhi_Plus_PhiS, fSigma2Phi_Plus_PhiS, fSig_Phi_Minus_PhiS, fSig_PhiS, fSig_2Phi_Minus_PhiS, fSig_Phi_Plus_PhiS, fSig_3Phi_Minus_PhiS, fSig_2Phi_Plus_PhiS, fEventWeight, fEventWeightMax, fEventWeightCeil, fEventWeightRn, fZAWFactor, fRR, fPhaseSpaceWeight, fPhaseShiftWeight, fWilliamsWeight, fDedrickWeight, fCatchenWeight, fPhi, fPhiS, fPhi_Corrected, fPhiS_Corrected;
 
 double fElectron_Mom_Sq_RF, fElectron_Mom_Sq_Col, fProton_Mom_Sq_Col, fProton_Mom_Sq_CM, fProton_Mom_Sq_RF, fPhoton_Mom_Sq_Col, fPhoton_Mom_Sq_CM, fPhoton_Mom_Sq_RF, fPion_Mom_Sq_Col, fPion_Mom_Sq_CM, fPion_Mom_Sq_RF, fNeutron_Mom_Sq_Col, fNeutron_Mom_Sq_CM, fNeutron_Mom_Sq_RF, fScatElec_Mom_Sq_Col, fScatElec_Mom_Sq_RF;
 
@@ -124,10 +149,13 @@ double fTerm_PhiMinusPhi_S_Col, fTerm_Phi_S_Col, fTerm_2PhiMinusPhi_S_Col, fTerm
 
 double fPhi_Pion_LeptonPlane_RF, fCos_Phi_Pion_LeptonPlane_RF, fSin_Phi_Pion_LeptonPlane_RF, fPhi_TargPol_LeptonPlane_RF, fCos_Phi_TargPol_LeptonPlane_RF, fSin_Phi_TargPol_LeptonPlane_RF, fTheta_Pion_Photon_RF, fPhi_Pion_LeptonPlane_Col, fCos_Phi_Pion_LeptonPlane_Col, fSin_Phi_Pion_LeptonPlane_Col, fPhi_TargPol_LeptonPlane_Col, fCos_Phi_TargPol_LeptonPlane_Col, fSin_Phi_TargPol_LeptonPlane_Col, fTheta_Pion_Photon_Col;
 
+double fPhi_Omega_LeptonPlane_RF, fCos_Phi_Omega_LeptonPlane_RF, fSin_Phi_Omega_LeptonPlane_RF, fTheta_Omega_Photon_RF;
+
 double fZASigma_UU_Col, fRorySigma_UT_Col, fSig_Phi_Minus_PhiS_Col, fSig_PhiS_Col, fSig_2Phi_Minus_PhiS_Col, fSig_Phi_Plus_PhiS_Col, fSig_3Phi_Minus_PhiS_Col, fSig_2Phi_Plus_PhiS_Col;
 
 double fepi1, fepi2, fradical;
 
+double fOmega_Energy_CM, fOmega_Mom_CM, fOmega_Energy_CM_GeV, fOmega_Mom_CM_GeV;   
 
 double fMomentum[300];
 
@@ -164,15 +192,38 @@ double fProb[300] = {
 0.00252913, 0.00245194, 0.00237706, 0.00230444, 0.00223399, 0.00216566, 0.00209939, 0.00203512, 0.00197277, 0.00191231 };
 
 
+pim::pim() {
+}
+
+
+
+pim::pim(int aaa) {
+
+	gen_seed = aaa;
+
+}
+
+
 
 /*--------------------------------------------------*/
 /*--------------------------------------------------*/
-
 
 void pim::Initilize() {
 
-    fRandom = new TRandom2(0);
-    fRandom->GetSeed();
+//    fRandom = new TRandom2(0);
+//    fRandom->GetSeed();
+//    fRandom->SetSeed(gen_seed);
+
+	
+    fRandom = new TRandom3();
+
+	fRandom->SetSeed(gen_seed);
+	
+//	cout << fRandom->GetSeed() << endl;
+//	cout << "Seed Used: " << gen_seed << endl;
+	
+
+//	exit(0);
 
     allset                                      = false;
     kCalcFermi                                  = false;
@@ -183,24 +234,24 @@ void pim::Initilize() {
     kFSI                                        = false;
     kMSele                                      = false;
     kMS                                         = false;
-  
-    //fLumi                                       = 0.374e33; // https://eic.jlab.org/wiki/index.php/EIC_luminosity
-    fLumi                                       = 1e34; // Estimate above is for JLEIC?
+//    fLumi                                     = 0.374e33; // Jlab design
+    fLumi                                       = 1e34; // https://eic.jlab.org/wiki/index.php/EIC_luminosity
     fuBcm2                                      = 1.0e-30;
     fPI                                         = 3.1415926;
     fDEG2RAD                                    = fPI/180.0;
     fRAD2DEG                                   = 180.0/fPI;
-    fEBeam                                      = 5.0;  // GeV
-    fPBeam                                      = 100; // 49.9912; // GeV
+
     fScatElec_Theta_I                           = 60.0 * fDEG2RAD;
     fScatElec_Theta_F                           = 175.0 * fDEG2RAD;
     fScatElec_E_Lo                              = 0.5;  // % of beam energy
     fScatElec_E_Hi                              = 2.5;  // % of beam energy
     fPion_Theta_I                               = 0.0 * fDEG2RAD;
     fPion_Theta_F                               = 50.0 * fDEG2RAD;
-    fPSF                                        = ( fEBeam * ( fScatElec_E_Hi - fScatElec_E_Lo ) * 
-  						  ( sin( fScatElec_Theta_F ) - sin( fScatElec_Theta_I ) ) * 2 * fPI * 
-  						  ( sin( fPion_Theta_F     ) - sin( fPion_Theta_I     ) ) * 2 * fPI );
+    fOmega_Theta_I                              = 0.0 * fDEG2RAD; 
+    fOmega_Theta_F                              = 360.0 * fDEG2RAD; 
+    // 02/06/21 - SJDK
+    // Set to 0, now set in PiPlusProd.cc
+    fPSF                                     = 0;
     fK                                          = 1000.0;
     fm                                          = 1.0/1000.0;
     fElectron_Mass                              = 0.511;
@@ -211,11 +262,24 @@ void pim::Initilize() {
     fNeutron_Mass_GeV                           = fNeutron_Mass/1000.0;
     fRecoilProton_Mass                          = 938.27;
     fRecoilProton_Mass_GeV                      = fRecoilProton_Mass/1000.0;
-    fPion_Mass                                  = 139.57;
+    fPion_Mass                                  = 139.57018;
     fPion_Mass_GeV                              = fPion_Mass/1000.0;
+
+    fKaon_Mass                                  = 493.677;
+    fKaon_Mass_GeV                              = fKaon_Mass/1000.0;
+    fLambda_Mass                                = 1115.683;
+    fLambda_Mass_GeV                            = fLambda_Mass/1000.0;
+    fSigma_Mass                                 = 1192.642;
+    fSigma_Mass_GeV                             = fSigma_Mass/1000.0;
+
+    fOmega_Mass                                 = 782.65;
+    fOmega_Mass_GeV                             = fOmega_Mass/1000.0;
+
     fDiff                                       = 0.5;
-    fElectron_Kin_Col_GeV                       = fEBeam;
-    fElectron_Kin_Col                           = fElectron_Kin_Col_GeV * 1000.0;
+    // 02/06/21 - SJDK
+    // Set to 0, now set in PiPlusProd.cc
+    fElectron_Kin_Col_GeV                       = 0;
+    fElectron_Kin_Col                           = 0;
     fAlpha                                      = 1./137.036;
     fMom_Ratio                                  = 0.460029;
     fMom_Dif                                    = 0.01;
@@ -251,6 +315,11 @@ void pim::Initilize() {
     fWSqNeg                                     = 0;
     fNSigmaNeg                                  = 0;
     fNMomConserve                               = 0;
+    // SJDK 15/06/21 - Integer counters to check number returning NaN and failing conservation laws added
+    fNaN                                        = 0;
+    fConserve                                   = 0;
+    fNWeightUnphys                              = 0;
+    fNWeightReject                              = 0;
     fSDiff                                      = 0;
     fScatElecEnergyLess                         = 0;
     fScatElecThetaLess                          = 0;
@@ -478,6 +547,31 @@ void pim::Initilize() {
     fNeutron_MS_Theta_Col                       = 0;
     fNeutron_MS_Phi_Col                         = 0;
     fNeutron_MS_Mom_Col                         = 0;
+
+    fKaon_Energy_Col                            = 0;       
+    fKaon_MomZ_Col                              = 0;       
+    fKaon_MomX_Col                              = 0;       
+    fKaon_MomY_Col                              = 0;       
+    fKaon_Theta_Col                             = 0;       
+    fKaon_Phi_Col                               = 0;       
+    fKaon_Mom_Col                               = 0;       
+    fKaon_Energy_Col_GeV                        = 0;       
+    fKaon_Mom_Col_GeV                           = 0;       
+    fKaon_MomX_Col_GeV                          = 0;       
+    fKaon_MomY_Col_GeV                          = 0;       
+    fKaon_MomZ_Col_GeV                          = 0;
+    fScathad_Energy_Col                         = 0;    
+    fScathad_MomZ_Col                           = 0;    
+    fScathad_MomX_Col                           = 0;    
+    fScathad_MomY_Col                           = 0;    
+    fScathad_Theta_Col                          = 0;    
+    fScathad_Phi_Col                            = 0;    
+    fScathad_Mom_Col                            = 0;    
+    fScathad_Energy_Col_GeV                     = 0;    
+    fScathad_Mom_Col_GeV                        = 0;    
+    fScathad_MomX_Col_GeV                       = 0;    
+    fScathad_MomY_Col_GeV                       = 0;    
+    fScathad_MomZ_Col_GeV                       = 0;
   
     fNeutron_Targ_Thickness                     = 0;
     fNeutron_Targ_Thickness_RadLen              = 0;
@@ -703,6 +797,9 @@ void pim::Initilize() {
     fSigma_Col                                  = 0;
     fSigma_UUPara                               = 0;
     fSig_VR                                     = 0;
+
+    fSig_fpi_6GeV                               = 0;
+
     fSig_L                                      = 0;
     fSig_T                                      = 0;
     fSigmaPhiS                                  = 0;
@@ -719,6 +816,8 @@ void pim::Initilize() {
     fSig_2Phi_Plus_PhiS                         = 0;
     fEventWeight                                = 0;
     fEventWeightMax                             = 0;
+    fEventWeightCeil                            = 0; // SJDK 11/05/21 - This is the maximum value found with the old method that is used to get the new unit weight
+    fEventWeightRn                              = 0; // SJDK 11/05/21 -Random number to compare determined weight to
     fWilliamsWeight                             = 0;
     fDedrickWeight                              = 0;
     fCatchenWeight                              = 0;
@@ -790,6 +889,17 @@ void pim::Initilize() {
     fPhi_Pion_LeptonPlane_RF                    = 0;
     fCos_Phi_Pion_LeptonPlane_RF                = 0;
     fSin_Phi_Pion_LeptonPlane_RF                = 0;
+
+    fPhi_Omega_LeptonPlane_RF                   = 0;
+    fCos_Phi_Omega_LeptonPlane_RF               = 0;
+    fSin_Phi_Omega_LeptonPlane_RF               = 0;
+    fTheta_Omega_Photon_RF                      = 0;
+
+    fOmega_Energy_CM                            = 0;
+    fOmega_Mom_CM                               = 0;
+    fOmega_Energy_CM_GeV                        = 0;
+    fOmega_Mom_CM_GeV                           = 0;
+
     fPhi_TargPol_LeptonPlane_RF                 = 0;
     fCos_Phi_TargPol_LeptonPlane_RF             = 0;
     fSin_Phi_TargPol_LeptonPlane_RF             = 0;
@@ -809,11 +919,12 @@ void pim::Initilize() {
     fSig_Phi_Plus_PhiS_Col                      = 0;
     fSig_3Phi_Minus_PhiS_Col                    = 0;
     fSig_2Phi_Plus_PhiS_Col                     = 0;
+    // SJDK 08/02/22 - New variables Ali added for conservation law checks
+    conserve                                    = 0;
+    ene                                         = 0;
+    mom                                         = 0;
 
 }
-
-
-
 
 //---------------------------------------------------------
 double pim::fermiMomentum() {
@@ -831,11 +942,13 @@ double pim::fermiMomentum() {
         kFermi = false;
       }
     }
+
+	cout << "Fermi momentum check: " << fMom << endl; 
   
     return fMom;
 }
 
-
+// SJDK - 08/02/22 - Original version where there is no separate energy difference
 int pim::CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, TLorentzVector P_pim, TLorentzVector P_pro) {
 
     double energy_check = (P_t.E() + P_E0.E()) - (P_e.E()+P_pim.E()+P_pro.E());
@@ -848,14 +961,53 @@ int pim::CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, 
         fabs( px_check )     < fDiff &&
         fabs( py_check )     < fDiff &&
         fabs( pz_check )     < fDiff )
-      err = 1;
-    /* else{  */
-    /*   cerr<<Form("*** dE = %f,  dPx = %f, dPy = %f, dPz = %f", energy_check, px_check, py_check, pz_check)<<endl;  */
-    /*   err = -1;  */
-    /* } */
+      {
+        conserve++;
+        err = 1;
+      }
+    else if (fabs( energy_check ) >= fDiff_E)
+         { 
+	   ene++;
+         } 
     
+    else (fabs( px_check )     >= fDiff ||
+          fabs( py_check )     >= fDiff ||
+          fabs( pz_check )     >= fDiff );
+      {
+	mom++;
+      }
     return err;
-  
+}
+
+// SJDK - 08/02/22 - Set the energy tolerance is a parameter that is fed in
+int pim::CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, TLorentzVector P_pim, TLorentzVector P_pro, double fDiff_E) {
+
+    double energy_check = (P_t.E() + P_E0.E()) - (P_e.E()+P_pim.E()+P_pro.E());
+    double px_check =(P_t.Px() + P_E0.Px()) - (P_e.Px()+P_pim.Px()+P_pro.Px()); 
+    double py_check =(P_t.Py() + P_E0.Py()) - (P_e.Py()+P_pim.Py()+P_pro.Py()); 
+    double pz_check =(P_t.Pz() + P_E0.Pz()) - (P_e.Pz()+P_pim.Pz()+P_pro.Pz()); 
+    
+    Int_t err = -1;
+    if( fabs( energy_check ) < fDiff_E &&
+        fabs( px_check )     < fDiff &&
+        fabs( py_check )     < fDiff &&
+        fabs( pz_check )     < fDiff )
+      {
+        conserve++;
+        err = 1;
+      }
+    else if (fabs( energy_check ) >= fDiff_E)
+         { 
+	   ene++;
+         } 
+    
+    else (fabs( px_check )     >= fDiff ||
+          fabs( py_check )     >= fDiff ||
+          fabs( pz_check )     >= fDiff );
+      {
+	mom++;
+      }
+    return err;
 }
 
 ///*--------------------------------------------------*/
@@ -868,7 +1020,7 @@ void pim::setrootfile( string rootFile ){
 ///****************************************
 /// Bill: re-delcreation of f1 is fixed,
 ///       all object function calls are switched pointer function calls
-
+/// SJDK - 08/02/22 - Rootfile output doesn't seem to work, this is also an odd/inflexible way of defining them since it can't account for multiple process types - perhaps it should have second argument which is a reaction type flag?
 
   f = new TFile(rootFile.c_str(),"recreate"); 
 
@@ -1039,5 +1191,3 @@ void pim::setrootfile( string rootFile ){
   /* t1->Branch("testsig",                                   &ftestsig,                                   "ftestsig/D"); */
 
 }
-
-

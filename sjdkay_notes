@@ -1,0 +1,35 @@
+Stephen JD Kay - University of Regina
+stephen.kay@uregina.ca
+26/11/20
+
+########################################################################################################################################
+
+Some notes on where to change or modify certain things to tweak the generator output as needed for different EIC/detector configurations
+
+########################################################################################################################################
+
+Beam Energy - Tweak the energy of each beam (e/p) on line 224/225 of eic_pim.cc in src/eic_evgen
+Luminosity - Adjust the luminosity on line 129 of eic_pim.cc in src/eic_evgen
+Beam Crossing Angle - Adjust line 665  of PiPlus_prod.cc in src/eic_evgen/process_routine
+
+########################################################################################################################################
+######################################################## Q2/W/t thresholds #############################################################
+########################################################################################################################################
+
+Lines that may be present in the .json file are ONLY for SoLID event generation
+
+Change these for EIC running in src/eic_evgen/process_routine/PiPlus_prod.cc 
+
+Relevant lines in src/eic_evgen/process_routine/PiPlus_prod.cc are as follows -
+
+Q2 - Line 256, Line 819 for comment in output file
+W - Line 387, Line 817 for comment in output file
+t - Line 484, Line 820 for comment in output file
+
+########################################################################################################################################
+##################################################### Comments/Future Changes ##########################################################
+########################################################################################################################################
+
+Can't tweak any of these variables for EIC runs in the .json file which is a bit odd.
+These are all variables that are likely to be changed so it might be nice to modify the generator so that these are read in as items from
+the config file.
