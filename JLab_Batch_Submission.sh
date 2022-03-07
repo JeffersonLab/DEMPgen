@@ -3,7 +3,7 @@
 # SJDK - 07/03/22 - A version of the batch submission script that is intended to run on the JLab iFarm
 # This script creates batch job files and submits them, these jobs run the Process_EIC.csh script
 
-# WARNING - This has not been tested yet!
+# This has been tested and works successfully
 
 echo "Running as ${USER}" # Checks who you're running this as
 
