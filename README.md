@@ -3,21 +3,35 @@ Event generator for Deep Exclusive Meson Production
 
 ## Building
 
-To build the event generator, the compiler needs acces to both a compiled installation of CERN ROOT and its source code. ROOT version 6.08.06 or later is supported, and must be installed with the MathMore package enabled. Be sure not to change the location of either the ROOT source or compiled files after installation, as this will interfere with ROOT's built in CMake configurators.
+- To build the event generator, the compiler needs acces to both a compiled installation of CERN ROOT and its source code. ROOT version 6.08.06 or later is supported, and must be installed with the MathMore package enabled. Be sure not to change the location of either the ROOT source or compiled files after installation, as this will interfere with ROOT's built in CMake configurators.
 
-CMake is also required. CMake 2.8 is the minimum supported version, and CMake 3 has been tested as well.
+- CMake is also required. CMake 2.8 is the minimum supported version, and CMake 3 has been tested as well.
 
-After downloading the source create a build directory and cd to it. Take note of the location of the source directory (where CMakeLists.txt should be stored) and run the commands:
+- After downloading the source create a build directory and cd to it. Take note of the location of the source directory (where CMakeLists.txt should be stored) and run the commands:
 
-mdkir build.
-cd build
-cmake ..
-make
+  - mdkir build.
+  - cd build
+  - cmake ..
+  - make -j8
 
-The event generator can now be run using the following command in the data/ directory.
+- As a one liner - 
+  - mkdir build && cd build && cmake ../ && make -j8
 
-cd data/
-./../build/DEMPgen ../Config.json
+- The event generator can now be run using the following command in the data/ directory.
+
+  - cd data/
+  - ./../build/DEMPgen ../Config.json
+
+### Building on the iFarm
+
+- Building on the JLab iFarm requires you to set up some software versions beforehand, to build successfully, I did the following
+  - Comment out any CUE or other initialisation in your .login/.cshrc scripts
+  - Login to an ifarm node
+  - module load cmake/3.19.4
+  - module use /group/halla/modulefiles
+  - module load root
+ 
+- I then build DEMGen using the one liner above without any issues, you will need to load these modules when running the generator subsequently (this is done by default in the farm job scripts)
 
 ## Configuration
 

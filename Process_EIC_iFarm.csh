@@ -3,13 +3,17 @@
 # SJDK - 07/03/22 - New script which takes in a whole bunch of inputs to create jobs/config files. Note that I'm not 100% happy with the pathing in this file so it should be tweaked and optimised at some point
 # This version is intended for use on the JLab iFarm. Pathing is set up for this purpose and is NOT relative.
 
-# WARNING - This has not yet been tested - Need to confirm it works OK on the farm
+# Tested on the iFarm - produces output
 
 # Set path depending upon hostname. Change or add more as needed  
 if ( "$HOSTNAME" =~ *farm* ) then
-    set DEMPGENPath="/group/eic/users/${USER}/DEMPgen"
+    set DEMPGENPath="/group/eic/users/${USER}/DEMPGen"
+    module use /group/halla/modulefiles
+    module load root
 else if ( "$HOSTNAME" =~ *qcd* ) then
-    set DEMPGENPath="/group/eic/users/${USER}/DEMPgen"
+    set DEMPGENPath="/group/eic/users/${USER}/DEMPGen"
+    module use /group/halla/modulefiles
+    module load root
 else
     set DEMPGENPath=$PWD
 endif
@@ -24,7 +28,7 @@ echo ""
 
 if ($#argv != 8 && $#argv != 9) then
     echo "! ERROR !"
-    echo "! ERROR ! - Expected 8 or 9 arguments, please see the opening information -! ERROR !"
+    echo "! ERROR ! - Expected 8 or 9 arguments, please see the opening information - ! ERROR !"
     echo "! ERROR !"
     exit 1
 endif
@@ -74,8 +78,8 @@ eval $DEMPGENPath/build/DEMPgen $ConfigFilename
 sleep 5
 
 # Filename as it's created is a bit odd, so rename it
-set OriginalOutput = $DEMPGENPath'/LundFiles/eic_input_DEMPGen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Particle$Hadron'_'$NumEvents'_'$FileNum'.dat'
-set RenamedOutput =  $DEMPGENPath'/LundFiles/eic_DEMPGen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Particle$Hadron'_'$NumEvents'_'$FileNum'.dat'
+set OriginalOutput = $DEMPGENPath'/data/LundFiles/eic_input_DEMPGen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Particle$Hadron'_'$NumEvents'_'$FileNum'.dat'
+set RenamedOutput =  $DEMPGENPath'/data/LundFiles/eic_DEMPGen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Particle$Hadron'_'$NumEvents'_'$FileNum'.dat'
 
 mv $OriginalOutput $RenamedOutput
 
