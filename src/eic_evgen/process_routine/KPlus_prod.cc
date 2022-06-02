@@ -746,8 +746,9 @@ Double_t  KPlus_Production::GetKPlus_CrossSection(){
   else {
     fSig_L = 0;
   }
- 
-  if ( ( fT_GeV > 0.0 ) && ( fT_GeV < 0.15 ) ) {
+   // SJDK - 02/06/22 - The validity range here was inconsistent, this only went from 0.0 to 0.15, leaving a gap between 0.15 to 0.2
+  // I changed the range to remove this gap. 
+  if ( ( fT_GeV > 0.0 ) && ( fT_GeV < 0.2 ) ) {
     eicSigmaT( fW_GeV,  fQsq_GeV, tpar0, tpar1, tpar2 , tpar3 , tpar4 );
     TF1 *fitCKYTranspol2 = new TF1("sigmaL","pol2", 0.0 , 0.2 );
     fitCKYTranspol2->FixParameter( 0 , tpar0 );
