@@ -120,7 +120,6 @@ double fBeta_CM_RF, fGamma_CM_RF;
 
 double fPhoton_MomZ_RF, fPhoton_MomX_RF, fPhoton_MomY_RF, fPhoton_Theta_RF, fPhoton_Phi_RF, fPion_Energy_RF, fPion_Energy_RF_GeV, fPiqVec_Theta_RF, fPion_Mom_RF, fPion_Mom_RF_GeV, fPion_MomX_RF, fPion_MomY_RF, fPion_MomZ_RF, fPion_Theta_RF, fPion_Phi_RF, fPion_MomX_RF_GeV, fPion_MomY_RF_GeV, fPion_MomZ_RF_GeV;
 
-
 double fT_Para, fT_Para_GeV, fT, fEpsilon, fx, fy, fz, fNeutron_Energy_RF, fNeutron_Energy_RF_GeV, fNeutron_Mom_RF, fNeutron_Mom_RF_GeV, fNeutron_qVec_Theta_RF, fNeutron_MomX_RF, fNeutron_MomY_RF, fNeutron_MomZ_RF, fNeutron_Theta_RF, fNeutron_Phi_RF, fPhoton_MomX_RF_GeV, fPhoton_MomY_RF_GeV, fPhoton_MomZ_RF_GeV, fNeutron_MomX_RF_GeV, fNeutron_MomY_RF_GeV, fNeutron_MomZ_RF_GeV;
 
 double fPhoton_Theta_Col, fPhoton_Phi_Col, fPhoton_Energy_Col, fPhoton_Mom_Col, fPhoton_MomX_Col, fPhoton_MomZ_Col, fPhoton_MomY_Col, fPhoton_Energy_Col_GeV, fPhoton_Mom_Col_GeV, fPhoton_MomX_Col_GeV, fPhoton_MomZ_Col_GeV, fPhoton_MomY_Col_GeV;
@@ -234,6 +233,7 @@ void pim::Initilize() {
     kFSI                                        = false;
     kMSele                                      = false;
     kMS                                         = false;
+    // The luminosity below is some default assumtpion, more up to date values are set in PiPlus prod and depend upon beam energy combinations
 //    fLumi                                     = 0.374e33; // Jlab design
     fLumi                                       = 1e34; // https://eic.jlab.org/wiki/index.php/EIC_luminosity
     fuBcm2                                      = 1.0e-30;

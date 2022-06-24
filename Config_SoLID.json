@@ -1,0 +1,31 @@
+{
+    //Config
+    // All values should use units of MeV for energies and momenta,
+    // and degrees for angles.
+    // n_events indicates number of attempts
+    // SJDK 17/06/22 - This is an old .json I found from DEMPEvGen, I believe these are still valid options for DEMPGen
+    "output_file" : "Test.root",
+    "n_events" : 10000,
+    "beam_energy": 11000,
+    "targ_pol_x": 0.865,
+    "targ_pol_y": 0,
+    "targ_pol_z": 0,
+    "scat_elec_Emin": 1100.0,
+    "scat_elec_Emax": 9900.0,
+    "scat_elec_thetamin": 5.0,
+    "scat_elec_thetamax": 27.0,
+    "prod_pion_thetamin": 5.0,
+    "prod_pion_thetamax": 20.0,
+    "multiple_scattering": false,
+    "ionization": false,
+    "bremsstrahlung": false,
+    "final_state_interaction": false,
+    "fermi_momentum": false,
+    "weight_cut": true,
+    "w_cut": true,
+    "w_min": 2,
+    "Qsq_cut": true,
+    "Qsq_min": 4,
+    "t_cut": true,
+    "t_min": -1.2
+}

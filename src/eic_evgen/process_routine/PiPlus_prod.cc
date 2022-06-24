@@ -131,35 +131,21 @@ void PiPlus_Production::Init() {
 
   cout << "Produced particle in exclusive production: " << rParticle << ";  with mass: " << fX_Mass << " MeV "<< endl;
   cout << fEBeam << " GeV electrons on " << fPBeam << " GeV ions" << endl;
-
-  // Depending upon beam energy combination, set the value for the max weight from the non normalised version to then generate unit weights
-  // The values were determined from a set of 100 x 1B events thrown runs, the mean weight value + 6.5 sigma was taken as the "max" weight for a given beam energy combination
-  // Probability of being more than 6.5 sigma away is over 1 in 12.5B
-  // The weight has to be scaled by the number thrown in the current calculation 
-  // fEventWeight is now independent of the number of events thrown
-
-  // SJDK 21/06/21 - Commented out for now, reverting to old weighting method
-
-  // if ((fEBeam == 5.0 ) && (fPBeam == 41.0) ){
-  //   //fEventWeightCeil = 0.0221836 * (1000000000); // Old value
-  //   fEventWeightCeil = 0.002296 * (1000000000);
-  // }
-
-  // else if ((fEBeam == 5.0 ) && (fPBeam == 100.0) ){
-  //   //fEventWeightCeil = 0.30281 * (1000000000); // Old value
-  //   fEventWeightCeil = 0.023960 * (1000000000);
-  // }
-
-  // else if ((fEBeam == 10.0 ) && (fPBeam == 100.0) ){
-  //   //fEventWeightCeil = 1.77775 * (1000000000); // Old value
-  //   fEventWeightCeil = 0.201569 * (1000000000);
-  // }
-  // else {
-  //   fEventWeightCeil = 1.0 * (100000000);
-  //   cout << endl << "!!!!! WARNING !!!!!" << endl;
-  //   cout << "Beam energy combination not recognised, weight ceiling set to 1." << endl;
-  //   cout << "!!!!! WARNING !!!!!" << endl << endl;
-  // }
+  
+  // Set luminosity value based upon beam energy combination
+  // See slide 11 in https://indico.cern.ch/event/1072579/contributions/4796856/attachments/2456676/4210776/CAP-EIC-June-7-2022-Seryi-r2.pdf
+  if ((fEBeam == 5.0 ) && (fPBeam == 41.0) ){
+    fLumi = 0.44e33;
+  }
+  else if ((fEBeam == 5.0 ) && (fPBeam == 100.0) ){
+    fLumi = 3.68e33;
+  }
+  else if ((fEBeam == 10.0 ) && (fPBeam == 100.0) ){
+    fLumi = 4.48e33;
+  }
+  else if ((fEBeam == 18.0 ) && (fPBeam == 275.0) ){
+    fLumi = 1.54e33;
+  }
 
 }
 
@@ -218,7 +204,7 @@ void PiPlus_Production::Processing_Event() {
 
   fQsq_GeV = -1.* r_lphotong.Mag2();
 
-  if ( fQsq_GeV < 5.0 ) {
+  if ( fQsq_GeV < 3.0 ) {
     qsq_ev++;
     return;
   }
@@ -798,7 +784,7 @@ void PiPlus_Production::Detail_Output() {
   //ppiDetails << "Max weight value                                             " << setw(20) << fEventWeightCeil << endl; 
   ppiDetails << "Number of events with w more than 10.6                       " << setw(20) << w_ev          << endl;
   ppiDetails << "Number of events with wsq negative                           " << setw(20) << w_neg_ev      << endl;
-  ppiDetails << "Number of events with qsq less than 5                        " << setw(20) << qsq_ev        << endl;
+  ppiDetails << "Number of events with qsq less than 3                        " << setw(20) << qsq_ev        << endl;
   ppiDetails << "Number of events with Meson (X) energy NaN                   " << setw(20) << fNaN          << endl;
   ppiDetails << "Number of events failing conservation law check              " << setw(20) << fConserve     << endl;
   ppiDetails << "Total events passing conservation laws                       " << setw(20) << conserve   << endl;
