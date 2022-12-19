@@ -34,7 +34,7 @@
     "prod_pion_thetamin": 5.0,
     "prod_pion_thetamax": 20.0,
     "multiple_scattering": false,
-    "ionization": false,
+    "ionisation": false,
     "bremsstrahlung": false,
     "final_state_interaction": false,
     "fermi_momentum": false,

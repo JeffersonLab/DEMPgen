@@ -157,7 +157,7 @@ void eic(Json::Value obj) {
 	  cout << "Using LUND output format" << endl;
 	}
 	else if (gOutputType == "HEPMC3"){
-	  cout << "Using HEPMC3 output format for Athena" << endl;
+	  cout << "Using HEPMC3 output format for EPIC" << endl;
 	}
 	else{
 	  cout << "Output type not recognised!" << endl;

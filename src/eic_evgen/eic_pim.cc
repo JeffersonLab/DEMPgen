@@ -243,8 +243,11 @@ void pim::Initilize() {
 
     fScatElec_Theta_I                           = 60.0 * fDEG2RAD;
     fScatElec_Theta_F                           = 175.0 * fDEG2RAD;
-    fScatElec_E_Lo                              = 0.5;  // % of beam energy
-    fScatElec_E_Hi                              = 2.5;  // % of beam energy
+    // SJDK 29/11/22 - Updated comment on two variables below
+    // Two parameters below are NOT a percentage of the beam energy as previously clamed. This parameter along with _Hi represent the RANGE of enegries over which the scattered electron is generated
+    // The range is from 0.5*EBeam to 2.5*EBeam -> Therefore for the phase space calculation, the spread of 2* the incoming beam energy is used in the calculation
+    fScatElec_E_Lo                              = 0.5;  // NOT a percentage of beam energy
+    fScatElec_E_Hi                              = 2.5;  // NOT a percentage of beam energy
     fPion_Theta_I                               = 0.0 * fDEG2RAD;
     fPion_Theta_F                               = 50.0 * fDEG2RAD;
     fOmega_Theta_I                              = 0.0 * fDEG2RAD; 

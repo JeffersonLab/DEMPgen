@@ -107,8 +107,8 @@ int main(int argc, char** argv){
  
      Gen_seed = gen_seed;
 
-     if (obj["ionization"].asBool())
-       cout << "Ionization Enabled" << endl;
+     if (obj["ionisation"].asBool())
+       cout << "Ionisation Enabled" << endl;
      if (obj["bremsstrahlung"].asBool())
        cout << "Bremsstrahlung Enabled" << endl;
      if (obj["fermi_momentum"].asBool())
@@ -309,7 +309,7 @@ int main(int argc, char** argv){
        // These effects occur before the reaction, so affect the vertex values
        targetthickness = ((*VertEvent->Vertex_z+370.0) * Helium_Density)/
          (ME->X0(Helium_Z, Helium_A));
-       if (obj["ionization"].asBool()){
+       if (obj["ionisation"].asBool()){
          ME->IonLoss(VertBeamElec, Window_A, Window_Z, Window_Density, targwindowthickness);
          ME->IonLoss(VertBeamElec, Helium_A, Helium_Z, Helium_Density, targetthickness);
        }
@@ -489,7 +489,7 @@ int main(int argc, char** argv){
    
        //cout << targetthickness << endl;
    
-       if (obj["ionization"].asBool()){
+       if (obj["ionisation"].asBool()){
    
          //Scattered Electron
          ME->IonLoss(LCorEvent->ScatElec, Window_A, Window_Z,

@@ -222,7 +222,8 @@ void PiPlus_Production::Processing_Event() {
     w_neg_ev++;
     return;
   }    
- 
+  
+  // 13/12/22 - SJDK - This is the start of the block that will need to be replaced by the ROOT function Rory used to determine the pion momentum
   // ---------------------------------------------------------
   // Pion momentum in collider frame, analytic solution starts
   // ---------------------------------------------------------
@@ -465,20 +466,20 @@ void PiPlus_Production::Processing_Event() {
   // ----------------------------------------------------
   //  Jacobian  dt/dcos(theta*)dphi in units of GeV2/sr
   // ----------------------------------------------------
-  fJacobian_CM = ( (lphoton_rfg.Vect()).Mag() - fBeta_CM_RF * lphoton_rfg.E() ) / ( fGamma_CM_RF * ( 1.0 - pow(fBeta_CM_RF,2) ) );
+  fJacobian_CM = ( (lphoton_rfg.Vect()).Mag() - fBeta_CM_RF * lphoton_rfg.E() ) / ( fGamma_CM_RF * ( 1.0 - pow(fBeta_CM_RF,2) ) ); // Eqn 22 in paper
  
-  fA = fJacobian_CM * fX_Mom_CM_GeV / fPi;
+  fA = fJacobian_CM * fX_Mom_CM_GeV / fPi; // Eqn 21 in paper
  
   // ----------------------------------------------------
   // Jacobian dOmega* / dOmega dimensionless
   // ----------------------------------------------------
   fJacobian_CM_RF  = ( pow((lX_rf.Vect()).Mag(),2)*fW) / 
     ( fX_Mom_CM * std::abs( ( fProton_Mass + lphoton_rf.E()) * (lX_rf.Vect()).Mag() - 
-			    ( lX_rf.E() * (lphoton_rf.Vect()).Mag() * cos( lX_rf.Theta() ) ) ) );
+			    ( lX_rf.E() * (lphoton_rf.Vect()).Mag() * cos( lX_rf.Theta() ) ) ) ); // Differs from next line in photon vect -> lphoton_rf vs r_lphoton
  
-  fJacobian_CM_Col = ( ( pow((r_lX.Vect()).Mag(),2) * fW ) /
+  fJacobian_CM_Col = ( ( pow((r_lX.Vect()).Mag(),2) * fW ) / // This one is actually used subsequently, so this must be Eqn 20
 		       ( fX_Mom_CM * std::abs( ( fProton_Mass + r_lphoton.E() ) * (r_lX.Vect()).Mag() -
-					       ( r_lX.E() * (r_lphoton.Vect()).Mag() * cos( r_lX.Theta() ) ) ) ) );
+					       ( r_lX.E() * (r_lphoton.Vect()).Mag() * cos( r_lX.Theta() ) ) ) ) ); 
 
 
   //	 cout <<  lX_rf.Vect().Mag() << "  " << << << << << << << << endl;
@@ -1023,7 +1024,7 @@ void PiPlus_Production::PiPlus_HEPMC3_Out_Init() {
 
 void PiPlus_Production::PiPlus_HEPMC3_Output() {
   
-  // HEPMC3 output for Athena simulations
+  // HEPMC3 output for Athena/EPIC simulations
 
   // First line - E - Event# - #Vertices - #Particles
   ppiOut << "E" << " "  << print_itt <<  " " << "1" << " " << 5 << endl;
