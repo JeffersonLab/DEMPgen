@@ -1072,7 +1072,7 @@ void KPlus_Production::KPlus_HEPMC3_Out_Init() {
 
 void KPlus_Production::KPlus_HEPMC3_Output() {
   
-  // HEPMC3 output for Athena simulations
+  // HEPMC3 output for Athena/EPIC simulations
 
   // First line - E - Event# - #Vertices - #Particles
   ppiOut << "E" << " "  << print_itt <<  " " << "1" << " " << 5 << endl;
