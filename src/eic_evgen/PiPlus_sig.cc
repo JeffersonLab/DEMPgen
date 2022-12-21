@@ -2,6 +2,7 @@
 // Inputs are -t, W, Qsq and epsilon (in GeV where appropriate)
 
 // Note, there isn't really any reason to split out the parameter determination from this, they could be done in the same file. The PiPlus parameters are a mess anyway.
+// In future, these files should also probably be moved elsewhere. The includes/dependencies probably need cleaning up too.
 
 #include "PiPlus_sig.h"
 #include "PiPlus_sig_Param.h"
