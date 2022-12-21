@@ -38,7 +38,7 @@ int fWLessShell, fWLess1P9, fSDiff;
 
 unsigned long long int fNEvents, fNRecorded, fNGenerated, fWSqNeg, fNMomConserve, fNSigmaNeg, fNaN, fConserve, fNWeightUnphys, fNWeightReject, fLundRecorded, fNFile;
 
-double fK, fm, fElectron_Kin_Col_GeV, fElectron_Kin_Col, fRand, fLumi, fuBcm2, fPI, fDEG2RAD, fRAD2DEG, fEBeam, fPBeam, fScatElec_Theta_I, fScatElec_Theta_F, fPion_Theta_I, fPion_Theta_F, fScatElec_E_Hi, fScatElec_E_Lo, fPSF; 
+double fK, fm, fElectron_Kin_Col_GeV, fElectron_Kin_Col, fRand, fLumi, fuBcm2, fPI, fDEG2RAD, fRAD2DEG, fEBeam, fPBeam, fScatElec_Theta_I, fScatElec_Theta_F, fPion_Theta_I, fPion_Theta_F, fMesonX_Theta_I, fMesonX_Theta_F, fScatElec_E_Hi, fScatElec_E_Lo, fPSF; 
 
 double fOmega_Theta_I, fOmega_Theta_F, fOmega_Theta_Col, fOmega_Phi_Col;
 
@@ -248,8 +248,11 @@ void pim::Initilize() {
     // The range is from 0.5*EBeam to 2.5*EBeam -> Therefore for the phase space calculation, the spread of 2* the incoming beam energy is used in the calculation
     fScatElec_E_Lo                              = 0.5;  // NOT a percentage of beam energy
     fScatElec_E_Hi                              = 2.5;  // NOT a percentage of beam energy
+    // Should remove specific pion/omega values here and JUST use MesonX, should then actually read this in as a parameter, use 0 to 50 as default
     fPion_Theta_I                               = 0.0 * fDEG2RAD;
     fPion_Theta_F                               = 50.0 * fDEG2RAD;
+    fMesonX_Theta_I                             = 0.0 * fDEG2RAD;
+    fMesonX_Theta_F                             = 50.0 * fDEG2RAD;
     fOmega_Theta_I                              = 0.0 * fDEG2RAD; 
     fOmega_Theta_F                              = 360.0 * fDEG2RAD; 
     // 02/06/21 - SJDK

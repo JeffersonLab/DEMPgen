@@ -13,7 +13,6 @@
 ///
 /// Comment: March 04, 2020: 
 
-
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 

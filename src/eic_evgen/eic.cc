@@ -83,6 +83,24 @@ void eic(int event_number, int target_direction, int kinematics_type, TString fi
 	  r1->process_reaction();
 	  delete r1;
 	}
+	else if (particle == "pi+" || particle == "Pion+" ||  particle == "Pi+"){
+	  hadron = "Neutron";
+	  particle = ExtractParticle(particle);
+	  charge = ExtractCharge(particle);
+	  //Reaction* r1 = new Reaction(particle);
+	  Reaction* r1 = new Reaction(particle, hadron);
+	  r1->process_reaction();
+	  delete r1;
+	}
+	else if (particle == "pi0" || particle == "Pion0" || particle == "Pi0"){
+	  hadron = "Proton";
+	  particle = ExtractParticle(particle);
+	  charge = ExtractCharge(particle);
+	  //Reaction* r1 = new Reaction(particle);
+	  Reaction* r1 = new Reaction(particle, hadron);
+	  r1->process_reaction();
+	  delete r1;
+	}
 	else{
 	  particle = ExtractParticle(particle);
 	  charge = ExtractCharge(particle);
@@ -137,6 +155,13 @@ void eic(Json::Value obj) {
 	    hadron = ExtractParticle(hadron);
 	  }
 	}
+	// SJDK - 19/12/22 - Specify hadron to neutron/proton for pi+/pi0 production, for pi0 production, may want to adjust? 
+	else if (particle == "pi+" || particle == "Pion+" || particle == "Pi+"){
+	  hadron = "Neutron";
+	}
+	else if (particle == "pi0" || particle == "Pion0" || particle == "Pi0"){
+	  hadron = "Proton";
+	}
 	else { // SJDK -09/02/22 - Note that in future this could be changed to get different hadrons in other reactions if desired
 	  hadron = "";
 	}
@@ -186,7 +211,8 @@ void eic(Json::Value obj) {
 	}
 
 	if(particle != "K+"){
-	  Reaction* r1 = new Reaction(particle);
+	  //Reaction* r1 = new Reaction(particle);
+	  Reaction* r1 = new Reaction(particle, hadron);
 	  r1->process_reaction();
 	  delete r1;
 	}
@@ -253,7 +279,5 @@ TString ExtractCharge(TString particle) {
 	} else {
 		charge = "0";
 	}
-
 	return charge;
-
 }

@@ -78,12 +78,13 @@ Reaction::~Reaction() {
 ///
 
 void Reaction::process_reaction() {
-  if (rParticle == "Pi+") {
-    PiPlus_Production* rr1 = new PiPlus_Production(rParticle);
-    rr1->process_reaction();
-    delete rr1;
-  }
-  else if (rParticle == "Pi0") {
+  // if (rParticle == "Pi+") {
+  //   PiPlus_Production* rr1 = new PiPlus_Production(rParticle);
+  //   rr1->process_reaction();
+  //   delete rr1;
+  // }
+  //else if (rParticle == "Pi0") {
+  if (rParticle == "Pi0") {
     //		Pi0_Production* r1 = new Pi0_Production("Eta");
     Pi0_Production* rr1 = new Pi0_Production(rParticle);
     rr1->process_reaction();
@@ -95,5 +96,11 @@ void Reaction::process_reaction() {
     rr1->process_reaction();
     delete rr1;
   }
-  // SJDK - 08/02/22 - Deleted large block of commented code that was below, was only there as reference?
+  // SJDK - 19/12/22 - New generic DEMP reaction class, the intention is that this should be able to handle any case
+  else if (rParticle == "Pi+") {
+    DEMP_Reaction* rr1 = new DEMP_Reaction(rParticle, rHadron);
+    rr1->process_reaction();
+    delete rr1;
+  }
+
 }

@@ -132,8 +132,10 @@ extern double fEBeam;
 extern double fPBeam;
 extern double fScatElec_Theta_I;
 extern double fScatElec_Theta_F;
-extern double fPion_Theta_I;
+extern double fPion_Theta_I; // SJDK 19/12/22 - These should be removed in future, specific to pion reaction cases. Should be generic MesonX
 extern double fPion_Theta_F;
+extern double fMesonX_Theta_I;
+extern double fMesonX_Theta_F;
 extern double fScatElec_E_Hi;
 extern double fScatElec_E_Lo;
 extern double fPSF;
