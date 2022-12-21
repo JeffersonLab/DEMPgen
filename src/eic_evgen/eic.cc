@@ -137,13 +137,12 @@ void eic(Json::Value obj) {
  
 //  	TDatime dsTime;
 //  	cout << "Start Time:   " << dsTime.GetHour() << ":" << dsTime.GetMinute() << endl;
-
+	// 21/12/22 - SJDK - Should do a check if these are defined or not, should crash if not defined or set defaults, see other quantities below
 	TString particle = obj["particle"].asString();
 	TString hadron = obj["hadron"].asString(); // 09/02/22 - SJDK - Added in hadron type argument for K+
 	// SJDK - 08/02/22 - This is terrible, need to change this, particle should just be K+
 	// Add a new flag which, hadron - where this is specified too, then add conditionals elsewhere based on this
-	// New conditional, special case for Kaon
-	
+	// New conditional, special case for Kaon	
 	particle = ExtractParticle(particle);
 	charge = ExtractCharge(particle);
 	if (particle == "K+"){
@@ -167,54 +166,116 @@ void eic(Json::Value obj) {
 
 	// SJDK - 01/06/21
 	// Set beam energies from .json read in
-	fEBeam = obj["ebeam"].asDouble();
-	fPBeam = obj["hbeam"].asDouble();
+	if (obj.isMember("ebeam")){
+	  fEBeam = obj["ebeam"].asDouble();
+	}
+	else{
+	  fEBeam = 5;
+	  cout << "Electron beam energy not specified in .json file, defaulting to 5 GeV." << endl;
+	}
+	if (obj.isMember("hbeam")){
+	  fPBeam = obj["hbeam"].asDouble();
+	}
+	else{
+	  fPBeam = 100;
+	  cout << "Ion beam energy not specified in .json file, defaulting to 100 GeV." << endl;
+	}
 
 	// SJDK - 12/01/22
 	// Set output type as a .json read in
 	// Should be Pythia6, LUND or HEPMC3
-	gOutputType = obj["OutputType"].asString();
-	if (gOutputType == "Pythia6"){
-	  cout << "Using Pythia6 output format for Fun4All" << endl;
-	}
-	else if (gOutputType == "LUND"){
-	  cout << "Using LUND output format" << endl;
-	}
-	else if (gOutputType == "HEPMC3"){
-	  cout << "Using HEPMC3 output format for EPIC" << endl;
+	if (obj.isMember("OutputType")){
+	  gOutputType = obj["OutputType"].asString();
+	  if (gOutputType == "Pythia6"){
+	    cout << "Using Pythia6 output format for Fun4All" << endl;
+	  }
+	  else if (gOutputType == "LUND"){
+	    cout << "Using LUND output format" << endl;
+	  }
+	  else if (gOutputType == "HEPMC3"){
+	    cout << "Using HEPMC3 output format for EPIC" << endl;
+	  }
+	  else{
+	    cout << "Output type not recognised!" << endl;
+	    cout << "Setting output type to Pythia6 by default!" << endl;
+	    gOutputType = "Pythia6";
+	  }
 	}
 	else{
-	  cout << "Output type not recognised!" << endl;
+	  cout << "Output type not specified in .json file!" << endl;
 	  cout << "Setting output type to Pythia6 by default!" << endl;
 	  gOutputType = "Pythia6";
 	}
-
 	///*--------------------------------------------------*/
 	/// The detector selection is determined here
 	/// The incidence proton phi angle is 
-
-	gDet_location = obj["det_location"].asString();
-
-	if (gDet_location == "ip8") {
-
-		fProton_incidence_phi = 0.0;
-
-	} else if (gDet_location == "ip6") {
-
-		fProton_incidence_phi = fPi;
-
-	} else {
-		fProton_incidence_phi = 0.0;
-		cout << "The interaction point not recognized!" << endl;
-		cout << "Therefore default opition ip6 is used." << endl;
+	if (obj.isMember("det_location")){
+	  gDet_location = obj["det_location"].asString();
+	  if (gDet_location == "ip8") {
+	    fProton_incidence_phi = 0.0;
+	  } 
+	  else if (gDet_location == "ip6") {
+	    fProton_incidence_phi = fPi;
+	  }
+	  else {
+	    fProton_incidence_phi = 0.0;
+	    cout << "The interaction point requested is not recognized!" << endl;
+	    cout << "Therefore ip6 is used by default." << endl;
+	  }
+	}
+	else{ // 21/12/22 - This could probably be combined with the else statement above in some way
+	    fProton_incidence_phi = 0.0;
+	    cout << "The interaction points was not specified in the .json file!" << endl;
+	    cout << "Therefore ip6 is used by default" << endl;
 	}
 
-	fScatElec_E_Lo = obj["Ee_Low"].asDouble();
-	fScatElec_E_Hi = obj["Ee_High"].asDouble();
-	fScatElec_Theta_I = obj["e_Theta_Low"].asDouble() *  fDEG2RAD;
-	fScatElec_Theta_F = obj["e_Theta_High"].asDouble() *  fDEG2RAD;
-	fEjectileX_Theta_I = obj["EjectileX_Theta_Low"].asDouble() * fDEG2RAD;
-	fEjectileX_Theta_F = obj["EjectileX_Theta_High"].asDouble() * fDEG2RAD;
+	if (obj.isMember("Ee_Low")){
+	  fScatElec_E_Lo = obj["Ee_Low"].asDouble();
+	}
+	else{
+	  fScatElec_E_Lo = 0.5;
+	  cout << "Minumum scattered electron energy not specified in .json file, defaulting to 0.5*EBeam." << endl;
+	}
+
+	if (obj.isMember("Ee_High")){
+	  fScatElec_E_Hi = obj["Ee_High"].asDouble();
+	}
+	else{
+	  fScatElec_E_Hi = 2.5;
+	  cout << "Max scattered electron energy not specified in .json file, defaulting to 2.5*EBeam." << endl;
+	}
+
+	if (obj.isMember("e_Theta_Low")){
+	  fScatElec_Theta_I = obj["e_Theta_Low"].asDouble() * fDEG2RAD;
+	}
+	else{
+	  fScatElec_Theta_I = 60.0 * fDEG2RAD;
+	  cout << "Min scattered electron theta not specified in .json file, defaulting to 60 degrees." << endl;
+	}
+
+	if (obj.isMember("e_Theta_High")){
+	  fScatElec_Theta_F = obj["e_Theta_High"].asDouble() * fDEG2RAD;
+	}
+	else{
+	  fScatElec_Theta_F = 175.0 * fDEG2RAD;
+	  cout << "Max scattered electron theta not specified in .json file, defaulting to 175 degrees." << endl;
+	}
+
+	if (obj.isMember("EjectileX_Theta_Low")){
+	  fEjectileX_Theta_I = obj["EjectileX_Theta_Low"].asDouble() * fDEG2RAD;
+	}
+	else{
+	  fEjectileX_Theta_I = 0.0 * fDEG2RAD;
+	  cout << "Min ejectile X theta not specified in .json file, defaulting to 0 degrees." << endl;
+	}
+
+	if (obj.isMember("EjectileX_Theta_High")){
+	  fEjectileX_Theta_F = obj["EjectileX_Theta_High"].asDouble() * fDEG2RAD;
+	}
+	else{
+	  fEjectileX_Theta_F = 60.0 * fDEG2RAD;
+	  cout << "Max  ejectile X theta not specified in .json file, defaulting to 60 degrees." << endl;
+	}
 
 	if(particle != "pi0"){ // Default case now
 	  Reaction* r1 = new Reaction(particle, hadron);
