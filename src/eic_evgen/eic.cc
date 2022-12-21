@@ -87,7 +87,6 @@ void eic(int event_number, int target_direction, int kinematics_type, TString fi
 	  hadron = "Neutron";
 	  particle = ExtractParticle(particle);
 	  charge = ExtractCharge(particle);
-	  //Reaction* r1 = new Reaction(particle);
 	  Reaction* r1 = new Reaction(particle, hadron);
 	  r1->process_reaction();
 	  delete r1;
@@ -112,7 +111,7 @@ void eic(int event_number, int target_direction, int kinematics_type, TString fi
 
 /*--------------------------------------------------*/
 /*--------------------------------------------------*/
-
+// SJDK 21/12/22 - Note that this is the one that actually gets used, reads in the .json file
 void eic(Json::Value obj) {
 
    	TString targetname;  
@@ -143,7 +142,7 @@ void eic(Json::Value obj) {
 	TString hadron = obj["hadron"].asString(); // 09/02/22 - SJDK - Added in hadron type argument for K+
 	// SJDK - 08/02/22 - This is terrible, need to change this, particle should just be K+
 	// Add a new flag which, hadron - where this is specified too, then add conditionals elsewhere based on this
-	//New conditional, special case for Kaon
+	// New conditional, special case for Kaon
 	
 	particle = ExtractParticle(particle);
 	charge = ExtractCharge(particle);
@@ -210,14 +209,20 @@ void eic(Json::Value obj) {
 		cout << "Therefore default opition ip6 is used." << endl;
 	}
 
-	if(particle != "K+"){
-	  //Reaction* r1 = new Reaction(particle);
+	fScatElec_E_Lo = obj["Ee_Low"].asDouble();
+	fScatElec_E_Hi = obj["Ee_High"].asDouble();
+	fScatElec_Theta_I = obj["e_Theta_Low"].asDouble() *  fDEG2RAD;
+	fScatElec_Theta_F = obj["e_Theta_High"].asDouble() *  fDEG2RAD;
+	fEjectileX_Theta_I = obj["EjectileX_Theta_Low"].asDouble() * fDEG2RAD;
+	fEjectileX_Theta_F = obj["EjectileX_Theta_High"].asDouble() * fDEG2RAD;
+
+	if(particle != "pi0"){ // Default case now
 	  Reaction* r1 = new Reaction(particle, hadron);
 	  r1->process_reaction();
 	  delete r1;
 	}
-	else{ // 09/02/22 - Special case for kaons, feed hadron in as well
-	  Reaction* r1 = new Reaction(particle, hadron);
+	else{  // Treat pi0 slightly differently for now
+	  Reaction* r1 = new Reaction(particle);
 	  r1->process_reaction();
 	  delete r1;
 	}

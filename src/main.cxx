@@ -49,7 +49,6 @@
 
 #include "eic_evgen/eic.h"
 
-
 using namespace std;
 using namespace constants;
 
@@ -99,7 +98,6 @@ int main(int argc, char** argv){
 		double HBeam = obj["hbeam"].asDouble();
 		TString hadron = obj["hadron"].asString(); // SJDK 08/02/22 - Add the hadron type as an argument
 //		bool = obj["pi0_particle"].asBool()
-//		eic(nEvents, target_direction, kinematics_type, file_name, gen_seed, particle);
  		eic(obj);
  
    } else if (obj["experiment"].asString() == "solid") {

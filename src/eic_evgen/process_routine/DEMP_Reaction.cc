@@ -70,7 +70,7 @@ void DEMP_Reaction::Init() {
 
   // 02/06/21 SJDK 
   // Set these values once the beam energies are read in
-  fPSF = ( fEBeam * ( fScatElec_E_Hi - fScatElec_E_Lo ) *( sin( fScatElec_Theta_F ) - sin( fScatElec_Theta_I ) ) * 2 * fPI *( sin( fMesonX_Theta_F ) - sin( fMesonX_Theta_I ) ) * 2 * fPI );
+  fPSF = ( fEBeam * ( fScatElec_E_Hi - fScatElec_E_Lo ) *( sin( fScatElec_Theta_F ) - sin( fScatElec_Theta_I ) ) * 2 * fPI *( sin( fEjectileX_Theta_F ) - sin( fEjectileX_Theta_I ) ) * 2 * fPI );
   fElectron_Kin_Col_GeV = fEBeam;
   fElectron_Kin_Col = fElectron_Kin_Col_GeV * 1000.0;
 
@@ -131,8 +131,8 @@ void DEMP_Reaction::Init() {
 
   rDEG2RAD   = fPI/180.0;
 
-  fX_Theta_I = fMesonX_Theta_I ;
-  fX_Theta_F = fMesonX_Theta_F;
+  fX_Theta_I = fEjectileX_Theta_I ;
+  fX_Theta_F = fEjectileX_Theta_F;
 
   cout << "Produced particle in exclusive production: " << rParticle << ";  with mass: " << fX_Mass << " MeV "<< endl;
   cout << fEBeam << " GeV electrons on " << fPBeam << " GeV ions" << endl;
@@ -514,22 +514,8 @@ void DEMP_Reaction::Processing_Event() {
   //             Lab cross section     Phase Space   Conversion     Luminosity                Total events tried
   // Hz        = ub / ( sr^2 * GeV ) * GeV * sr^2 * ( cm^2 / ub ) * ( # / ( cm^2 * sec ) ) / ( # )
 
-  // SJDK 11/05/21 - This is the previous non unit weight
-  // SJDK 24/06/21 - Explicitly taking the absolute value of the weigth such that the value is positive!
+  // SJDK 24/06/21 - Explicitly taking the absolute value of the weight such that the value is positive!
   fEventWeight = abs(fSigma_Col * fPSF * fuBcm2 * fLumi / fNEvents);   // in Hz
-  // SJDK 21/06/21 - Commenting out "unit weight" calculation for now, reverting to old version
-  // SJDK 11/05/21 - New weight calculation, division by ceiling weight value to attempt to get a "unit" value
-  //fEventWeight = abs(fSigma_Col * fPSF * fuBcm2 * fLumi )/fEventWeightCeil;
-  // if ( (fEventWeight > 1) || (fEventWeight <= 0) ){
-  //   fNWeightUnphys ++;
-  //   return;
-  // }
-  // SJDK 21/06/21 - Reversed sign of condition here, actually want to reject those with a value less than the random number
-  // fEventWeightRn = fRandom->Uniform( 0, 1.0);
-  // if ( fEventWeight < fEventWeightRn ){
-  //   fNWeightReject ++;
-  //   return;
-  // }
 
   fNRecorded++;
   fLundRecorded++;
@@ -669,7 +655,8 @@ Double_t DEMP_Reaction::Get_Total_Cross_Section() {
   switch (p) {
 
   case Pi0: 			total_sig = GetPi0_CrossSection();
-  case PiPlus: 		total_sig = GetPiPlus_CrossSection();
+  case PiPlus: 		        total_sig = GetPiPlus_CrossSection(fT_GeV, fW_GeV, fQsq_GeV, fEpsilon);
+    //case PiPlus: 		total_sig = GetPiPlus_CrossSection();
   }
 
   return total_sig;
@@ -678,106 +665,105 @@ Double_t DEMP_Reaction::Get_Total_Cross_Section() {
 
 Double_t DEMP_Reaction::GetPi0_CrossSection() {
 
-  double_t sig_total;	
-  return sig_total;
-
-}
-
-/*--------------------------------------------------*/
-/// Charged Pi+ moduel: 
-/// Author: Z. Ahmed 
-/// Date: 2017
-
-Double_t  DEMP_Reaction::GetPiPlus_CrossSection(){
-
   double_t sig_total;
-
-  // --------------------------------------------------------------------------------------------------
-  // CKY sigma L and T starts
-  // --------------------------------------------------------------------------------------------------
-  double lpar0 = 0., lpar1 = 0., lpar2 = 0., lpar3 = 0., lpar4 = 0., lpar5 = 0., lpar6 = 0.;
-  double tpar0 = 0., tpar1 = 0., tpar2 = 0., tpar3 = 0., tpar4 = 0.;
-
-
-  lpar0 = 0.;    lpar1 = 0.;    lpar2 = 0.;    lpar3 = 0.;    lpar4 = 0.;    lpar5 = 0.;    lpar6 = 0.;
-  tpar0 = 0.;    tpar1 = 0.;    tpar2 = 0.;    tpar3 = 0.;    tpar4 = 0.;
- 
-  fSig_L = 0;
-  fSig_T = 0;
- 
-  if ( ( fT_GeV > 0. ) && ( fT_GeV < 0.15 ) ) {
-    eicSigmaL( fW_GeV,  fQsq_GeV, lpar0, lpar1, lpar2 , lpar3 , lpar4 , lpar5 , lpar6 );
-    TF1 *fitCKYLonglandau = new TF1("sigmaL","landau", 0.0 , 0.15 );
-    fitCKYLonglandau->FixParameter( 0 , lpar0 );
-    fitCKYLonglandau->FixParameter( 1 , lpar1 );
-    fitCKYLonglandau->FixParameter( 2 , lpar2 );
-    fSig_L = fitCKYLonglandau->Eval(fT_GeV);
-    if ( lpar0 == 0 || lpar1 == 0 || lpar2 == 0 )
-      fSig_L = 0;
-    fitCKYLonglandau = NULL;
-    delete fitCKYLonglandau;
-  }
-  else if ( ( fT_GeV > 0.15 ) && ( fT_GeV < 0.5 ) ) {
-    eicSigmaL( fW_GeV,  fQsq_GeV, lpar0, lpar1, lpar2 , lpar3 , lpar4 , lpar5 , lpar6 );
-    TF1 *fitCKYLongexpo1 = new TF1("sigmaL","expo", 0.15 , 0.5 );
-    fitCKYLongexpo1->FixParameter( 0 , lpar3 );
-    fitCKYLongexpo1->FixParameter( 1 , lpar4 );
-    fSig_L = fitCKYLongexpo1->Eval(fT_GeV);
-    if ( lpar3 == 0 || lpar4 == 0 )
-      fSig_L = 0;
-    fitCKYLongexpo1 = NULL;
-    delete fitCKYLongexpo1;
-  }
-  else if ( ( fT_GeV > 0.5 ) && ( fT_GeV < 1.3 ) ) {
-    eicSigmaL( fW_GeV,  fQsq_GeV, lpar0, lpar1, lpar2 , lpar3 , lpar4 , lpar5 , lpar6 );
-    TF1 *fitCKYLongexpo2 = new TF1("sigmaL","expo", 0.5 , 1.3 );
-    fitCKYLongexpo2->FixParameter( 0 , lpar5 );
-    fitCKYLongexpo2->FixParameter( 1 , lpar6 );
-    fSig_L = fitCKYLongexpo2->Eval(fT_GeV);
-    if ( lpar5 == 0 || lpar6 == 0 )
-      fSig_L = 0;
-    fitCKYLongexpo2 = NULL;
-    delete fitCKYLongexpo2;
-  }
-  else {
-    fSig_L = 0;
-  }
- 
-  // -------------------------------------------------------------------------------------------
-  // SJDK - 02/06/22 - The validity range here was inconsistent, this only went from 0.0 to 0.15, leaving a gap between 0.15 to 0.2
-  // I changed the range to remove this gap. 
-  if ( ( fT_GeV > 0.0 ) && ( fT_GeV < 0.2 ) ) {
-    eicSigmaT( fW_GeV,  fQsq_GeV, tpar0, tpar1, tpar2 , tpar3 , tpar4 );
-    TF1 *fitCKYTranspol2 = new TF1("sigmaL","pol2", 0.0 , 0.2 );
-    fitCKYTranspol2->FixParameter( 0 , tpar0 );
-    fitCKYTranspol2->FixParameter( 1 , tpar1 );
-    fitCKYTranspol2->FixParameter( 2 , tpar2 );
-    fSig_T = fitCKYTranspol2->Eval(fT_GeV);
-    if ( tpar0 == 0 || tpar1 == 0 || tpar2 == 0 )
-      fSig_T = 0;
-    fitCKYTranspol2 = NULL;
-    delete fitCKYTranspol2;
-  }
-  else if ( ( fT_GeV > 0.2 ) && ( fT_GeV < 1.3 ) ) {
-    eicSigmaT( fW_GeV,  fQsq_GeV, tpar0, tpar1, tpar2 , tpar3 , tpar4 );
-    TF1 *fitCKYTransexpo = new TF1("sigmaL","expo", 0.2 , 1.3 );
-    fitCKYTransexpo->FixParameter( 0 , tpar3 );
-    fitCKYTransexpo->FixParameter( 1 , tpar4 );
-    fSig_T = fitCKYTransexpo->Eval(fT_GeV);
-    if ( tpar3 == 0 || tpar4 == 0 )
-      fSig_T = 0;
-    fitCKYTransexpo = NULL;
-    delete fitCKYTransexpo;
-  }
- 
-  // -------------------------------------------------------------------------------------------
- 
-  fSig_VR = fSig_T + fEpsilon * fSig_L;
-
-  sig_total = fSig_VR;
-
   return sig_total;
+
 }
+
+// /*--------------------------------------------------*/
+// /// Charged Pi+ module: 
+// /// Author: Z. Ahmed 
+// /// Date: 2017
+
+// Double_t  DEMP_Reaction::GetPiPlus_CrossSection(){
+
+//   double_t sig_total;
+
+//   // --------------------------------------------------------------------------------------------------
+//   // CKY sigma L and T starts
+//   // --------------------------------------------------------------------------------------------------
+//   double lpar0 = 0., lpar1 = 0., lpar2 = 0., lpar3 = 0., lpar4 = 0., lpar5 = 0., lpar6 = 0.;
+//   double tpar0 = 0., tpar1 = 0., tpar2 = 0., tpar3 = 0., tpar4 = 0.;
+
+//   lpar0 = 0.;    lpar1 = 0.;    lpar2 = 0.;    lpar3 = 0.;    lpar4 = 0.;    lpar5 = 0.;    lpar6 = 0.;
+//   tpar0 = 0.;    tpar1 = 0.;    tpar2 = 0.;    tpar3 = 0.;    tpar4 = 0.;
+ 
+//   fSig_L = 0;
+//   fSig_T = 0;
+ 
+//   if ( ( fT_GeV > 0. ) && ( fT_GeV < 0.15 ) ) {
+//     PiPlus_sigmaL_Param( fW_GeV,  fQsq_GeV, lpar0, lpar1, lpar2 , lpar3 , lpar4 , lpar5 , lpar6 );
+//     TF1 *fitCKYLonglandau = new TF1("sigmaL","landau", 0.0 , 0.15 );
+//     fitCKYLonglandau->FixParameter( 0 , lpar0 );
+//     fitCKYLonglandau->FixParameter( 1 , lpar1 );
+//     fitCKYLonglandau->FixParameter( 2 , lpar2 );
+//     fSig_L = fitCKYLonglandau->Eval(fT_GeV);
+//     if ( lpar0 == 0 || lpar1 == 0 || lpar2 == 0 )
+//       fSig_L = 0;
+//     fitCKYLonglandau = NULL;
+//     delete fitCKYLonglandau;
+//   }
+//   else if ( ( fT_GeV > 0.15 ) && ( fT_GeV < 0.5 ) ) {
+//     PiPlus_sigmaL_Param( fW_GeV,  fQsq_GeV, lpar0, lpar1, lpar2 , lpar3 , lpar4 , lpar5 , lpar6 );
+//     TF1 *fitCKYLongexpo1 = new TF1("sigmaL","expo", 0.15 , 0.5 );
+//     fitCKYLongexpo1->FixParameter( 0 , lpar3 );
+//     fitCKYLongexpo1->FixParameter( 1 , lpar4 );
+//     fSig_L = fitCKYLongexpo1->Eval(fT_GeV);
+//     if ( lpar3 == 0 || lpar4 == 0 )
+//       fSig_L = 0;
+//     fitCKYLongexpo1 = NULL;
+//     delete fitCKYLongexpo1;
+//   }
+//   else if ( ( fT_GeV > 0.5 ) && ( fT_GeV < 1.3 ) ) {
+//     PiPlus_sigmaL_Param( fW_GeV,  fQsq_GeV, lpar0, lpar1, lpar2 , lpar3 , lpar4 , lpar5 , lpar6 );
+//     TF1 *fitCKYLongexpo2 = new TF1("sigmaL","expo", 0.5 , 1.3 );
+//     fitCKYLongexpo2->FixParameter( 0 , lpar5 );
+//     fitCKYLongexpo2->FixParameter( 1 , lpar6 );
+//     fSig_L = fitCKYLongexpo2->Eval(fT_GeV);
+//     if ( lpar5 == 0 || lpar6 == 0 )
+//       fSig_L = 0;
+//     fitCKYLongexpo2 = NULL;
+//     delete fitCKYLongexpo2;
+//   }
+//   else {
+//     fSig_L = 0;
+//   }
+ 
+//   // -------------------------------------------------------------------------------------------
+//   // SJDK - 02/06/22 - The validity range here was inconsistent, this only went from 0.0 to 0.15, leaving a gap between 0.15 to 0.2
+//   // I changed the range to remove this gap. 
+//   if ( ( fT_GeV > 0.0 ) && ( fT_GeV < 0.2 ) ) {
+//     PiPlus_sigmaT_Param( fW_GeV,  fQsq_GeV, tpar0, tpar1, tpar2 , tpar3 , tpar4 );
+//     TF1 *fitCKYTranspol2 = new TF1("sigmaL","pol2", 0.0 , 0.2 );
+//     fitCKYTranspol2->FixParameter( 0 , tpar0 );
+//     fitCKYTranspol2->FixParameter( 1 , tpar1 );
+//     fitCKYTranspol2->FixParameter( 2 , tpar2 );
+//     fSig_T = fitCKYTranspol2->Eval(fT_GeV);
+//     if ( tpar0 == 0 || tpar1 == 0 || tpar2 == 0 )
+//       fSig_T = 0;
+//     fitCKYTranspol2 = NULL;
+//     delete fitCKYTranspol2;
+//   }
+//   else if ( ( fT_GeV > 0.2 ) && ( fT_GeV < 1.3 ) ) {
+//     PiPlus_sigmaT_Param( fW_GeV,  fQsq_GeV, tpar0, tpar1, tpar2 , tpar3 , tpar4 );
+//     TF1 *fitCKYTransexpo = new TF1("sigmaL","expo", 0.2 , 1.3 );
+//     fitCKYTransexpo->FixParameter( 0 , tpar3 );
+//     fitCKYTransexpo->FixParameter( 1 , tpar4 );
+//     fSig_T = fitCKYTransexpo->Eval(fT_GeV);
+//     if ( tpar3 == 0 || tpar4 == 0 )
+//       fSig_T = 0;
+//     fitCKYTransexpo = NULL;
+//     delete fitCKYTransexpo;
+//   }
+ 
+//   // -------------------------------------------------------------------------------------------
+ 
+//   fSig_VR = fSig_T + fEpsilon * fSig_L;
+
+//   sig_total = fSig_VR;
+
+//   return sig_total;
+// }
 
 /*--------------------------------------------------*/
 /// Output generator detail
@@ -786,8 +772,6 @@ void DEMP_Reaction::Detail_Output() {
 
   DEMPDetails << "Total events tried                                           " << setw(20) << fNGenerated   << endl;
   DEMPDetails << "Total events recorded                                        " << setw(20) << fNRecorded    << endl;
-  // 09/02/22 - Commented out, not used anymore
-  //DEMPDetails << "Max weight value                                             " << setw(20) << fEventWeightCeil << endl; 
   DEMPDetails << "Number of events with w more than 10.6                       " << setw(20) << w_ev          << endl;
   DEMPDetails << "Number of events with wsq negative                           " << setw(20) << w_neg_ev      << endl;
   DEMPDetails << "Number of events with qsq less than 3                        " << setw(20) << qsq_ev        << endl;
@@ -797,9 +781,6 @@ void DEMP_Reaction::Detail_Output() {
   DEMPDetails << "Total events failed energy conservation                      " << setw(20) << ene   << endl; 
   DEMPDetails << "Total events failed momentum conserveation                   " << setw(20) << mom   << endl;
   DEMPDetails << "Number of events with -t more than threshold                 " << setw(20) << t_ev          << endl;
-  // SJDK 21/06/21 - Commenting out, reverting to old weight determination
-  //DEMPDetails << "Number of events with unit weight outside of 0 to 1          " << setw(20) << fNWeightUnphys << endl;
-  //DEMPDetails << "Number of events with unit weight less than random number    " << setw(20) << fNWeightReject << endl;
   DEMPDetails << "Number of events with w less than threshold                  " << setw(20) << fWSqNeg       << endl;
   DEMPDetails << "Number of events with mom not conserve                       " << setw(20) << fNMomConserve << endl;
   DEMPDetails << "Number of events with Sigma negative                         " << setw(20) << fNSigmaNeg    << endl;

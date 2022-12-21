@@ -28,10 +28,13 @@
 
 #include "eic_pim.h"
 
-#include "tssa_sig_Para.h"
+#include "PiPlus_sig.h"
+#include "PiPlus_sig_Param.h"
+//#include "KPlusLambda_sig_Param.h"
+//#include "KPlusSigma_sig_Param.h"
+//#include "Pi0_sig_Param.h"
 
 #include "reaction_routine.h"
-#include "legacy.h"
 
 #include "json/json.h"
 #include "json/json-forwards.h"
