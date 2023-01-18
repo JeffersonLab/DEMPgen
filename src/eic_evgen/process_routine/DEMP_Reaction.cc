@@ -137,8 +137,9 @@ void DEMP_Reaction::Init() {
   cout << "Produced particle in exclusive production: " << rParticle << ";  with mass: " << fX_Mass << " MeV "<< endl;
   cout << fEBeam << " GeV electrons on " << fPBeam << " GeV ions" << endl;
   
-  // Set luminosity value based upon beam energy combination
+  // Set luminosity value based upon beam energy combination, note that if no case matches, a default of 1e33 is assumed. Cases are a set of nominal planned beam energy combinations for the EIC (and EICC)
   // See slide 11 in https://indico.cern.ch/event/1072579/contributions/4796856/attachments/2456676/4210776/CAP-EIC-June-7-2022-Seryi-r2.pdf
+  // If available in the future, this could be replaced by some fixed function
   if ((fEBeam == 5.0 ) && (fPBeam == 41.0) ){
     fLumi = 0.44e33;
   }
@@ -150,6 +151,15 @@ void DEMP_Reaction::Init() {
   }
   else if ((fEBeam == 18.0 ) && (fPBeam == 275.0) ){
     fLumi = 1.54e33;
+  }
+  else if ((fEBeam == 3.5 ) && (fPBeam == 20) ){ // EICC optimal beam energy combination
+    fLumi = 2e33;
+  }
+  else if ((fEBeam == 2.8 ) && (fPBeam == 13) ){ // EICC lowest beam energy combination
+    fLumi = 0.7e33;
+  }
+  else{
+    cout << "!!! Notice !!! The beam energy combination simulated does not match an expected case, a default luminosity value of - " << fLumi << " cm^2s^-1 has been assumed. !!! Notice !!!" << endl;
   }
 
 }

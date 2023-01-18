@@ -233,9 +233,11 @@ void pim::Initilize() {
     kFSI                                        = false;
     kMSele                                      = false;
     kMS                                         = false;
-    // The luminosity below is some default assumtpion, more up to date values are set in PiPlus prod and depend upon beam energy combinations
+    // 18/01/23 - The luminosity below is some default assumtpion, more up to date values are set in PiPlus prod and depend upon beam energy combinations if they are specified
+    // See slide 11 in https://indico.cern.ch/event/1072579/contributions/4796856/attachments/2456676/4210776/CAP-EIC-June-7-2022-Seryi-r2.pdf for more info
 //    fLumi                                     = 0.374e33; // Jlab design
-    fLumi                                       = 1e34; // https://eic.jlab.org/wiki/index.php/EIC_luminosity
+    //fLumi                                       = 1e34; // https://eic.jlab.org/wiki/index.php/EIC_luminosity - OUTDATED
+    fLumi                                       = 1e33; // 18/01/23, this seems a better default based upon more up to date info, see link above
     fuBcm2                                      = 1.0e-30;
     fPI                                         = 3.1415926;
     fDEG2RAD                                    = fPI/180.0;

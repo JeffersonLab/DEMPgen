@@ -48,8 +48,8 @@ void eic() {
 }
 
 /*--------------------------------------------------*/
-
-void eic(int event_number, int target_direction, int kinematics_type, TString file_name, int fEIC_seed, TString particle, TString hadron, TString det_location, TString OutputType, double EBeam, double HBeam) {
+// 18/01/23 - SJDK- This function is never used since eic() is only called with a json object as the argument. Commented out for now, delete later?
+/* void eic(int event_number, int target_direction, int kinematics_type, TString file_name, int fEIC_seed, TString particle, TString hadron, TString det_location, TString OutputType, double EBeam, double HBeam) {
 
    	TString targetname;
 	TString charge;
@@ -108,6 +108,7 @@ void eic(int event_number, int target_direction, int kinematics_type, TString fi
 	  delete r1;
 	}
 }
+/*
 
 /*--------------------------------------------------*/
 /*--------------------------------------------------*/
@@ -277,6 +278,9 @@ void eic(Json::Value obj) {
 	  cout << "Max  ejectile X theta not specified in .json file, defaulting to 60 degrees." << endl;
 	}
 
+	// 18/01/23 - SJDK - I think this would probably be the best point to set the parameter read in for cross section calculations, once the particle and hadron are set, it can then read in the relevant parameter array. For example, assign "sigParArray" to the output of "ReadCrossSectionPar"
+	//sigParArray = ReadCrossSectionPar(particle, hadron);
+
 	if(particle != "pi0"){ // Default case now
 	  Reaction* r1 = new Reaction(particle, hadron);
 	  r1->process_reaction();
@@ -346,4 +350,30 @@ TString ExtractCharge(TString particle) {
 		charge = "0";
 	}
 	return charge;
+}
+
+double ReadCrossSectionPar(TString particle, TString hadron){
+
+  if (particle == "Pi+" && hadron == "Neutron"){
+    cout << "Add Pi+/Neutron case here" << endl;
+  }
+  else if (particle == "Pi-" && hadron == "Proton"){
+    cout << "Add Pi-/Proton case here" << endl;
+  }
+  else if (particle == "K+" && hadron == "Lambda"){
+    cout << "Add K+/Lambda case here" << endl;
+  }
+  else if (particle == "K+" && hadron == "Sigma"){
+    cout << "Add K+/Sigma case here" << endl;
+  }
+  else if (particle == "Pi0"){
+    cout << "Add Pi0 case here" << endl;
+  }
+  else{
+    cout << "Throw some error" << endl;
+  }
+  
+  // Need to set and return the array, whatever it is
+  // retrun Array; 
+  
 }

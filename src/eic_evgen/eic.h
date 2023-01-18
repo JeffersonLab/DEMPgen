@@ -42,7 +42,8 @@
 void eic();
 //void eic(int, int, int, TString, int, TString);
 
-void eic(int, int, int, TString, int, TString, TString, TString, TString, double, double);
+// 18/01/23 - SJDK- This function is never used since eic() is only called with a json object as the argument. Commented out for now, delete later?
+//void eic(int, int, int, TString, int, TString, TString, TString, TString, double, double);
 void eic(Json::Value);
 
 extern int fSeed;
@@ -50,7 +51,8 @@ extern int fSeed;
 void SetEICSeed(int);
 
 TString ExtractParticle(TString);
-TString ExtractCharge(TString) ;
+TString ExtractCharge(TString);
+
+double SetCrossSectionPar(TString, TString);
 
 #endif
-

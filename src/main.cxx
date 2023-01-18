@@ -471,8 +471,7 @@ int main(int argc, char** argv){
          cout << "Px Violation" << endl;
    
        //Matter Effects~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   
-   
+      
        targetthickness = ((-330.0 - *VertEvent->Vertex_z) * Helium_Density)/
          (ME->X0(Helium_Z, Helium_A));
        // Assuming path along z only inside the target.
