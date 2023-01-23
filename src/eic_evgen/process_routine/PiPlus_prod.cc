@@ -1,4 +1,5 @@
 #include "reaction_routine.h"
+
 #include "eic.h"
 
 using namespace std;
@@ -147,6 +148,33 @@ void PiPlus_Production::Init() {
     fLumi = 1.54e33;
   }
 
+
+
+  /*--------------------------------------------------*/ 
+
+  CoinToss = new TRandom3();
+
+  F = new TF1("F",
+              "[6]-sqrt([7]**2+x**2)-sqrt([8]**2+([3]-[0]*x)**2+([4]-[1]*x)**2+([5]-[2]*x)**2)",
+              0, 12000);
+
+  extern Json::Value obj;
+
+  char AngleGenName[100] = "AngleGen";
+  double dummy[2] = {0,1};
+  double ThetaRange[2] = {obj["prod_pion_thetamin"].asDouble()*TMath::DegToRad(),
+                          obj["prod_pion_thetamax"].asDouble()*TMath::DegToRad()};
+
+  double PhiRange[2] = {0, 360*TMath::DegToRad()};
+  AngleGen = new CustomRand(AngleGenName, dummy,
+                            ThetaRange, PhiRange);
+
+  UnitVect = new TVector3(0,0,1);
+
+  Pion = new Particle();
+  Proton_Particle = new Particle();
+
+
 }
 
 void PiPlus_Production::Processing_Event() {
@@ -159,6 +187,20 @@ void PiPlus_Production::Processing_Event() {
     Consider_Proton_Fermi_Momentum();
  
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   // ----------------------------------------------------
   // Boost vector from collider (lab) frame to protons rest frame (Fix target)
@@ -218,6 +260,9 @@ void PiPlus_Production::Processing_Event() {
   fW_GeV    = lwg.Mag();
   fWSq_GeV  = lwg.Mag2();
     
+ 
+
+
   if ( fWSq_GeV < 0 ) { 
     w_neg_ev++;
     return;
@@ -227,7 +272,170 @@ void PiPlus_Production::Processing_Event() {
   // ---------------------------------------------------------
   // Pion momentum in collider frame, analytic solution starts
   // ---------------------------------------------------------
- 
+
+
+   proton_mass_mev = fProton_Mass;
+   pion_mass_mev = 139.57;
+
+   Interaction = new Particle();
+   Target      = new Particle();
+   Initial     = new Particle();
+   Final       = new Particle();
+
+   Particle* VertBeamElec = new Particle();
+   Particle* VertScatElec = new Particle();
+
+   Particle* Photon = new Particle();
+
+   VertBeamElec->SetPxPyPzE(0,      0,       11000,  11000);
+   VertScatElec->SetPxPyPzE(15.934, 1106.06, 2281.09, 2535.16);
+   Target->SetPxPyPzE(0,  0,  0,  939.565);
+
+   *Photon = *VertBeamElec - *VertScatElec;
+   *Interaction = *Photon;
+
+   Solve();
+
+
+//
+//   Float_t pion_theta_i, pion_phi_i;
+//
+//   pion_theta_i = 0.282478;
+//   pion_phi_i = 3.49651;
+//
+//   TVector3* UnitVect = new TVector3(0,0,1);
+//   UnitVect->SetTheta(pion_theta_i);
+//   UnitVect->SetPhi(pion_phi_i);
+//   UnitVect->SetMag(1);
+//
+//
+//   r_lelectron + r_lproton;
+//
+
+//
+//
+//   Particle* VertBeamElec = new Particle();
+//   Particle* VertScatElec = new Particle();
+//
+//   Particle* Photon = new Particle();
+//
+//   VertBeamElec->SetPxPyPzE(0,      0,       11000,  11000);
+//   VertScatElec->SetPxPyPzE(15.934, 1106.06, 2281.09, 2535.16);
+//   Target->SetPxPyPzE(0,  0,  0,  939.565);
+//
+//   *Photon = *VertBeamElec - *VertScatElec;
+//   *Interaction = *Photon;
+//
+////   Interaction->SetName("VirtPhot");
+////   Interaction->SetVx(868.374);
+////   Interaction->SetVy(1281.64);
+////   Interaction->SetVz(7854.51);
+//
+//
+//   *Initial = *Interaction+*Target;
+//
+//   double pars[9];
+//   pars[0] = UnitVect->X();
+//   pars[1] = UnitVect->Y();
+//   pars[2] = UnitVect->Z();
+//
+//   pars[3] = Initial->Px();
+//   pars[4] = Initial->Py();
+//   pars[5] = Initial->Pz();
+//   pars[6] = Initial->E();
+//  
+//   pars[7] = pion_mass_mev;
+//   pars[8] = proton_mass_mev;
+//
+//   cout << Interaction->Px() << "  " << Interaction->Py() << "  " 
+//        << Interaction->Pz() << "  " << Interaction->E() << "  "<< Interaction->GetMass() << endl;
+//   
+//  F->SetParameters(pars);
+//
+//  double P = F->GetX(0, 0, pars[6], 0.0001, 10000);
+//
+//  //std::cout << "Zero: " << F->Eval(P) << std::endl;
+//
+//  Pion = new Particle();
+//  Proton_Particle = new Particle();
+//
+//  Particle * Pion1 = new Particle(pion_mass_mev,
+//                                  P*pars[0],
+//                                  P*pars[1],
+//                                  P*pars[2]);
+//  *Pion = *Pion1;
+//
+//  cout << endl;
+//  cout << pars[0] << "  " << pars[1]  << "  " << pars[2] << endl;
+//  cout << pars[3] << "  " << pars[4]  << "  " << pars[5] << endl;
+//  cout << pars[6] << "  " << pars[7]  << "  " << pars[8] << endl;
+//
+//
+//  Particle * Proton1 = new Particle();
+//  *Proton1 = *Initial-*Pion;
+//  *Proton_Particle = *Proton1;
+//
+//  cout << Pion->E() << "   " << Proton_Particle->E() << endl;
+//
+//  if (TMath::Abs(F->Eval(P)) > 1){
+//    delete Pion1;
+//    delete Proton1;
+//  }
+////  cout << (*Initial).Mag2() << endl;
+//
+//  cout << "AAAAAAAA " << SolnCheck() << endl;
+//
+//  if (!SolnCheck()){
+//    delete Pion1;
+//    delete Proton1;
+//  }
+//
+//  //Check for Second solution:
+//  double P2 = F->GetX(0, P+100, pars[6], 0.0001, 10000);
+//
+//  if (TMath::Abs(F->Eval(P2))> 1){
+//    //No second soln
+//    delete Pion1;
+//    delete Proton1;
+//  }
+//
+//
+//  //Try second solution
+//  Particle * Pion2 = new Particle(pion_mass_mev,
+//                                  P*pars[0],
+//                                  P*pars[1],
+//                                  P*pars[2]);
+//  *Pion = *Pion2;
+//
+//  Particle * Proton2 = new Particle();
+//  *Proton2 = *Initial - * Pion;
+//  *Proton_Particle = *Proton2;
+//
+//  if (SolnCheck()){
+//     //Toss a coin
+//     if (CoinToss->Uniform(0,1)>0.5){
+////       delete Pion1;
+////       delete Pion2;
+////       delete Proton1;
+////       delete Proton2;
+//     }
+//   }
+// 
+//   //Either SolnCheck or coin toss failed
+//   //Revert to original solution
+// 
+//   *Proton_Particle = *Proton1;
+//   *Pion = *Pion1;
+// 
+//   delete Pion1;
+//   delete Pion2;
+//   delete Proton1;
+//   delete Proton2;
+//
+//  exit(0);
+
+  /*--------------------------------------------------*/ 
+
   double fupx = sin( fX_Theta_Col ) * cos( fX_Phi_Col );
   double fupy = sin( fX_Theta_Col ) * sin( fX_Phi_Col );
   double fupz = cos( fX_Theta_Col );
@@ -1047,3 +1255,210 @@ void PiPlus_Production::PiPlus_HEPMC3_Output() {
   ppiOut << "P" << " " << "5" << " " << "-1" << " " << PDGtype(recoil_nucleon) << " " << r_l_scat_nucleon_g.X() << " "  << r_l_scat_nucleon_g.Y() << " "  << r_l_scat_nucleon_g.Z() << " " << r_l_scat_nucleon_g.E() << " " << f_Scat_Nucleon_Mass_GeV << " " << "1" << endl;
   
 }
+
+
+
+
+/*--------------------------------------------------*/ 
+
+bool PiPlus_Production::SolnCheck()
+{
+
+  // Double Checking for solution viability
+  if (TMath::Abs(proton_mass_mev- Proton_Particle->M())>1){
+    //cerr << "Mass Missmatch" << endl;
+    //cerr << TMath::Abs(proton_mass_mev-Proton->M()) << endl;
+    return false;
+  }
+  if (TMath::Abs(W_in()-W_out())>1){
+    //cerr << "W Missmatch" << endl;
+    //cerr << TMath::Abs(W_in()-W_out()) << endl;
+    return false;
+  }
+  *Final = *Proton_Particle + *Pion;
+
+  if (TMath::Abs(Initial->Px()-Final->Px())>1){
+    //cerr << "Px Missmatch" << endl;
+    //cerr << TMath::Abs(Initial->Px()-Final->Px()) << endl;
+    return false;
+  }
+
+  if (TMath::Abs(Initial->Py()-Final->Py())>1){
+    //cerr << "Py Missmatch" << endl;
+    //cerr << TMath::Abs(Initial->Py()-Final->Py()) << endl;
+    return false;
+  }
+
+  if (TMath::Abs(Initial->Pz()-Final->Pz())>1){
+    //cerr << "Pz Missmatch" << endl;
+    //cerr << TMath::Abs(Initial->Pz()-Final->Pz()) << endl;
+    return false;
+  }
+
+  if (TMath::Abs(Initial->E()-Final->E())>1){
+    return false;
+  }
+  return true;
+}
+
+/*--------------------------------------------------*/ 
+double PiPlus_Production::W_in()
+{
+  return (*Interaction+*Target).Mag2();
+}
+
+/*--------------------------------------------------*/ 
+double PiPlus_Production::W_out()
+{
+  return (*Proton_Particle+*Pion).Mag2();
+}
+
+/*--------------------------------------------------*/ 
+
+int PiPlus_Production::Solve()
+{
+  double theta = AngleGen->Theta();
+  double phi = AngleGen->Phi();
+
+  theta = 0.282478;   
+  phi = 3.49651;
+
+  cout << " Theta Phi: "<< theta << "   " << phi << endl; 
+
+  return this->Solve(theta, phi);
+
+}
+
+/*--------------------------------------------------*/ 
+
+int PiPlus_Production::Solve(double theta, double phi)
+{
+  *Initial = *Interaction+*Target;
+
+
+  W_in_val = W_in();
+
+
+  if (W_in_val<0){
+    //cout << "W < 0 " << endl;
+    return 1;
+  }
+
+
+  //cout << proton_mass_mev << endl;
+
+  UnitVect->SetTheta(theta);
+  UnitVect->SetPhi(phi);
+  UnitVect->SetMag(1);
+
+
+  double pars[9];
+  pars[0] = UnitVect->X();
+  pars[1] = UnitVect->Y();
+  pars[2] = UnitVect->Z();
+  pars[3] = Initial->Px();
+  pars[4] = Initial->Py();
+  pars[5] = Initial->Pz();
+  pars[6] = Initial->E();
+  pars[7] = pion_mass_mev;
+  pars[8] = proton_mass_mev;
+
+
+  cout << Interaction->Px() << "  " << Interaction->Py() << "  " << Interaction->Pz() << "  " << Interaction->E() << "  " << Interaction->GetMass() << endl;
+
+  cout << Target->Px() << "  " << Target->Py() << "  " << Target->Pz() << "  " << Target->E() << "  " << Target->GetMass() << endl;
+
+
+  cout << endl;
+  cout << pars[0] << "  " << pars[1]  << "  " << pars[2] << endl;
+  cout << pars[3] << "  " << pars[4]  << "  " << pars[5] << endl;
+  cout << pars[6] << "  " << pars[7]  << "  " << pars[8] << endl;
+
+
+  F->SetParameters(pars);
+
+  double P = F->GetX(0, 0, pars[6], 0.0001, 10000);
+
+  //std::cout << "Zero: " << F->Eval(P) << std::endl;
+
+
+  Particle * Pion1 = new Particle(pion_mass_mev,
+                                  P*pars[0],
+                                  P*pars[1],
+                                  P*pars[2]);
+  *Pion = *Pion1;
+
+  Particle * Proton1 = new Particle();
+  *Proton1 = *Initial-*Pion;
+  *Proton_Particle = *Proton1;
+
+  cout << Pion->E() << "   " << Proton_Particle->E() << endl;
+
+  if (TMath::Abs(F->Eval(P)) > 1){
+    delete Pion1;
+    delete Proton1;
+    return 1;
+  }
+  cout << "AAAAAAAA " <<  SolnCheck() <<  endl;
+
+  if (!SolnCheck()){
+    delete Pion1;
+    delete Proton1;
+    return 1;
+  }
+
+
+  //Check for Second solution:
+  double P2 = F->GetX(0, P+100, pars[6], 0.0001, 10000);
+
+  if (TMath::Abs(F->Eval(P2))> 1){
+    //No second soln
+    delete Pion1;
+    delete Proton1;
+    return 0;
+  }
+
+
+  //Try second solution
+  Particle * Pion2 = new Particle(pion_mass_mev,
+                                  P*pars[0],
+                                  P*pars[1],
+                                  P*pars[2]);
+  *Pion = *Pion2;
+
+  Particle * Proton2 = new Particle();
+  *Proton2 = *Initial - * Pion;
+  *Proton_Particle = *Proton2;
+
+  if (SolnCheck()){
+    //Toss a coin
+    if (CoinToss->Uniform(0,1)>0.5){
+      delete Pion1;
+      delete Pion2;
+      delete Proton1;
+      delete Proton2;
+      return 0; // Keep second solution
+    }
+  }
+
+  //Either SolnCheck or coin toss failed
+  //Revert to original solution
+
+  *Proton_Particle = *Proton1;
+  *Pion = *Pion1;
+
+  delete Pion1;
+  delete Pion2;
+  delete Proton1;
+  delete Proton2;
+
+  exit(0);
+
+  return 0;
+
+}
+
+
+
+
+

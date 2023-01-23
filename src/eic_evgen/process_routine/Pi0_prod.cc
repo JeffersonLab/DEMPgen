@@ -8,7 +8,6 @@ Pi0_Production::Pi0_Production() {
 
 	cout << "Program Start" << endl;
 
-
 }
 
 /*--------------------------------------------------*/
