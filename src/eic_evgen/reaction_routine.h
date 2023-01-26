@@ -16,6 +16,10 @@
 
 #include "TCanvas.h"
 
+#include "Particle.hxx"
+#include "CustomRand.hxx"
+
+
 class Reaction{
 
  public:
@@ -193,6 +197,34 @@ class PiPlus_Production {
   Double_t r_fSig_L;
 
   unsigned long long int print_itt;
+
+  ///*--------------------------------------------------*/ 
+  // Rory Check algorithm
+  
+  Float_t proton_mass_mev, pion_mass_mev;
+  
+  Particle* Pion;
+  Particle* Proton_Particle;
+
+  Particle* Interaction;
+  Particle* Target;
+
+  Particle* Initial;
+  Particle* Final;
+
+  bool SolnCheck();
+  double W_in(); 
+  double W_out();
+  double W_in_val;
+
+  TRandom3* CoinToss;
+  CustomRand* AngleGen;
+ 
+  TF1* F;
+  TVector3* UnitVect;
+
+  int Solve();
+  int Solve(double theta, double phi);
 
 }; 
 
@@ -414,5 +446,7 @@ class KPlus_Production {
   unsigned long long int print_itt;
 
 };
+
+
 
 # endif
