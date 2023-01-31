@@ -105,7 +105,7 @@ void DEMP_Reaction::Init() {
   if (rHadron == "Neutron" ) {
     rParticle_scat_hadron  = "Neutron"; 
     recoil_hadron  = Neutron; 
-    f_Scat_hadron_Mass     = fNeutron_Mass;
+    f_Scat_hadron_Mass = fNeutron_Mass;
     f_Scat_hadron_Mass_GeV = f_Scat_hadron_Mass/1000;
   }
   else if (rHadron == "Proton" ) {	
@@ -171,8 +171,7 @@ void DEMP_Reaction::Processing_Event() {
   // ----------------------------------------------------
 
   if( kCalcFermi ) {
-    Consider_Proton_Fermi_Momentum();
- 
+    Consider_Proton_Fermi_Momentum(); 
   }
 
   // ----------------------------------------------------
@@ -378,7 +377,6 @@ void DEMP_Reaction::Processing_Event() {
   //                                          End                                           //
   // Transformation of e', pi- and recoil proton to target's rest frmae without energy loss //
   ////////////////////////////////////////////////////////////////////////////////////////////
-
 
   // -----------------------------------------------------------------------------------------
   // Calculate -t

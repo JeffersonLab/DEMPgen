@@ -39,6 +39,8 @@
 #include "json/json.h"
 #include "json/json-forwards.h"
 
+using std::vector;
+
 void eic();
 //void eic(int, int, int, TString, int, TString);
 
@@ -53,6 +55,9 @@ void SetEICSeed(int);
 TString ExtractParticle(TString);
 TString ExtractCharge(TString);
 
-double SetCrossSectionPar(TString, TString);
+vector<vector<vector<vector<double>>>> ReadCrossSectionPar(TString particle, TString hadron);
 
 #endif
+
+
+

@@ -10,7 +10,6 @@
 ///
 /// Comment: Feb 24, 2020: the main function is excuted in main.cc
 
-
 #include "eic.h"
 
 using std::setw;
@@ -18,6 +17,7 @@ using std::setprecision;
 using std::cout;
 using std::cin;
 using std::endl;
+using std::vector;
 using namespace std;
 
 //---------------------------------------------------------
@@ -114,8 +114,8 @@ void eic() {
 /*--------------------------------------------------*/
 // SJDK 21/12/22 - Note that this is the one that actually gets used, reads in the .json file
 void eic(Json::Value obj) {
-
-   	TString targetname;  
+   	
+        TString targetname;  
  	TString charge;
 
 	int target_direction = obj["Targ_dir"].asInt();
@@ -279,9 +279,19 @@ void eic(Json::Value obj) {
 	}
 
 	// 18/01/23 - SJDK - I think this would probably be the best point to set the parameter read in for cross section calculations, once the particle and hadron are set, it can then read in the relevant parameter array. For example, assign "sigParArray" to the output of "ReadCrossSectionPar"
-	//sigParArray = ReadCrossSectionPar(particle, hadron);
+	        
+        //vector<vector<vector<vector<double>>>> sig;
+        SigPar = ReadCrossSectionPar(particle, hadron);
+	/*
+        cout << "!!!!!!!!!!!!!!!!!! TEST - EIC.CC !!!!!!!!!!!!!!!!!!" << endl;
+        cout<<SigPar[0][3][4][5]<<endl;
+	cout << "!!!!!!!!!!!!!!!!!! TEST - EIC.CC !!!!!!!!!!!!!!!!!!" << endl;
+        cout << "!!!!!!!!!!!!!!!!!! TEST - EIC.CC !!!!!!!!!!!!!!!!!!" << endl;
+        cout<<SigPar[1][3][4][6]<<endl;
+	cout << "!!!!!!!!!!!!!!!!!! TEST - EIC.CC !!!!!!!!!!!!!!!!!!" << endl;
+	*/  
 
-	if(particle != "pi0"){ // Default case now
+        if(particle != "pi0"){ // Default case now
 	  Reaction* r1 = new Reaction(particle, hadron);
 	  r1->process_reaction();
 	  delete r1;
@@ -291,7 +301,6 @@ void eic(Json::Value obj) {
 	  r1->process_reaction();
 	  delete r1;
 	}
-
 }
 
 /*--------------------------------------------------*/
@@ -340,20 +349,22 @@ TString ExtractParticle(TString particle) {
 
 TString ExtractCharge(TString particle) {
 
-	TString charge;
+  TString charge;
 
-	if (particle.Contains("+") || particle.Contains("plus")) {
-		charge = "+";
-	} else if (particle.Contains("-") || particle.Contains("minus")) {
-		charge = "-";
-	} else {
-		charge = "0";
-	}
-	return charge;
+  if (particle.Contains("+") || particle.Contains("plus")) {
+    charge = "+";
+  } else if (particle.Contains("-") || particle.Contains("minus")) {
+    charge = "-";
+  } else {
+    charge = "0";
+  }
+  return charge;
 }
 
-double ReadCrossSectionPar(TString particle, TString hadron){
-
+vector<vector<vector<vector<double>>>> ReadCrossSectionPar(TString particle, TString hadron){
+  
+  string sigL_ParamFile, sigT_ParamFile;
+ 
   if (particle == "Pi+" && hadron == "Neutron"){
     cout << "Add Pi+/Neutron case here" << endl;
   }
@@ -362,9 +373,13 @@ double ReadCrossSectionPar(TString particle, TString hadron){
   }
   else if (particle == "K+" && hadron == "Lambda"){
     cout << "Add K+/Lambda case here" << endl;
+    sigL_ParamFile = "../src/eic_evgen/CrossSection_Params/KPlusLambda_Param_sigL";
+    sigT_ParamFile = "../src/eic_evgen/CrossSection_Params/KPlusLambda_Param_sigT"; // Shouldn't really have a relative path, should look at setting a DEMPGen variable and doing this in a better way later
   }
   else if (particle == "K+" && hadron == "Sigma"){
     cout << "Add K+/Sigma case here" << endl;
+    sigL_ParamFile = "../src/eic_evgen/CrossSection_Params/KPlusSigma_Param_sigL";
+    sigT_ParamFile = "../src/eic_evgen/CrossSection_Params/KPlusSigma_Param_sigT";
   }
   else if (particle == "Pi0"){
     cout << "Add Pi0 case here" << endl;
@@ -372,8 +387,34 @@ double ReadCrossSectionPar(TString particle, TString hadron){
   else{
     cout << "Throw some error" << endl;
   }
-  
-  // Need to set and return the array, whatever it is
-  // retrun Array; 
-  
+ 
+  //....................................................................................................
+  // Love's model parameters (Gojko, Stephen and Nishchey helped me to understand this part) 
+  //....................................................................................................
+  double ptmp;
+  std::vector<std::vector<std::vector<std::vector<double>>>> p_vec;
+  fstream file_vgl; // The parameterization file we will open and loop over
+
+  for (int i = 0; i < 2; i++){
+    if(i == 0){
+      file_vgl.open(sigL_ParamFile, ios::in); 
+    }
+    if(i == 1){
+      file_vgl.open(sigT_ParamFile, ios::in); 
+    }
+    p_vec.push_back(std::vector<std::vector<std::vector<double>>>());
+    for(int j=0; j <9; j++){// Loop over all values of W - 2 to 10
+      p_vec[i].push_back(std::vector<std::vector<double>>());
+      for(int k=0; k<35; k++){ // Loop over all values of Q2 - 1 to 35 for each w
+	p_vec[i][j].push_back(std::vector<double>());
+      
+	for(int l=0; l<13; l++){ //Loop over all columns at once
+	  file_vgl>>ptmp;
+	  p_vec[i][j][k].push_back(ptmp);
+	}
+      }
+    }
+    file_vgl.close();// Need to close the file at end of each loop over i 
+  }       
+  return p_vec;
 }

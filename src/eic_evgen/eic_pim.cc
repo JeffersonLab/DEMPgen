@@ -13,13 +13,14 @@
 
 #include "eic_pim.h"
 
+using std::vector;
 using namespace std;
 
 //TRandom2 *fRandom;                    
 TRandom3 *fRandom;                    
 
 TFile *f;                    
-TTree *t1;                    
+TTree *t1;
 
 int gKinematics_type;
 bool gPi0_decay;
@@ -157,6 +158,8 @@ double fepi1, fepi2, fradical;
 double fOmega_Energy_CM, fOmega_Mom_CM, fOmega_Energy_CM_GeV, fOmega_Mom_CM_GeV;   
 
 double fMomentum[300];
+
+vector<vector<vector<vector<double>>>> SigPar;
 
 double fProb[300] = {    
 6.03456,    6.02429,    6.01155,    5.99636,    5.97873,    5.95869,    5.93626,    5.91147,    5.88435,    5.85493,

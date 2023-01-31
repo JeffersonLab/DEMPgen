@@ -71,8 +71,8 @@ class DEMP_Reaction {
 
   Double_t GetPi0_CrossSection();
   //Double_t GetPiPlus_CrossSection();
-  Double_t GetKPlus_CrossSection();
-
+  //Double_t GetKPlus_CrossSection();
+  Double_t GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TString fHadron);
 
   /*--------------------------------------------------*/
   // Parameters
