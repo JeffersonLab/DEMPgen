@@ -1,5 +1,6 @@
 // 31/01/23 - SJDK
-// New file to get the KPlus cross section via the scaling method that Ali utilised in preliminary kaon studies
+// New file to get the KPlus cross section via the scaling method that Ali Usman utilised in preliminary kaon studies
+// This method relies upon getting the pion cross section before subsequently scaling it
 
 #include "KPlus_sig_Scaling.h"
 #include "PiPlus_sig.h"

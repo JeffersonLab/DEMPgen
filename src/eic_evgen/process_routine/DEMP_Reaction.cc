@@ -164,13 +164,6 @@ void DEMP_Reaction::Init() {
     cout << "!!! Notice !!! The beam energy combination simulated does not match an expected case, a default luminosity value of - " << fLumi << " cm^2s^-1 has been assumed. !!! Notice !!!" << endl;
   }
   
- /* cout << "!!!!!!!!!!!!!!!!!! TEST - DEMP_REACTION.CC !!!!!!!!!!!!!!!!!!" << endl;
-  cout<<SigPar[0][6][15][9]<<endl;
-  cout << "!!!!!!!!!!!!!!!!!! TEST - DEMP_REACTION.CC !!!!!!!!!!!!!!!!!!" << endl;
-  cout << "!!!!!!!!!!!!!!!!!! TEST - DEMP_REACTION.CC !!!!!!!!!!!!!!!!!!" << endl;
-  cout<<SigPar[1][3][4][6]<<endl;
-  cout << "!!!!!!!!!!!!!!!!!! TEST - DEMP_REACTION.CC !!!!!!!!!!!!!!!!!!" << endl;
-  */
 }
 
 void DEMP_Reaction::Processing_Event() {
