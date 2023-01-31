@@ -100,7 +100,7 @@ double GetKPlus_CrossSection_Scaling(double ft, double fw, double fqsq, double f
   gpolepi = 13.1;
 
   r2_dip = 0.411;
-  r2_mono = 0.431;                                                                                                                                                                                                              
+  r2_mono = 0.431;
 
   hbarc = 0.197;
   mkg = meson_mass;

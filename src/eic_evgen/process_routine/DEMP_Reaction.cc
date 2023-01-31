@@ -171,10 +171,9 @@ void DEMP_Reaction::Processing_Event() {
   // ----------------------------------------------------
   // Considering Fermi momentum for the proton
   // ----------------------------------------------------
-
+  // SJDK - 31/01/23 - This doesn't seem to do anything?
   if( kCalcFermi ) {
-    Consider_Proton_Fermi_Momentum();
- 
+    Consider_Proton_Fermi_Momentum(); 
   }
 
   // ----------------------------------------------------
@@ -220,6 +219,7 @@ void DEMP_Reaction::Processing_Event() {
   r_lphotong = r_lelectrong - r_lscatelecg;
 
   fQsq_GeV = -1.* r_lphotong.Mag2();
+  // SJDK 31/01/23 - Again, should this be a user defined/set range?
   // SJDK 30/01/23 - Changed Qsq range to match new validity range from Love's paramaterisation
   if ( fQsq_GeV < 1.0 || fQsq_GeV > 35.0 ) {
     qsq_ev++;
@@ -239,6 +239,14 @@ void DEMP_Reaction::Processing_Event() {
     w_neg_ev++;
     return;
   }    
+
+  // SJDK 31/01/23 - Should have the lower/upper W ranges be user defined?
+  // Also, moved this cut up in the code, W is known at this point, so why wait to cut on it?
+  //if ( fW_GeV < 3.0 || fW_GeV > 10.6 ) { // SJDK 31/01/23 - Previous range utilised
+  if ( fW_GeV < 2.0 || fW_GeV > 10 ) { // SJDK 31/01/23 - New range for W to work with K+ cross section model
+    w_ev++;
+    return;
+  }
   
   // 13/12/22 - SJDK - This is the start of the block that will need to be replaced by the ROOT function Rory used to determine the pion momentum
   // 21/12/22 - SJDK - Should split this out into its own class, then have two different variants (Rory vs Ahmed)
@@ -308,13 +316,7 @@ void DEMP_Reaction::Processing_Event() {
   // ----------------------------------------------------------------------------------------------
   // Calculate w = (proton + photon)^2
   // ----------------------------------------------------------------------------------------------
-     
-  //if ( fW_GeV < 3.0 || fW_GeV > 10.6 ) {
-  if ( fW_GeV < 3.0 || fW_GeV > 10 ) {
-    w_ev++;
-    return;
-  }
-
+  
   r_lw = r_lproton + r_lphoton;
   fW = r_lw.Mag();
 
@@ -412,7 +414,9 @@ void DEMP_Reaction::Processing_Event() {
  
   fT = -1.*lt.Mag2();
   fT_GeV = -1.*ltg.Mag2();
-
+  
+  // 31/01/23 - SJDK - Kinematics type 1 is FF and 2 is TSSA, this reaction class shouldn't care about this and only have a limit depending upon particle type?
+  /*
   if ( gKinematics_type == 1 && fT_GeV > 0.5 ) {
     t_ev++;
     return;
@@ -422,7 +426,18 @@ void DEMP_Reaction::Processing_Event() {
     t_ev++;
     return;
   }
- 
+  */ 
+
+  // 31/01/23 SJDK - New limit on t, remove only events outside the parameterisation range, limits depend upon particle type, need to add Pi0 version
+  if (rParticle == "Pi+" && fT_GeV > 1.3 ) {
+    t_ev++;
+    return;
+  }
+  else if (rParticle == "K+" && fT_GeV > 2.0) {
+    t_ev++;
+    return;
+  }
+  
   fx = fQsq_GeV / ( 2.0 * r_lprotong.Dot( r_lphotong ) );
   fy = r_lprotong.Dot( r_lphotong ) / r_lprotong.Dot( r_lelectrong );
   fz = r_lX.E()/r_lphoton.E();    
@@ -528,7 +543,6 @@ void DEMP_Reaction::Processing_Event() {
   fSigma_Col = r_fSig * fFlux_Factor_Col * fA * fJacobian_CM_Col;
 
   if ( ( fSigma_Col <= 0 ) || std::isnan( fSigma_Col ) ) { 
-    cout << "-ve cross section for event "<< print_itt << "   " << fT_GeV << "  " <<  fW_GeV << "   " << "   " << fQsq_GeV << "   " << fEpsilon << endl;
     fNSigmaNeg ++;
     return;
   }
@@ -537,14 +551,14 @@ void DEMP_Reaction::Processing_Event() {
   //             Lab cross section     Phase Space   Conversion     Luminosity                Total events tried
   // Hz        = ub / ( sr^2 * GeV ) * GeV * sr^2 * ( cm^2 / ub ) * ( # / ( cm^2 * sec ) ) / ( # )
 
-  // SJDK 24/06/21 - Explicitly taking the absolute value of the weight such that the value is positive!
+  // SJDK 24/06/21 - Explicitly taking the absolute value of the weight such that the value is positive! Shouldn't matter since any -ve cross section events should be dumped above
   fEventWeight = abs(fSigma_Col * fPSF * fuBcm2 * fLumi / fNEvents);   // in Hz
 
   fNRecorded++;
   fLundRecorded++;
   fRatio = fNRecorded / fNGenerated;
 
-   if (gOutputType == "Pythia6"){
+  if (gOutputType == "Pythia6"){
       DEMPReact_Pythia6_Output();
   }
   else if (gOutputType == "LUND"){
@@ -668,23 +682,24 @@ Double_t DEMP_Reaction::Get_Phi_TargPol_LeptonPlane_RF () {
   return fPhi_TargPol_LeptonPlane_RF;
 
 }
-// SJDK 21/12/22 - Note, this separation into cases is fine, the kaon could be done several different ways
-// 1 - Split the kaon case up into two sub cases, call a different cross section function each time
-// 2 - Have the recoil hadron mass as an argument for the kaon cross section, it gets the correponding parameters from this (or scales as appropriate if we go with scaling)
+
 Double_t DEMP_Reaction::Get_Total_Cross_Section() {
 
   Double_t total_sig, total_sig2;
 
-  Particle_t p = ParticleEnum(rParticle);
-  switch (p) {
-  case Pi0: 			total_sig = GetPi0_CrossSection();
-  case PiPlus: 		        total_sig = GetPiPlus_CrossSection(fT_GeV, fW_GeV, fQsq_GeV, fEpsilon);
-  case KPlus: 		        total_sig = GetKPlus_CrossSection(fT_GeV, fW_GeV, fQsq_GeV, fEpsilon, rHadron);
+  if (rParticle == "Pi+"){
+    total_sig = GetPiPlus_CrossSection(fT_GeV, fW_GeV, fQsq_GeV, fEpsilon);
   }
-  // SJDK - 31/01/23 - This second case gets the total cross section for the K+ as calculated from Ali's earlier scaling calculation, retain this for comparison.
-  switch (p){
-  case KPlus:                    total_sig2 = GetKPlus_CrossSection_Scaling(fT_GeV, fW_GeV, fQsq_GeV, fEpsilon, fX_Mass_GeV, rHadron);
+  else if (rParticle == "Pi0"){
+    total_sig = GetPi0_CrossSection();
   }
+  else if (rParticle == "K+"){
+    total_sig = GetKPlus_CrossSection(fT_GeV, fW_GeV, fQsq_GeV, fEpsilon, rHadron);
+    // SJDK - 31/01/23 - This second case gets the total cross section for the K+ as calculated from Ali's earlier scaling calculation, retain this for comparison.
+    total_sig2 = GetKPlus_CrossSection_Scaling(fT_GeV, fW_GeV, fQsq_GeV, fEpsilon, fX_Mass_GeV, rHadron);
+  }
+  
+  //cout << fT_GeV <<  "  " << fW_GeV << "   " << fQsq_GeV << "   " << "KPlus Paramterisation - " << total_sig << " !!! Old Scaling method - " << total_sig2 << endl;
   
   return total_sig;
 
@@ -694,20 +709,6 @@ Double_t DEMP_Reaction::Get_Total_Cross_Section() {
 Double_t DEMP_Reaction::GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TString fHadron) {
 
   double_t sig_total;
-  // SJDK 27/01/23 - Now you can define functions for sigmaL and sigmaT (depending upon the values of t/w/Q2 etc)
-  // Assign parameters from the SigPar vector to your functions, evaluate them and interpolate as before
-  // THEN, sum -> sigT +(eps*sigL) and return this as sig_total, job done!
-
-  // sigmaT uses the same set combination of functions across the whole range in Q2/W and they are the same functions for Lambda and Sigma
-  // As such, you will only need ONE definition of sigmaT -> sigT_fn = ...., sigT = eval(sigT_fn(ft));
-  
-  // sigmaL uses different functions for different ranges, so we need to assign the function dependending upon the value of Q2/W
-
-  // Luckily, we don't actually need to worry about the hadron type since the form of the functions is identical for the Lambda and the Sigma
-  // BUT, we might as well read it as an argument anyway just in case we wanted to use it in future (or maybe scale it based on the particle type or something)
-  // The parameter read in already grabs the correct parameter set for the reaction you care about
-
-  // Start with getting it to calculate sigL and sigT based upon just the parameterisation, check they make sense, then add in the interpolation
      
   double w,q2,t; // For the sake of testing, I redescribed the fw,fqsq,ft as w,q2,t as I alraedy had a file in my PC to calculate the crossection with these notations
   w=fw; q2=fqsq; t=ft;
@@ -800,24 +801,24 @@ Double_t DEMP_Reaction::GetKPlus_CrossSection(double ft, double fw, double fqsq,
  
   /*if(SigPar[1][x_1][y_1][10] != -10001){ // t_1 is t_min for the first corner - this is always the bottom left corner
     t_1 = SigPar[1][x_1][y_1][10];
-  }
-  else if (SigPar[1][x_1][y_1][11] != -10001){
+    }
+    else if (SigPar[1][x_1][y_1][11] != -10001){
     t_1 =  SigPar[1][x_1][y_1][11];
-  } 
-  else if ( SigPar[1][x_1][y_1][12] != -10001){
+    } 
+    else if ( SigPar[1][x_1][y_1][12] != -10001){
     t_1 =  SigPar[1][x_1][y_1][12];
-  }
-  //................................................................................... 
+    }
+    //................................................................................... 
   
-  if(SigPar[1][x_1][y_2][10] != -10001) {  // t_2 is t_min for the second corner - this is always the bottom right corner
+    if(SigPar[1][x_1][y_2][10] != -10001) {  // t_2 is t_min for the second corner - this is always the bottom right corner
     t_2 = SigPar[1][x_1][y_2][10];
-  }
-  else if (SigPar[1][x_1][y_2][11] != -10001){
+    }
+    else if (SigPar[1][x_1][y_2][11] != -10001){
     t_2 = SigPar[1][x_1][y_2][11];
-  }
-  else if (SigPar[1][x_1][y_2][12] != -10001){
+    }
+    else if (SigPar[1][x_1][y_2][12] != -10001){
     t_2 = SigPar[1][x_1][y_2][12];
-  }*/
+    }*/
   //...................................................................................        
  
   if(SigPar[1][x_2][y_1][10] != -10001){ // t_3 is t_min for the third corner - this is always the top left corner
@@ -829,20 +830,20 @@ Double_t DEMP_Reaction::GetKPlus_CrossSection(double ft, double fw, double fqsq,
   else if (SigPar[1][x_2][y_1][12] != -10001){
     t_3 = SigPar[1][x_2][y_1][12];
   }
-   else {
+  else {
     return -100;
   }
   //...................................................................................
   
- /* if(SigPar[1][x_2][y_2][10] != -10001){  // t_4 is t_min for the fourth corner - this is always the top right corner
-    t_4 = SigPar[1][x_2][y_2][10];
-  }
-  else if (SigPar[1][x_2][y_2][11] != -10001){
-    t_4 =SigPar[1][x_2][y_2][11];
-  }
-  else if (SigPar[1][x_2][y_2][12] != -10001){
-    t_4 = SigPar[1][x_2][y_2][12];
-  } */
+  /* if(SigPar[1][x_2][y_2][10] != -10001){  // t_4 is t_min for the fourth corner - this is always the top right corner
+     t_4 = SigPar[1][x_2][y_2][10];
+     }
+     else if (SigPar[1][x_2][y_2][11] != -10001){
+     t_4 =SigPar[1][x_2][y_2][11];
+     }
+     else if (SigPar[1][x_2][y_2][12] != -10001){
+     t_4 = SigPar[1][x_2][y_2][12];
+     } */
   //.................................................................................................................................................................... 
   // Calcualtion of sigT's at all the corners of the square 
   //....................................................................................................................................................................  
@@ -980,14 +981,15 @@ Double_t DEMP_Reaction::GetKPlus_CrossSection(double ft, double fw, double fqsq,
     //....................................................................................................................................................................
     // Difterent if and else conditions to find the crossection values at the given points.
     //....................................................................................................................................................................
-
-    if (sigT1 == sigT2 && sigT2 == sigT3 && sigT3 == sigT4 && sigT4 == sigT1){ // if the w and q2 will have whole number values
+    // SJDK - 31/01/23 - This seems to spam things to screen, even when running pi+
+    /*
+      if (sigT1 == sigT2 && sigT2 == sigT3 && sigT3 == sigT4 && sigT4 == sigT1){ // if the w and q2 will have whole number values
       cerr<<"fsigTa = "<<sigT1 <<endl;
-    }   
-
+      }   
+    */
     //...................................................................................
 
-    else if (sigT1 != 0 && sigT2 != 0 && sigT3 != 0 && sigT4 != 0){ // if all the four corners are  present
+    if (sigT1 != 0 && sigT2 != 0 && sigT3 != 0 && sigT4 != 0){ // if all the four corners are  present
    
       // Taking the log of claculated sigT values    
       lsigT1 = TMath::Log(sigT1); //log value of sigT1.
@@ -1015,37 +1017,37 @@ Double_t DEMP_Reaction::GetKPlus_CrossSection(double ft, double fw, double fqsq,
       {
 	// In this case, we will need atleat three corners to find the cross-section. The third corner (i.e. top left) will always be there and for other two corners, find the value of the cross-section at the first and the fourth corner at the minimum value of t. After that we can interpolate them.
 
-// First try to find t_1 and t_4 
+	// First try to find t_1 and t_4 
 
- if(SigPar[1][x_1][y_1][10] != -10001){ // t_1 is t_min for the first corner - this is always the bottom left corner
-    t_1 = SigPar[1][x_1][y_1][10];
-  }
-  else if (SigPar[1][x_1][y_1][11] != -10001){
-    t_1 =  SigPar[1][x_1][y_1][11];
-  } 
-  else if ( SigPar[1][x_1][y_1][12] != -10001){
-    t_1 =  SigPar[1][x_1][y_1][12];
-  }
-  else {
-    return -100;
-  }
+	if(SigPar[1][x_1][y_1][10] != -10001){ // t_1 is t_min for the first corner - this is always the bottom left corner
+	  t_1 = SigPar[1][x_1][y_1][10];
+	}
+	else if (SigPar[1][x_1][y_1][11] != -10001){
+	  t_1 =  SigPar[1][x_1][y_1][11];
+	} 
+	else if ( SigPar[1][x_1][y_1][12] != -10001){
+	  t_1 =  SigPar[1][x_1][y_1][12];
+	}
+	else {
+	  return -100;
+	}
  
-//...................................................................................  
-if(SigPar[1][x_2][y_2][10] != -10001){  // t_4 is t_min for the fourth corner - this is always the top right corner
-    t_4 = SigPar[1][x_2][y_2][10];
-  }
-  else if (SigPar[1][x_2][y_2][11] != -10001){
-    t_4 =SigPar[1][x_2][y_2][11];
-  }
-  else if (SigPar[1][x_2][y_2][12] != -10001){
-    t_4 = SigPar[1][x_2][y_2][12];
-  }
-  else {
-    return -100;
-  }
+	//...................................................................................  
+	if(SigPar[1][x_2][y_2][10] != -10001){  // t_4 is t_min for the fourth corner - this is always the top right corner
+	  t_4 = SigPar[1][x_2][y_2][10];
+	}
+	else if (SigPar[1][x_2][y_2][11] != -10001){
+	  t_4 =SigPar[1][x_2][y_2][11];
+	}
+	else if (SigPar[1][x_2][y_2][12] != -10001){
+	  t_4 = SigPar[1][x_2][y_2][12];
+	}
+	else {
+	  return -100;
+	}
 
 
-//Calculating the sigT11 at bottom left corner of the square      
+	//Calculating the sigT11 at bottom left corner of the square      
 	if (t_1>=SigPar[1][x_1][y_1][10]&& t_1<SigPar[1][x_1][y_1][11]){ 
 	  TF1* parasigT= new TF1("parasigT","pol2");
 	  parasigT->FixParameter(0, SigPar[1][x_1][y_1][2]); 
@@ -1129,22 +1131,22 @@ if(SigPar[1][x_2][y_2][10] != -10001){  // t_4 is t_min for the fourth corner - 
     else if (sigT1 == 0 && sigT2 == 0){  // if we loose the 1st and the 2nd corner simultaneously
       // In this case, we will need atleat three corners to find the cross-section. The third corner (i.e. top left) and the fourth corner (i.e. top right)will always be there and for other one corner, find the value of the cross-section at the first corner at the minimum value of t. After that we can interpolate them.
 
-// First try to find t_1
+      // First try to find t_1
 
- if(SigPar[1][x_1][y_1][10] != -10001){ // t_1 is t_min for the first corner - this is always the bottom left corner
-    t_1 = SigPar[1][x_1][y_1][10];
-  }
-  else if (SigPar[1][x_1][y_1][11] != -10001){
-    t_1 =  SigPar[1][x_1][y_1][11];
-  } 
-  else if ( SigPar[1][x_1][y_1][12] != -10001){
-    t_1 =  SigPar[1][x_1][y_1][12];
-  }
-  else {
-    return -100;
-  } 
+      if(SigPar[1][x_1][y_1][10] != -10001){ // t_1 is t_min for the first corner - this is always the bottom left corner
+	t_1 = SigPar[1][x_1][y_1][10];
+      }
+      else if (SigPar[1][x_1][y_1][11] != -10001){
+	t_1 =  SigPar[1][x_1][y_1][11];
+      } 
+      else if ( SigPar[1][x_1][y_1][12] != -10001){
+	t_1 =  SigPar[1][x_1][y_1][12];
+      }
+      else {
+	return -100;
+      } 
      
-   //Calculating the sigT11 at bottom left corner of the square
+      //Calculating the sigT11 at bottom left corner of the square
       if (t_1>=SigPar[1][x_1][y_1][10]&& t_1<SigPar[1][x_1][y_1][11]){ 
 	TF1* parasigT= new TF1("parasigT","pol2");
 	parasigT->FixParameter(0, SigPar[1][x_1][y_1][2]); 
@@ -1236,27 +1238,27 @@ if(SigPar[1][x_2][y_2][10] != -10001){  // t_4 is t_min for the fourth corner - 
 
   /*if(SigPar[0][x_1][y_1][9] != -10001){ // l_1 is t_min for the first corner - this is always the bottom left corner
     l_1 = SigPar[0][x_1][y_1][9];
-  }
-  else if (SigPar[0][x_1][y_1][10] != -10001){
+    }
+    else if (SigPar[0][x_1][y_1][10] != -10001){
     l_1 =  SigPar[0][x_1][y_1][10];
-  }       
-  else if ( SigPar[0][x_1][y_1][11] != -10001){
+    }       
+    else if ( SigPar[0][x_1][y_1][11] != -10001){
     l_1 =  SigPar[0][x_1][y_1][11];
-  }
-   else {
+    }
+    else {
     return -100;
-  } 
-  //................................................................................... 
+    } 
+    //................................................................................... 
   
-  if(SigPar[0][x_1][y_2][9] != -10001) {  // l_2 is t_min for the second corner - this is always the bottom right corner
+    if(SigPar[0][x_1][y_2][9] != -10001) {  // l_2 is t_min for the second corner - this is always the bottom right corner
     l_2 = SigPar[0][x_1][y_2][9]; 
-  }
-  else if (SigPar[0][x_1][y_2][10] != -10001){
+    }
+    else if (SigPar[0][x_1][y_2][10] != -10001){
     l_2 = SigPar[0][x_1][y_2][10];
-  }
-  else if (SigPar[0][x_1][y_2][11] != -10001){
+    }
+    else if (SigPar[0][x_1][y_2][11] != -10001){
     l_2 = SigPar[0][x_1][y_2][11];
-  }*/
+    }*/
   //...................................................................................        
  
   if(SigPar[0][x_2][y_1][9] != -10001){ // l_3 is t_min for the third corner - this is always the top left corner
@@ -1268,7 +1270,7 @@ if(SigPar[1][x_2][y_2][10] != -10001){  // t_4 is t_min for the fourth corner - 
   else if (SigPar[0][x_2][y_1][11] != -10001){
     l_3 = SigPar[0][x_2][y_1][11];
   }
-   else {
+  else {
     return -100;
   } 
   
@@ -1276,13 +1278,13 @@ if(SigPar[1][x_2][y_2][10] != -10001){  // t_4 is t_min for the fourth corner - 
   
   /*if(SigPar[0][x_2][y_2][9] != -10001){  // l_4 is t_min for the fourth corner - this is always the top right corner
     l_4 = SigPar[0][x_2][y_2][9];
-  }
-  else if (SigPar[0][x_2][y_2][10] != -10001){
+    }
+    else if (SigPar[0][x_2][y_2][10] != -10001){
     l_4 =SigPar[0][x_2][y_2][10];
-  }
-  else if (SigPar[0][x_2][y_2][11] != -10001){
+    }
+    else if (SigPar[0][x_2][y_2][11] != -10001){
     l_4 = SigPar[0][x_2][y_2][11];
-  } */
+    } */
   //.................................................................................................................................................................... 
   // Calcualtion of sigL's at all the corners of the square 
   //....................................................................................................................................................................  
@@ -1519,33 +1521,33 @@ if(SigPar[1][x_2][y_2][10] != -10001){  // t_4 is t_min for the fourth corner - 
       {
 	// In this case, we will need atleat three corners to find the cross-section. The third corner (i.e. top left) will always be there and for other two corners, find the value of the cross-section at the first and the fourth corner at the minimum value of t. After that we can interpolate them.
  
-// First try to find t_1 and t_4
+	// First try to find t_1 and t_4
 
-if(SigPar[0][x_1][y_1][9] != -10001){ // l_1 is t_min for the first corner - this is always the bottom left corner
-    l_1 = SigPar[0][x_1][y_1][9];
-  }
-  else if (SigPar[0][x_1][y_1][10] != -10001){
-    l_1 =  SigPar[0][x_1][y_1][10];
-  }       
-  else if ( SigPar[0][x_1][y_1][11] != -10001){
-    l_1 =  SigPar[0][x_1][y_1][11];
-  }
-   else {
-    return -100;
-  } 
- //...................................................................................
- if(SigPar[0][x_2][y_2][9] != -10001){  // l_4 is t_min for the fourth corner - this is always the top right corner
-    l_4 = SigPar[0][x_2][y_2][9];
-  }
-  else if (SigPar[0][x_2][y_2][10] != -10001){
-    l_4 =SigPar[0][x_2][y_2][10];
-  }
-  else if (SigPar[0][x_2][y_2][11] != -10001){
-    l_4 = SigPar[0][x_2][y_2][11];
-  }
- else {
-    return -100;
-  } 
+	if(SigPar[0][x_1][y_1][9] != -10001){ // l_1 is t_min for the first corner - this is always the bottom left corner
+	  l_1 = SigPar[0][x_1][y_1][9];
+	}
+	else if (SigPar[0][x_1][y_1][10] != -10001){
+	  l_1 =  SigPar[0][x_1][y_1][10];
+	}       
+	else if ( SigPar[0][x_1][y_1][11] != -10001){
+	  l_1 =  SigPar[0][x_1][y_1][11];
+	}
+	else {
+	  return -100;
+	} 
+	//...................................................................................
+	if(SigPar[0][x_2][y_2][9] != -10001){  // l_4 is t_min for the fourth corner - this is always the top right corner
+	  l_4 = SigPar[0][x_2][y_2][9];
+	}
+	else if (SigPar[0][x_2][y_2][10] != -10001){
+	  l_4 =SigPar[0][x_2][y_2][10];
+	}
+	else if (SigPar[0][x_2][y_2][11] != -10001){
+	  l_4 = SigPar[0][x_2][y_2][11];
+	}
+	else {
+	  return -100;
+	} 
 	//Calculating the sigL11 at bottom left corner of the square
 	if (l_1>=SigPar[0][x_1][y_1][9] && l_1<SigPar[0][x_1][y_1][10]){
 	  if(w_1 ==2 || w_2 ==2 || w_1 ==3 ||w_2 ==3){
@@ -1661,21 +1663,21 @@ if(SigPar[0][x_1][y_1][9] != -10001){ // l_1 is t_min for the first corner - thi
     else if (sigL1 == 0 && sigL2 == 0){  // if we loose the 1st and the 2nd corner simultaneously
       // In this case, we will need atleat three corners to find the cross-section. The third corner (i.e. top left) and the fourth corner (i.e. top right)will always be there and for other one corner, find the value of the cross-section at the first corner at the minimum value of t. After that we can interpolate them.
 
-// First try to find t_1
+      // First try to find t_1
 
-if(SigPar[0][x_1][y_1][9] != -10001){ // l_1 is t_min for the first corner - this is always the bottom left corner
-    l_1 = SigPar[0][x_1][y_1][9];
-  }
-  else if (SigPar[0][x_1][y_1][10] != -10001){
-    l_1 =  SigPar[0][x_1][y_1][10];
-  }       
-  else if ( SigPar[0][x_1][y_1][11] != -10001){
-    l_1 =  SigPar[0][x_1][y_1][11];
-  }
-   else {
-    return -100;
-  } 
- //...................................................................................
+      if(SigPar[0][x_1][y_1][9] != -10001){ // l_1 is t_min for the first corner - this is always the bottom left corner
+	l_1 = SigPar[0][x_1][y_1][9];
+      }
+      else if (SigPar[0][x_1][y_1][10] != -10001){
+	l_1 =  SigPar[0][x_1][y_1][10];
+      }       
+      else if ( SigPar[0][x_1][y_1][11] != -10001){
+	l_1 =  SigPar[0][x_1][y_1][11];
+      }
+      else {
+	return -100;
+      } 
+      //...................................................................................
       //Calculating the sigL11 at bottom left corner of the square
       if (l_1>=SigPar[0][x_1][y_1][9] && l_1<SigPar[0][x_1][y_1][10]){
 	if(w_1 ==2 || w_2 ==2 || w_1 ==3 ||w_2 ==3){
@@ -1760,7 +1762,7 @@ if(SigPar[0][x_1][y_1][9] != -10001){ // l_1 is t_min for the first corner - thi
   //....................................................................................................................................................................
   else{
     //cerr<<" Invalid t-value "<<endl;
-   return -100;
+    return -100;
   } 
   //....................................................................................................................................................................
   //.................................................................................................................................................................... 
@@ -1787,15 +1789,15 @@ void DEMP_Reaction::Detail_Output() {
 
   DEMPDetails << "Total events tried                                           " << setw(20) << fNGenerated   << endl;
   DEMPDetails << "Total events recorded                                        " << setw(20) << fNRecorded    << endl;
-  DEMPDetails << "Number of events with w more than 10                         " << setw(20) << w_ev          << endl;
   DEMPDetails << "Number of events with wsq negative                           " << setw(20) << w_neg_ev      << endl;
+  DEMPDetails << "Number of events with 2 < w < 10                             " << setw(20) << w_ev          << endl;
   DEMPDetails << "Number of events with qsq < 1 or > 35                        " << setw(20) << qsq_ev        << endl;
   DEMPDetails << "Number of events with Meson (X) energy NaN                   " << setw(20) << fNaN          << endl;
   DEMPDetails << "Number of events failing conservation law check              " << setw(20) << fConserve     << endl;
   DEMPDetails << "Total events passing conservation laws                       " << setw(20) << conserve   << endl;
   DEMPDetails << "Total events failed energy conservation                      " << setw(20) << ene   << endl; 
   DEMPDetails << "Total events failed momentum conserveation                   " << setw(20) << mom   << endl;
-  DEMPDetails << "Number of events with -t more than threshold                 " << setw(20) << t_ev          << endl;
+  DEMPDetails << "Number of events with -t > 2 (K+) or -t > 1.3 (Pi+) GeV      " << setw(20) << t_ev          << endl;
   DEMPDetails << "Number of events with w less than threshold                  " << setw(20) << fWSqNeg       << endl;
   DEMPDetails << "Number of events with mom not conserve                       " << setw(20) << fNMomConserve << endl;
   DEMPDetails << "Number of events with Sigma negative                         " << setw(20) << fNSigmaNeg    << endl;
@@ -1811,67 +1813,67 @@ void DEMP_Reaction::Detail_Output() {
 void DEMP_Reaction::Lund_Output() {
 
   DEMPOut << "3"
-	 << " \t " << fPhi           // var 1
-	 << " \t " << fPhiS          // var 2
-	 << " \t " << fx             // var 3
-	 << " \t " << "1"	       
-	 << " \t " << fQsq_GeV       // var 4
-	 << " \t " << fT_GeV         // var 5
-	 << " \t " << fW_GeV 	       // var 6
-	 << " \t " << fEpsilon       // var 7
-	 << " \t " << fEventWeight   // var 8	   
-	 << endl;
+	  << " \t " << fPhi           // var 1
+	  << " \t " << fPhiS          // var 2
+	  << " \t " << fx             // var 3
+	  << " \t " << "1"	       
+	  << " \t " << fQsq_GeV       // var 4
+	  << " \t " << fT_GeV         // var 5
+	  << " \t " << fW_GeV 	       // var 6
+	  << " \t " << fEpsilon       // var 7
+	  << " \t " << fEventWeight   // var 8	   
+	  << endl;
        
   // Produced Particle X
   DEMPOut << setw(10) << "1" 
-	 << setw(10) << "1" 
-	 << setw(10) << "1" 
-	 << setw(10) << PDGtype(produced_X)
-	 << setw(10) << "0" 
-	 << setw(10) << "0" 
-	 << setw(16) << r_lX_g.X()
-	 << setw(16) << r_lX_g.Y()   
-	 << setw(16) << r_lX_g.Z()  
-	 << setw(16) << r_lX_g.E()
-	 << setw(16) << fX_Mass_GeV
-	 << setw(16) << fVertex_X
-	 << setw(16) << fVertex_Y
-	 << setw(16) << fVertex_Z
-	 << endl;
+	  << setw(10) << "1" 
+	  << setw(10) << "1" 
+	  << setw(10) << PDGtype(produced_X)
+	  << setw(10) << "0" 
+	  << setw(10) << "0" 
+	  << setw(16) << r_lX_g.X()
+	  << setw(16) << r_lX_g.Y()   
+	  << setw(16) << r_lX_g.Z()  
+	  << setw(16) << r_lX_g.E()
+	  << setw(16) << fX_Mass_GeV
+	  << setw(16) << fVertex_X
+	  << setw(16) << fVertex_Y
+	  << setw(16) << fVertex_Z
+	  << endl;
      
   // Scattered electron
   DEMPOut << setw(10) << "2" 
-	 << setw(10) << "-1" 
-	 << setw(10) << "1" 
-	 << setw(10) << "11" 
-	 << setw(10) << "0" 
-	 << setw(10) << "0" 
-	 << setw(16) << r_lscatelecg.X() 
-	 << setw(16) << r_lscatelecg.Y() 
-	 << setw(16) << r_lscatelecg.Z() 
-	 << setw(16) << r_lscatelecg.E()
-	 << setw(16) << fElectron_Mass_GeV
-	 << setw(16) << fVertex_X
-	 << setw(16) << fVertex_Y
-	 << setw(16) << fVertex_Z
-	 << endl;
+	  << setw(10) << "-1" 
+	  << setw(10) << "1" 
+	  << setw(10) << "11" 
+	  << setw(10) << "0" 
+	  << setw(10) << "0" 
+	  << setw(16) << r_lscatelecg.X() 
+	  << setw(16) << r_lscatelecg.Y() 
+	  << setw(16) << r_lscatelecg.Z() 
+	  << setw(16) << r_lscatelecg.E()
+	  << setw(16) << fElectron_Mass_GeV
+	  << setw(16) << fVertex_X
+	  << setw(16) << fVertex_Y
+	  << setw(16) << fVertex_Z
+	  << endl;
  	  
   // Recoiled neutron
   DEMPOut << setw(10) << "3" 
-	 << setw(10) << "1" 
-	 << setw(10) << "1" 
-	 << setw(10) << PDGtype(recoil_hadron)
-	 << setw(10) << "0" 
-	 << setw(10) << "0" 
-	 << setw(16) << r_l_scat_hadron_g.X() 
-	 << setw(16) << r_l_scat_hadron_g.Y()
-	 << setw(16) << r_l_scat_hadron_g.Z()
-	 << setw(16) << r_l_scat_hadron_g.E()
-	 << setw(16) << f_Scat_hadron_Mass_GeV
-	 << setw(16) << fVertex_X
-	 << setw(16) << fVertex_Y
-	 << setw(16) << fVertex_Z
-	 << endl;
+	  << setw(10) << "1" 
+	  << setw(10) << "1" 
+	  << setw(10) << PDGtype(recoil_hadron)
+	  << setw(10) << "0" 
+	  << setw(10) << "0" 
+	  << setw(16) << r_l_scat_hadron_g.X() 
+	  << setw(16) << r_l_scat_hadron_g.Y()
+	  << setw(16) << r_l_scat_hadron_g.Z()
+	  << setw(16) << r_l_scat_hadron_g.E()
+	  << setw(16) << f_Scat_hadron_Mass_GeV
+	  << setw(16) << fVertex_X
+	  << setw(16) << fVertex_Y
+	  << setw(16) << fVertex_Z
+	  << endl;
 }
 
 void DEMP_Reaction::DEMPReact_Pythia6_Out_Init() {
