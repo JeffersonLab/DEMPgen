@@ -146,9 +146,18 @@ void eic(Json::Value obj) {
 	// New conditional, special case for Kaon	
 	particle = ExtractParticle(particle);
 	charge = ExtractCharge(particle);
+	if(hadron == "Sigma" || hadron == "sigma"){ // SJDK - 31/01/23 - If hadron specified as Sigma, interpret this as Sigma0. Also correct for lower case
+	  hadron = "Sigma0";
+	}
+	if (hadron == "lambda"){ // SJDK - 31/01/23 - Make Lambda selection case insensitive
+	  hadron = "Lambda"; 
+	}
 	if (particle == "K+"){
 	  if (hadron != "Lambda" && hadron != "Sigma0"){
 	    hadron = "Lambda";
+	    cout << "! WARNING !" << endl;
+	    cout << "! WARNING !- K+ production specified but hadron not recognised, deaulting to Lambda - ! WARNING!" << endl;
+	    cout << "! WARNING !" << endl;
 	  }
 	  else{
 	    hadron = ExtractParticle(hadron);

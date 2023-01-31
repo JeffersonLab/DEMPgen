@@ -18,7 +18,7 @@ include_directories("src/eic_evgen")
 include_directories(SYSTEM ${ROOT_INCLUDE_DIRS})
 #include_directories(include/json)
 
-file(GLOB SOURCES "src/*" "src/eic_evgen/eic.cc" "src/eic_evgen/eic_pim.cc" "src/eic_evgen/PiPlus_sig_Param.cc" "src/eic_evgen/reaction_routine.cc" "src/eic_evgen/PiPlus_sig.cc" "src/eic_evgen/process_routine/*")
+file(GLOB SOURCES "src/*" "src/eic_evgen/eic.cc" "src/eic_evgen/eic_pim.cc" "src/eic_evgen/PiPlus_sig_Param.cc" "src/eic_evgen/reaction_routine.cc" "src/eic_evgen/PiPlus_sig.cc" "src/eic_evgen/process_routine/*" "src/eic_evgen/KPlus_sig_Scaling.cc")
 # file(GLOB SOURCES "src/*.cpp")
 
 message("Root Include Dirs: " ${ROOT_INCLUDE_DIRS})
