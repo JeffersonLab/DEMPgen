@@ -10,7 +10,6 @@
 ///
 /// Comment: Feb 24, 2020: the main function is excuted in main.cc
 
-
 #include "eic.h"
 
 using std::setw;
@@ -18,6 +17,7 @@ using std::setprecision;
 using std::cout;
 using std::cin;
 using std::endl;
+using std::vector;
 using namespace std;
 
 //---------------------------------------------------------
@@ -48,8 +48,8 @@ void eic() {
 }
 
 /*--------------------------------------------------*/
-
-void eic(int event_number, int target_direction, int kinematics_type, TString file_name, int fEIC_seed, TString particle, TString hadron, TString det_location, TString OutputType, double EBeam, double HBeam) {
+// 18/01/23 - SJDK- This function is never used since eic() is only called with a json object as the argument. Commented out for now, delete later?
+/* void eic(int event_number, int target_direction, int kinematics_type, TString file_name, int fEIC_seed, TString particle, TString hadron, TString det_location, TString OutputType, double EBeam, double HBeam) {
 
    	TString targetname;
 	TString charge;
@@ -83,6 +83,23 @@ void eic(int event_number, int target_direction, int kinematics_type, TString fi
 	  r1->process_reaction();
 	  delete r1;
 	}
+	else if (particle == "pi+" || particle == "Pion+" ||  particle == "Pi+"){
+	  hadron = "Neutron";
+	  particle = ExtractParticle(particle);
+	  charge = ExtractCharge(particle);
+	  Reaction* r1 = new Reaction(particle, hadron);
+	  r1->process_reaction();
+	  delete r1;
+	}
+	else if (particle == "pi0" || particle == "Pion0" || particle == "Pi0"){
+	  hadron = "Proton";
+	  particle = ExtractParticle(particle);
+	  charge = ExtractCharge(particle);
+	  //Reaction* r1 = new Reaction(particle);
+	  Reaction* r1 = new Reaction(particle, hadron);
+	  r1->process_reaction();
+	  delete r1;
+	}
 	else{
 	  particle = ExtractParticle(particle);
 	  charge = ExtractCharge(particle);
@@ -91,13 +108,14 @@ void eic(int event_number, int target_direction, int kinematics_type, TString fi
 	  delete r1;
 	}
 }
+/*
 
 /*--------------------------------------------------*/
 /*--------------------------------------------------*/
-
+// SJDK 21/12/22 - Note that this is the one that actually gets used, reads in the .json file
 void eic(Json::Value obj) {
-
-   	TString targetname;  
+   	
+        TString targetname;  
  	TString charge;
 
 	int target_direction = obj["Targ_dir"].asInt();
@@ -120,22 +138,37 @@ void eic(Json::Value obj) {
  
 //  	TDatime dsTime;
 //  	cout << "Start Time:   " << dsTime.GetHour() << ":" << dsTime.GetMinute() << endl;
-
+	// 21/12/22 - SJDK - Should do a check if these are defined or not, should crash if not defined or set defaults, see other quantities below
 	TString particle = obj["particle"].asString();
 	TString hadron = obj["hadron"].asString(); // 09/02/22 - SJDK - Added in hadron type argument for K+
 	// SJDK - 08/02/22 - This is terrible, need to change this, particle should just be K+
 	// Add a new flag which, hadron - where this is specified too, then add conditionals elsewhere based on this
-	//New conditional, special case for Kaon
-	
+	// New conditional, special case for Kaon	
 	particle = ExtractParticle(particle);
 	charge = ExtractCharge(particle);
+	if(hadron == "Sigma" || hadron == "sigma"){ // SJDK - 31/01/23 - If hadron specified as Sigma, interpret this as Sigma0. Also correct for lower case
+	  hadron = "Sigma0";
+	}
+	if (hadron == "lambda"){ // SJDK - 31/01/23 - Make Lambda selection case insensitive
+	  hadron = "Lambda"; 
+	}
 	if (particle == "K+"){
 	  if (hadron != "Lambda" && hadron != "Sigma0"){
 	    hadron = "Lambda";
+	    cout << "! WARNING !" << endl;
+	    cout << "! WARNING !- K+ production specified but hadron not recognised, deaulting to Lambda - ! WARNING!" << endl;
+	    cout << "! WARNING !" << endl;
 	  }
 	  else{
 	    hadron = ExtractParticle(hadron);
 	  }
+	}
+	// SJDK - 19/12/22 - Specify hadron to neutron/proton for pi+/pi0 production, for pi0 production, may want to adjust? 
+	else if (particle == "pi+" || particle == "Pion+" || particle == "Pi+"){
+	  hadron = "Neutron";
+	}
+	else if (particle == "pi0" || particle == "Pion0" || particle == "Pi0"){
+	  hadron = "Proton";
 	}
 	else { // SJDK -09/02/22 - Note that in future this could be changed to get different hadrons in other reactions if desired
 	  hadron = "";
@@ -143,59 +176,140 @@ void eic(Json::Value obj) {
 
 	// SJDK - 01/06/21
 	// Set beam energies from .json read in
-	fEBeam = obj["ebeam"].asDouble();
-	fPBeam = obj["hbeam"].asDouble();
+	if (obj.isMember("ebeam")){
+	  fEBeam = obj["ebeam"].asDouble();
+	}
+	else{
+	  fEBeam = 5;
+	  cout << "Electron beam energy not specified in .json file, defaulting to 5 GeV." << endl;
+	}
+	if (obj.isMember("hbeam")){
+	  fPBeam = obj["hbeam"].asDouble();
+	}
+	else{
+	  fPBeam = 100;
+	  cout << "Ion beam energy not specified in .json file, defaulting to 100 GeV." << endl;
+	}
 
 	// SJDK - 12/01/22
 	// Set output type as a .json read in
 	// Should be Pythia6, LUND or HEPMC3
-	gOutputType = obj["OutputType"].asString();
-	if (gOutputType == "Pythia6"){
-	  cout << "Using Pythia6 output format for Fun4All" << endl;
-	}
-	else if (gOutputType == "LUND"){
-	  cout << "Using LUND output format" << endl;
-	}
-	else if (gOutputType == "HEPMC3"){
-	  cout << "Using HEPMC3 output format for EPIC" << endl;
+	if (obj.isMember("OutputType")){
+	  gOutputType = obj["OutputType"].asString();
+	  if (gOutputType == "Pythia6"){
+	    cout << "Using Pythia6 output format for Fun4All" << endl;
+	  }
+	  else if (gOutputType == "LUND"){
+	    cout << "Using LUND output format" << endl;
+	  }
+	  else if (gOutputType == "HEPMC3"){
+	    cout << "Using HEPMC3 output format for EPIC" << endl;
+	  }
+	  else{
+	    cout << "Output type not recognised!" << endl;
+	    cout << "Setting output type to Pythia6 by default!" << endl;
+	    gOutputType = "Pythia6";
+	  }
 	}
 	else{
-	  cout << "Output type not recognised!" << endl;
+	  cout << "Output type not specified in .json file!" << endl;
 	  cout << "Setting output type to Pythia6 by default!" << endl;
 	  gOutputType = "Pythia6";
 	}
-
 	///*--------------------------------------------------*/
 	/// The detector selection is determined here
 	/// The incidence proton phi angle is 
-
-	gDet_location = obj["det_location"].asString();
-
-	if (gDet_location == "ip8") {
-
-		fProton_incidence_phi = 0.0;
-
-	} else if (gDet_location == "ip6") {
-
-		fProton_incidence_phi = fPi;
-
-	} else {
-		fProton_incidence_phi = 0.0;
-		cout << "The interaction point not recognized!" << endl;
-		cout << "Therefore default opition ip6 is used." << endl;
+	if (obj.isMember("det_location")){
+	  gDet_location = obj["det_location"].asString();
+	  if (gDet_location == "ip8") {
+	    fProton_incidence_phi = 0.0;
+	  } 
+	  else if (gDet_location == "ip6") {
+	    fProton_incidence_phi = fPi;
+	  }
+	  else {
+	    fProton_incidence_phi = 0.0;
+	    cout << "The interaction point requested is not recognized!" << endl;
+	    cout << "Therefore ip6 is used by default." << endl;
+	  }
+	}
+	else{ // 21/12/22 - This could probably be combined with the else statement above in some way
+	    fProton_incidence_phi = 0.0;
+	    cout << "The interaction points was not specified in the .json file!" << endl;
+	    cout << "Therefore ip6 is used by default" << endl;
 	}
 
-	if(particle != "K+"){
-	  Reaction* r1 = new Reaction(particle);
-	  r1->process_reaction();
-	  delete r1;
+	if (obj.isMember("Ee_Low")){
+	  fScatElec_E_Lo = obj["Ee_Low"].asDouble();
 	}
-	else{ // 09/02/22 - Special case for kaons, feed hadron in as well
+	else{
+	  fScatElec_E_Lo = 0.5;
+	  cout << "Minumum scattered electron energy not specified in .json file, defaulting to 0.5*EBeam." << endl;
+	}
+
+	if (obj.isMember("Ee_High")){
+	  fScatElec_E_Hi = obj["Ee_High"].asDouble();
+	}
+	else{
+	  fScatElec_E_Hi = 2.5;
+	  cout << "Max scattered electron energy not specified in .json file, defaulting to 2.5*EBeam." << endl;
+	}
+
+	if (obj.isMember("e_Theta_Low")){
+	  fScatElec_Theta_I = obj["e_Theta_Low"].asDouble() * fDEG2RAD;
+	}
+	else{
+	  fScatElec_Theta_I = 60.0 * fDEG2RAD;
+	  cout << "Min scattered electron theta not specified in .json file, defaulting to 60 degrees." << endl;
+	}
+
+	if (obj.isMember("e_Theta_High")){
+	  fScatElec_Theta_F = obj["e_Theta_High"].asDouble() * fDEG2RAD;
+	}
+	else{
+	  fScatElec_Theta_F = 175.0 * fDEG2RAD;
+	  cout << "Max scattered electron theta not specified in .json file, defaulting to 175 degrees." << endl;
+	}
+
+	if (obj.isMember("EjectileX_Theta_Low")){
+	  fEjectileX_Theta_I = obj["EjectileX_Theta_Low"].asDouble() * fDEG2RAD;
+	}
+	else{
+	  fEjectileX_Theta_I = 0.0 * fDEG2RAD;
+	  cout << "Min ejectile X theta not specified in .json file, defaulting to 0 degrees." << endl;
+	}
+
+	if (obj.isMember("EjectileX_Theta_High")){
+	  fEjectileX_Theta_F = obj["EjectileX_Theta_High"].asDouble() * fDEG2RAD;
+	}
+	else{
+	  fEjectileX_Theta_F = 60.0 * fDEG2RAD;
+	  cout << "Max  ejectile X theta not specified in .json file, defaulting to 60 degrees." << endl;
+	}
+
+	// 18/01/23 - SJDK - I think this would probably be the best point to set the parameter read in for cross section calculations, once the particle and hadron are set, it can then read in the relevant parameter array. For example, assign "sigParArray" to the output of "ReadCrossSectionPar"
+	        
+        //vector<vector<vector<vector<double>>>> sig;
+        SigPar = ReadCrossSectionPar(particle, hadron);
+	/*
+        cout << "!!!!!!!!!!!!!!!!!! TEST - EIC.CC !!!!!!!!!!!!!!!!!!" << endl;
+        cout<<SigPar[0][3][4][5]<<endl;
+	cout << "!!!!!!!!!!!!!!!!!! TEST - EIC.CC !!!!!!!!!!!!!!!!!!" << endl;
+        cout << "!!!!!!!!!!!!!!!!!! TEST - EIC.CC !!!!!!!!!!!!!!!!!!" << endl;
+        cout<<SigPar[1][3][4][6]<<endl;
+	cout << "!!!!!!!!!!!!!!!!!! TEST - EIC.CC !!!!!!!!!!!!!!!!!!" << endl;
+	*/  
+
+        if(particle != "pi0"){ // Default case now
 	  Reaction* r1 = new Reaction(particle, hadron);
 	  r1->process_reaction();
 	  delete r1;
 	}
-
+	else{  // Treat pi0 slightly differently for now
+	  Reaction* r1 = new Reaction(particle);
+	  r1->process_reaction();
+	  delete r1;
+	}
 }
 
 /*--------------------------------------------------*/
@@ -244,16 +358,72 @@ TString ExtractParticle(TString particle) {
 
 TString ExtractCharge(TString particle) {
 
-	TString charge;
+  TString charge;
 
-	if (particle.Contains("+") || particle.Contains("plus")) {
-		charge = "+";
-	} else if (particle.Contains("-") || particle.Contains("minus")) {
-		charge = "-";
-	} else {
-		charge = "0";
+  if (particle.Contains("+") || particle.Contains("plus")) {
+    charge = "+";
+  } else if (particle.Contains("-") || particle.Contains("minus")) {
+    charge = "-";
+  } else {
+    charge = "0";
+  }
+  return charge;
+}
+
+vector<vector<vector<vector<double>>>> ReadCrossSectionPar(TString particle, TString hadron){
+  
+  string sigL_ParamFile, sigT_ParamFile;
+ 
+  if (particle == "Pi+" && hadron == "Neutron"){
+    cout << "Add Pi+/Neutron case here" << endl;
+  }
+  else if (particle == "Pi-" && hadron == "Proton"){
+    cout << "Add Pi-/Proton case here" << endl;
+  }
+  else if (particle == "K+" && hadron == "Lambda"){
+    cout << "Add K+/Lambda case here" << endl;
+    sigL_ParamFile = "../src/eic_evgen/CrossSection_Params/KPlusLambda_Param_sigL";
+    sigT_ParamFile = "../src/eic_evgen/CrossSection_Params/KPlusLambda_Param_sigT"; // Shouldn't really have a relative path, should look at setting a DEMPGen variable and doing this in a better way later
+  }
+  else if (particle == "K+" && hadron == "Sigma"){
+    cout << "Add K+/Sigma case here" << endl;
+    sigL_ParamFile = "../src/eic_evgen/CrossSection_Params/KPlusSigma_Param_sigL";
+    sigT_ParamFile = "../src/eic_evgen/CrossSection_Params/KPlusSigma_Param_sigT";
+  }
+  else if (particle == "Pi0"){
+    cout << "Add Pi0 case here" << endl;
+  }
+  else{
+    cout << "Throw some error" << endl;
+  }
+ 
+  //....................................................................................................
+  // Love's model parameters (Gojko, Stephen and Nishchey helped me to understand this part) 
+  //....................................................................................................
+  double ptmp;
+  std::vector<std::vector<std::vector<std::vector<double>>>> p_vec;
+  fstream file_vgl; // The parameterization file we will open and loop over
+
+  for (int i = 0; i < 2; i++){
+    if(i == 0){
+      file_vgl.open(sigL_ParamFile, ios::in); 
+    }
+    if(i == 1){
+      file_vgl.open(sigT_ParamFile, ios::in); 
+    }
+    p_vec.push_back(std::vector<std::vector<std::vector<double>>>());
+    for(int j=0; j <9; j++){// Loop over all values of W - 2 to 10
+      p_vec[i].push_back(std::vector<std::vector<double>>());
+      for(int k=0; k<35; k++){ // Loop over all values of Q2 - 1 to 35 for each w
+	p_vec[i][j].push_back(std::vector<double>());
+      
+	for(int l=0; l<13; l++){ //Loop over all columns at once
+	  file_vgl>>ptmp;
+	  p_vec[i][j][k].push_back(ptmp);
 	}
-
-	return charge;
-
+      }
+    }
+    file_vgl.close();// Need to close the file at end of each loop over i 
+  }       
+  return p_vec;
 }

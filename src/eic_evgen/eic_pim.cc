@@ -13,13 +13,14 @@
 
 #include "eic_pim.h"
 
+using std::vector;
 using namespace std;
 
 //TRandom2 *fRandom;                    
 TRandom3 *fRandom;                    
 
 TFile *f;                    
-TTree *t1;                    
+TTree *t1;
 
 int gKinematics_type;
 bool gPi0_decay;
@@ -38,7 +39,7 @@ int fWLessShell, fWLess1P9, fSDiff;
 
 unsigned long long int fNEvents, fNRecorded, fNGenerated, fWSqNeg, fNMomConserve, fNSigmaNeg, fNaN, fConserve, fNWeightUnphys, fNWeightReject, fLundRecorded, fNFile;
 
-double fK, fm, fElectron_Kin_Col_GeV, fElectron_Kin_Col, fRand, fLumi, fuBcm2, fPI, fDEG2RAD, fRAD2DEG, fEBeam, fPBeam, fScatElec_Theta_I, fScatElec_Theta_F, fPion_Theta_I, fPion_Theta_F, fScatElec_E_Hi, fScatElec_E_Lo, fPSF; 
+double fK, fm, fElectron_Kin_Col_GeV, fElectron_Kin_Col, fRand, fLumi, fuBcm2, fPI, fDEG2RAD, fRAD2DEG, fEBeam, fPBeam, fScatElec_Theta_I, fScatElec_Theta_F, fPion_Theta_I, fPion_Theta_F, fEjectileX_Theta_I, fEjectileX_Theta_F, fScatElec_E_Hi, fScatElec_E_Lo, fPSF; 
 
 double fOmega_Theta_I, fOmega_Theta_F, fOmega_Theta_Col, fOmega_Phi_Col;
 
@@ -158,6 +159,8 @@ double fOmega_Energy_CM, fOmega_Mom_CM, fOmega_Energy_CM_GeV, fOmega_Mom_CM_GeV;
 
 double fMomentum[300];
 
+vector<vector<vector<vector<double>>>> SigPar;
+
 double fProb[300] = {    
 6.03456,    6.02429,    6.01155,    5.99636,    5.97873,    5.95869,    5.93626,    5.91147,    5.88435,    5.85493,
 5.82325,    5.78935,    5.75326,    5.71504,    5.67472,    5.63235,    5.58799,    5.54169,     5.4935,    5.44347,		   
@@ -233,23 +236,30 @@ void pim::Initilize() {
     kFSI                                        = false;
     kMSele                                      = false;
     kMS                                         = false;
-    // The luminosity below is some default assumtpion, more up to date values are set in PiPlus prod and depend upon beam energy combinations
+    // 18/01/23 - The luminosity below is some default assumtpion, more up to date values are set in PiPlus prod and depend upon beam energy combinations if they are specified
+    // See slide 11 in https://indico.cern.ch/event/1072579/contributions/4796856/attachments/2456676/4210776/CAP-EIC-June-7-2022-Seryi-r2.pdf for more info
 //    fLumi                                     = 0.374e33; // Jlab design
-    fLumi                                       = 1e34; // https://eic.jlab.org/wiki/index.php/EIC_luminosity
+    //fLumi                                       = 1e34; // https://eic.jlab.org/wiki/index.php/EIC_luminosity - OUTDATED
+    fLumi                                       = 1e33; // 18/01/23, this seems a better default based upon more up to date info, see link above
     fuBcm2                                      = 1.0e-30;
     fPI                                         = 3.1415926;
     fDEG2RAD                                    = fPI/180.0;
     fRAD2DEG                                   = 180.0/fPI;
 
-    fScatElec_Theta_I                           = 60.0 * fDEG2RAD;
-    fScatElec_Theta_F                           = 175.0 * fDEG2RAD;
+    //fScatElec_Theta_I                           = 60.0 * fDEG2RAD;
+    //fScatElec_Theta_F                           = 175.0 * fDEG2RAD;
     // SJDK 29/11/22 - Updated comment on two variables below
     // Two parameters below are NOT a percentage of the beam energy as previously clamed. This parameter along with _Hi represent the RANGE of enegries over which the scattered electron is generated
     // The range is from 0.5*EBeam to 2.5*EBeam -> Therefore for the phase space calculation, the spread of 2* the incoming beam energy is used in the calculation
-    fScatElec_E_Lo                              = 0.5;  // NOT a percentage of beam energy
-    fScatElec_E_Hi                              = 2.5;  // NOT a percentage of beam energy
+    // SJDK 21/12/22 - Set by .json read in
+    //fScatElec_E_Lo                              = 0.5;  // NOT a percentage of beam energy
+    //fScatElec_E_Hi                              = 2.5;  // NOT a percentage of beam energy
+    // Should remove specific pion/omega values here and JUST use EjectileX, should then actually read this in as a parameter, use 0 to 50 as default
     fPion_Theta_I                               = 0.0 * fDEG2RAD;
     fPion_Theta_F                               = 50.0 * fDEG2RAD;
+    // SJDK 21/12/22 - Set by .json read in
+    //fEjectileX_Theta_I                          = 0.0 * fDEG2RAD;
+    //fEjectileX_Theta_F                          = 50.0 * fDEG2RAD;
     fOmega_Theta_I                              = 0.0 * fDEG2RAD; 
     fOmega_Theta_F                              = 360.0 * fDEG2RAD; 
     // 02/06/21 - SJDK

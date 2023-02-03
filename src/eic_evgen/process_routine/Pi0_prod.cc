@@ -34,8 +34,8 @@ Pi0_Production::~Pi0_Production() {
 
 //	cout << "File closed!" << endl;
 
-	ppiOut.close();
-	ppiDetails.close();
+	DEMPOut.close();
+	DEMPDetails.close();
 
 }
 
@@ -334,7 +334,7 @@ void Pi0_Production::Processing_Event() {
 
 //	double e_photon_rf = lproton_rf.E();
 
-//	fu_min = -fQsq + pow(f_Scat_Nucleon_Mass, 2) -2.*(e_pi0CM*e_photCM -sqrt( (e_pi0CM**2-mass**2)*(e_photCM**2+qsq) ))
+//	fu_min = -fQsq + pow(f_Scat_hadron_Mass, 2) -2.*(e_pi0CM*e_photCM -sqrt( (e_pi0CM**2-mass**2)*(e_photCM**2+qsq) ))
 
     double ft = fc * fc - fb + fX_Mass * fX_Mass - fProton_Mass * fProton_Mass;
 
@@ -342,7 +342,7 @@ void Pi0_Production::Processing_Event() {
 
 
 
-//    double fttt = lproton_rfg * lproton_rfg - 2* lproton_rfg * l_scat_nucleon_rf_g + l_scat_nucleon_rf_g * l_scat_nucleon_rf_g;
+//    double fttt = lproton_rfg * lproton_rfg - 2* lproton_rfg * l_scat_hadron_rf_g + l_scat_hadron_rf_g * l_scat_hadron_rf_g;
 //    double fuuu = lproton_rfg * lproton_rfg - 2* lproton_rfg * lX_rfg + lX_rfg * lX_rfg;
 	
 
@@ -351,10 +351,10 @@ void Pi0_Production::Processing_Event() {
 
 	ft_min = -fQsq_GeV + pow(fX_Mass, 2) -2.*(e_X_rf*e_photon_rf -sqrt( (pow(e_X_rf, 2) - pow(fX_Mass, 2)) * (pow(e_photon_rf,2)+fQsq) ));
 
-	fu_min = -fQsq_GeV + pow(f_Scat_Nucleon_Mass, 2) -2.*(e_X_rf*e_photon_rf -sqrt( (pow(e_X_rf, 2) - pow(f_Scat_Nucleon_Mass , 2))*(pow(e_photon_rf,2)+fQsq) ));
+	fu_min = -fQsq_GeV + pow(f_Scat_hadron_Mass, 2) -2.*(e_X_rf*e_photon_rf -sqrt( (pow(e_X_rf, 2) - pow(f_Scat_hadron_Mass , 2))*(pow(e_photon_rf,2)+fQsq) ));
 
 
-// 	cout << "asd: " << ft_min  << "    " <<  fu_min  <<  f_Scat_Nucleon_Mass  << "   " << fX_Mass << "    " << fProton_Mass << "     "<< fQsq << "    " << e_photon_rf << "    photon photon:  " <<  lphoton_rf.E() << "    " << fm  << "    " << r_lphoton.E() << "    " << beta_col_rf.Mag() << endl;
+// 	cout << "asd: " << ft_min  << "    " <<  fu_min  <<  f_Scat_hadron_Mass  << "   " << fX_Mass << "    " << fProton_Mass << "     "<< fQsq << "    " << e_photon_rf << "    photon photon:  " <<  lphoton_rf.E() << "    " << fm  << "    " << r_lphoton.E() << "    " << beta_col_rf.Mag() << endl;
 // 
 //     
 // 	cout << r_lprotong.Px() << "  " << r_lprotong.Py() << "  " << r_lprotong.Pz() << "  " << r_lprotong.E() << endl;
@@ -387,20 +387,20 @@ void Pi0_Production::Processing_Event() {
     r_lX_g = r_lX * fm;
 
 	// ----------------------------------------------------
-    // Scattered nucleon collider (lab) frame
+    // Scattered hadron collider (lab) frame
 
-    r_l_scat_nucleon.SetPxPyPzE( ( r_lproton + r_lelectron - r_lscatelec - r_lX).X(),
+    r_l_scat_hadron.SetPxPyPzE( ( r_lproton + r_lelectron - r_lscatelec - r_lX).X(),
  			     ( r_lproton + r_lelectron - r_lscatelec - r_lX ).Y(),
  			     ( r_lproton + r_lelectron - r_lscatelec - r_lX ).Z(),
  			     sqrt( pow( ( ( ( r_lproton + r_lelectron - r_lscatelec - r_lX ).Vect() ).Mag()),2) +
- 				   pow( f_Scat_Nucleon_Mass ,2 ) ) );
+ 				   pow( f_Scat_hadron_Mass ,2 ) ) );
 
-    r_l_scat_nucleon_g = r_l_scat_nucleon * fm;
+    r_l_scat_hadron_g = r_l_scat_hadron * fm;
 
-//	cout << "Proton Momentum: " << r_l_scat_nucleon_g.Vect().Mag() << "   " << r_l_scat_nucleon_g.Vect().Theta() << "   Angle: "<< r_l_scat_nucleon_g.Vect().Theta() *180/fPi << endl;
+//	cout << "Proton Momentum: " << r_l_scat_hadron_g.Vect().Mag() << "   " << r_l_scat_hadron_g.Vect().Theta() << "   Angle: "<< r_l_scat_hadron_g.Vect().Theta() *180/fPi << endl;
 //	cout << "X Momentum: " << r_lX_g.Vect().Mag() << "   Angle: " << r_lX_g.Vect().Theta() << "   " << r_lX_g.Vect().Theta() *180/fPi<< endl ;
 
-//	cout << "Proton-X  Angle: " << r_lX_g.Vect().Angle(r_l_scat_nucleon_g.Vect())*180/fPi << endl ; 
+//	cout << "Proton-X  Angle: " << r_lX_g.Vect().Angle(r_l_scat_hadron_g.Vect())*180/fPi << endl ; 
 
     // ----------------------------------------------------------------------------------------------
     // ----------------------------------------------------------------------------------------------
@@ -427,7 +427,7 @@ void Pi0_Production::Processing_Event() {
      fW_Prime_GeV = lwp.Mag();    
 
    	 fsini = r_lelectron + r_lproton;
-     fsfin = r_lscatelec + r_lX + r_l_scat_nucleon;
+     fsfin = r_lscatelec + r_lX + r_l_scat_hadron;
      
      fsinig = fsini * fm;
      fsfing = fsfin * fm; 
@@ -439,7 +439,7 @@ void Pi0_Production::Processing_Event() {
        kSConserve = true;
      }
         
-     if ( pd->CheckLaws( r_lelectron, r_lproton, r_lscatelec, r_lX, r_l_scat_nucleon) != 1 )
+     if ( pd->CheckLaws( r_lelectron, r_lproton, r_lscatelec, r_lX, r_l_scat_hadron) != 1 )
        return;
 
 
@@ -468,9 +468,9 @@ void Pi0_Production::Processing_Event() {
      lX_rf.Boost(-beta_col_rf);
      lX_rfg = lX_rf * fm;
          
-     l_scat_nucleon_rf = r_l_scat_nucleon;
-     l_scat_nucleon_rf.Boost(-beta_col_rf);
-     l_scat_nucleon_rf_g = l_scat_nucleon_rf * fm;
+     l_scat_hadron_rf = r_l_scat_hadron;
+     l_scat_hadron_rf.Boost(-beta_col_rf);
+     l_scat_hadron_rf_g = l_scat_hadron_rf * fm;
 
 
 
@@ -498,14 +498,14 @@ void Pi0_Production::Processing_Event() {
 // 		cout << fQsq_GeV << "  " <<  fWSq_GeV << "  ";             
 // 
 // 		cout << r_lscatelecg.Vect().Theta()       << "  " <<  r_lscatelecg.Vect().Mag()    << "  " 
-// 			 << r_l_scat_nucleon_g.Vect().Theta() << "  " << r_l_scat_nucleon_g.Vect().Mag() << "  " 
+// 			 << r_l_scat_hadron_g.Vect().Theta() << "  " << r_l_scat_hadron_g.Vect().Mag() << "  " 
 //              << r_lX_g.Vect().Theta()             << "  " << r_lX_g.Vect().Mag()                  
 // 			 << endl; 
 		
 		polar_out << fQsq_GeV << "  " <<  fWSq_GeV << "  ";             
 
 		polar_out << r_lscatelecg.Vect().Theta()  << "  " <<  r_lscatelecg.Vect().Mag()      << "  " 
-			 << r_l_scat_nucleon_g.Vect().Theta() << "  " << r_l_scat_nucleon_g.Vect().Mag() << "  " 
+			 << r_l_scat_hadron_g.Vect().Theta() << "  " << r_l_scat_hadron_g.Vect().Mag() << "  " 
              << r_lX_g.Vect().Theta()             << "  " << r_lX_g.Vect().Mag()             << "  "                
              << l_photon_1.Vect().Theta()         << "  " << l_photon_1.Vect().Mag()         << "  "                
              << l_photon_2.Vect().Theta()         << "  " << l_photon_2.Vect().Mag()                  
@@ -561,7 +561,7 @@ void Pi0_Production::Processing_Event() {
 //   double e_photCM = (fWSq_GeV - fQsq_GeV - pow(fProton_Mass/1000, 2))/fW_GeV/2.;
 
      double e_photCM = (fWSq_GeV - fQsq_GeV - pow(fProton_Mass/1000, 2))/fW_GeV/2.;
-     double e_pCM = (fWSq_GeV  + pow(fProton_Mass/1000, 2) - pow(f_Scat_Nucleon_Mass/1000, 2))/fW_GeV/2.;
+     double e_pCM = (fWSq_GeV  + pow(fProton_Mass/1000, 2) - pow(f_Scat_hadron_Mass/1000, 2))/fW_GeV/2.;
 
 //	 cout << "*********:  " <<  e_photCM   << "     " << e_pCM << endl;
 //	 cout << "*********:  " << e_photon_rf << "      "<< e_p_rf << endl;
@@ -578,14 +578,14 @@ void Pi0_Production::Processing_Event() {
 	fu_min = -fQsq_GeV + pow(fProton_Mass/1000, 2) -2.*(e_pCM*e_photCM -sqrt( (pow(e_pCM/1000, 2) - pow(fProton_Mass/1000 , 2))*(pow(e_photCM/1000,2)+fQsq_GeV) ));
 
 	
-// 	cout << fQsq_GeV << "   " << "AAAA " <<  (pow(e_p_rf/1000, 2) - pow(f_Scat_Nucleon_Mass/1000 , 2))*(pow(e_photon_rf/1000,2)+fQsq_GeV) << "   ::::  " <<  (pow(e_p_rf/1000, 2) - pow(fProton_Mass/1000 , 2)) << "     " << (pow(e_photon_rf/1000,2)+fQsq_GeV) << "      " <<  pow(e_p_rf/1000, 2) << "     " <<  pow(fProton_Mass/1000 , 2) << "     " << e_p_rf/1000*e_photon_rf/1000 << endl;
+// 	cout << fQsq_GeV << "   " << "AAAA " <<  (pow(e_p_rf/1000, 2) - pow(f_Scat_hadron_Mass/1000 , 2))*(pow(e_photon_rf/1000,2)+fQsq_GeV) << "   ::::  " <<  (pow(e_p_rf/1000, 2) - pow(fProton_Mass/1000 , 2)) << "     " << (pow(e_photon_rf/1000,2)+fQsq_GeV) << "      " <<  pow(e_p_rf/1000, 2) << "     " <<  pow(fProton_Mass/1000 , 2) << "     " << e_p_rf/1000*e_photon_rf/1000 << endl;
 // 
 //     cout << endl;
 //     cout << endl;
 //     cout << endl;
 // 
 // 
-// 	cout << "asd: " << ft_min  << "    " <<  fu_min << "   " <<  f_Scat_Nucleon_Mass  << "   " << fX_Mass << "    " << fProton_Mass << "     "<< fQsq << "    " << e_photon_rf << "    photon photon:  " <<  lphoton_rf.E() << "    " << fm  << "    " << r_lphoton.E() << "    " << beta_col_rf.Mag() << endl;
+// 	cout << "asd: " << ft_min  << "    " <<  fu_min << "   " <<  f_Scat_hadron_Mass  << "   " << fX_Mass << "    " << fProton_Mass << "     "<< fQsq << "    " << e_photon_rf << "    photon photon:  " <<  lphoton_rf.E() << "    " << fm  << "    " << r_lphoton.E() << "    " << beta_col_rf.Mag() << endl;
 // 
 //     
 // 	cout << "Photon energy: " << e_X_rf << "    " << e_photon_rf << endl;
@@ -604,7 +604,7 @@ void Pi0_Production::Processing_Event() {
 
      fBeta_CM_RF           = (lphoton_rf.Vect()).Mag() / ( lphoton_rf.E() + fProton_Mass );
      fGamma_CM_RF          = ( lphoton_rf.E() + fProton_Mass ) / fW;
-     fX_Energy_CM       = ( pow( fW , 2) + pow(fX_Mass , 2) - pow(f_Scat_Nucleon_Mass , 2) ) / ( 2.0 * fW);    
+     fX_Energy_CM       = ( pow( fW , 2) + pow(fX_Mass , 2) - pow(f_Scat_hadron_Mass , 2) ) / ( 2.0 * fW);    
      fX_Mom_CM          = sqrt( pow(fX_Energy_CM , 2) - pow(fX_Mass , 2));    
      fX_Energy_CM_GeV   = fX_Energy_CM / 1000.0;
      fX_Mom_CM_GeV      = fX_Mom_CM / 1000.0;
@@ -684,7 +684,7 @@ void Pi0_Production::Processing_Event() {
      // -----------------------------------------------------------------------------------
      // If we have fermi momentum then epsilon should be in rest frame 
      // The theta angle of scattered angle used in expression of epsilon is the angle 
-     // with respect to direction of incoming electron in the rest frame of target nucleon
+     // with respect to direction of incoming electron in the rest frame of target hadron
      // epsilon=1./(1.+ 2.*(pgam_restg**2)/q2g * *(tand(thscat_rest/2.))**2)
      // -----------------------------------------------------------------------------------
  
@@ -715,13 +715,13 @@ void Pi0_Production::Processing_Event() {
  
      fA = fJacobian_CM * fX_Mom_CM_GeV / fPi;
  
-//	cout << "LXXXX check:   " << ( r_lproton + r_lelectron - r_lscatelec - r_lX).X() << "   " << ( r_lproton + r_lelectron - r_lscatelec - r_lX ).Y() << "    " << ( r_lproton + r_lelectron - r_lscatelec - r_lX ).Z() << "     " << sqrt( pow( ( ( ( r_lproton + r_lelectron - r_lscatelec - r_lX ).Vect() ).Mag()),2) + pow( f_Scat_Nucleon_Mass ,2 ) ) << endl;
+//	cout << "LXXXX check:   " << ( r_lproton + r_lelectron - r_lscatelec - r_lX).X() << "   " << ( r_lproton + r_lelectron - r_lscatelec - r_lX ).Y() << "    " << ( r_lproton + r_lelectron - r_lscatelec - r_lX ).Z() << "     " << sqrt( pow( ( ( ( r_lproton + r_lelectron - r_lscatelec - r_lX ).Vect() ).Mag()),2) + pow( f_Scat_hadron_Mass ,2 ) ) << endl;
 
 
-    double fttt = r_lprotong * r_lprotong - 2 * r_lprotong * r_l_scat_nucleon_g  + r_l_scat_nucleon_g * r_l_scat_nucleon_g;
+    double fttt = r_lprotong * r_lprotong - 2 * r_lprotong * r_l_scat_hadron_g  + r_l_scat_hadron_g * r_l_scat_hadron_g;
     double fuuu = r_lprotong * r_lprotong - 2 * r_lprotong * r_lX_g + r_lX_g * r_lX_g;
  
-// 	cout << "check this: " << r_lprotong * r_lprotong << "     " <<  r_l_scat_nucleon_g * r_l_scat_nucleon_g << "    " <<  r_lX_g * r_lX_g << endl;
+// 	cout << "check this: " << r_lprotong * r_lprotong << "     " <<  r_l_scat_hadron_g * r_l_scat_hadron_g << "    " <<  r_lX_g * r_lX_g << endl;
 // 
 // 	cout << "t: " << ft << "   " << fttt << "    u: " << fu << "    "  << fuuu << endl;  
 // 
@@ -791,11 +791,11 @@ void Pi0_Production::Processing_Event() {
 
 void Pi0_Production::Detail_Output() {
 
-   ppiDetails << "Total events tried                           " << setw(50) << fNGenerated   << endl;
-   ppiDetails << "Total events recorded                        " << setw(50) << fNRecorded    << endl;
+   DEMPDetails << "Total events tried                           " << setw(50) << fNGenerated   << endl;
+   DEMPDetails << "Total events recorded                        " << setw(50) << fNRecorded    << endl;
 
-   ppiDetails << "Seed used for the Random Number Generator    " << setw(50) << fSeed         << endl;
-   ppiDetails << "Number of lund events                        " << setw(50) << fLundRecorded << endl;
+   DEMPDetails << "Seed used for the Random Number Generator    " << setw(50) << fSeed         << endl;
+   DEMPDetails << "Number of lund events                        " << setw(50) << fLundRecorded << endl;
 
 }
 
@@ -806,7 +806,7 @@ void Pi0_Production::Detail_Output() {
 void Pi0_Production::Pi0_Lund_Output() {
 
 
-      ppiOut << "5"
+      DEMPOut << "5"
   	   << " \t " << fPhi           // var 1
   	   << " \t " << fPhiS          // var 2
   	   << " \t " << fx             // var 3
@@ -821,7 +821,7 @@ void Pi0_Production::Pi0_Lund_Output() {
  	///*--------------------------------------------------*/
   	// Initial State
  
-      ppiOut << setw(10) << "1" 
+      DEMPOut << setw(10) << "1" 
   	   << setw(10) << "-1" 
   	   << setw(10) << "0" 
   	   << setw(10) << "11"
@@ -837,7 +837,7 @@ void Pi0_Production::Pi0_Lund_Output() {
   	   << setw(16) << fVertex_Z
   	   << endl;
 
-      ppiOut << setw(10) << "2" 
+      DEMPOut << setw(10) << "2" 
   	   << setw(10) << "1" 
   	   << setw(10) << "0" 
   	   << setw(10) << "2212"
@@ -859,7 +859,7 @@ void Pi0_Production::Pi0_Lund_Output() {
   	// Final State
  	      
       // Produced Particle X
-      ppiOut << setw(10) << "3" 
+      DEMPOut << setw(10) << "3" 
   	   << setw(10) << "1" 
   	   << setw(10) << "1" 
   	   << setw(10) << PDGtype(produced_X)
@@ -876,7 +876,7 @@ void Pi0_Production::Pi0_Lund_Output() {
   	   << endl;
       
       // Scattered electron
-      ppiOut << setw(10) << "4" 
+      DEMPOut << setw(10) << "4" 
   	   << setw(10) << "-1" 
   	   << setw(10) << "1" 
   	   << setw(10) << "11" 
@@ -893,101 +893,21 @@ void Pi0_Production::Pi0_Lund_Output() {
   	   << endl;
   	  
       // Recoiled neutron
-      ppiOut << setw(10) << "5" 
+      DEMPOut << setw(10) << "5" 
   	   << setw(10) << "1" 
   	   << setw(10) << "1" 
-  	   << setw(10) << PDGtype(recoil_nucleon)
+  	   << setw(10) << PDGtype(recoil_hadron)
   	   << setw(10) << "0" 
   	   << setw(10) << "0" 
-  	   << setw(16) << r_l_scat_nucleon_g.X() 
-  	   << setw(16) << r_l_scat_nucleon_g.Y()
-  	   << setw(16) << r_l_scat_nucleon_g.Z()
-  	   << setw(16) << r_l_scat_nucleon_g.E()
-  	   << setw(16) << f_Scat_Nucleon_Mass_GeV
+  	   << setw(16) << r_l_scat_hadron_g.X() 
+  	   << setw(16) << r_l_scat_hadron_g.Y()
+  	   << setw(16) << r_l_scat_hadron_g.Z()
+  	   << setw(16) << r_l_scat_hadron_g.E()
+  	   << setw(16) << f_Scat_hadron_Mass_GeV
   	   << setw(16) << fVertex_X
   	   << setw(16) << fVertex_Y
   	   << setw(16) << fVertex_Z
   	   << endl;
- 
- 	
-// 	   cout << "Particle check: " << PDGtype(produced_X) << "       " << PDGtype(recoil_nucleon) << endl;
- 
-
-
-
-
-// 	///*--------------------------------------------------*/
-// 
-//      ppiOut << "3"
-//  	   << " \t " << fPhi           // var 1
-//  	   << " \t " << fPhiS          // var 2
-//  	   << " \t " << fx             // var 3
-//  	   << " \t " << "1"	       
-//  	   << " \t " << fQsq_GeV       // var 4
-//  	   << " \t " << fT_GeV         // var 5
-//  	   << " \t " << fW_GeV 	       // var 6
-//  	   << " \t " << fEpsilon       // var 7
-//  	   << " \t " << fEventWeight   // var 8	   
-//  	   << endl;
-// 
-// 	///*--------------------------------------------------*/
-//  	// Final State
-// 	      
-//      // Produced Particle X
-//      ppiOut << setw(10) << "1" 
-//  	   << setw(10) << "1" 
-//  	   << setw(10) << "1" 
-//  	   << setw(10) << PDGtype(produced_X)
-//  	   << setw(10) << "0" 
-//  	   << setw(10) << "0" 
-//  	   << setw(16) << r_lX_g.X()
-//  	   << setw(16) << r_lX_g.Y()   
-//  	   << setw(16) << r_lX_g.Z()  
-//  	   << setw(16) << r_lX_g.E()
-//  	   << setw(16) << fX_Mass_GeV
-//  	   << setw(16) << fVertex_X
-//  	   << setw(16) << fVertex_Y
-//  	   << setw(16) << fVertex_Z
-//  	   << endl;
-//      
-//      // Scattered electron
-//      ppiOut << setw(10) << "2" 
-//  	   << setw(10) << "-1" 
-//  	   << setw(10) << "1" 
-//  	   << setw(10) << "11" 
-//  	   << setw(10) << "0" 
-//  	   << setw(10) << "0" 
-//  	   << setw(16) << r_lscatelecg.X() 
-//  	   << setw(16) << r_lscatelecg.Y() 
-//  	   << setw(16) << r_lscatelecg.Z() 
-//  	   << setw(16) << r_lscatelecg.E()
-//  	   << setw(16) << fElectron_Mass_GeV
-//  	   << setw(16) << fVertex_X
-//  	   << setw(16) << fVertex_Y
-//  	   << setw(16) << fVertex_Z
-//  	   << endl;
-//  	  
-//      // Recoiled neutron
-//      ppiOut << setw(10) << "3" 
-//  	   << setw(10) << "1" 
-//  	   << setw(10) << "1" 
-//  	   << setw(10) << PDGtype(recoil_nucleon)
-//  	   << setw(10) << "0" 
-//  	   << setw(10) << "0" 
-//  	   << setw(16) << r_l_scat_nucleon_g.X() 
-//  	   << setw(16) << r_l_scat_nucleon_g.Y()
-//  	   << setw(16) << r_l_scat_nucleon_g.Z()
-//  	   << setw(16) << r_l_scat_nucleon_g.E()
-//  	   << setw(16) << f_Scat_Nucleon_Mass_GeV
-//  	   << setw(16) << fVertex_X
-//  	   << setw(16) << fVertex_Y
-//  	   << setw(16) << fVertex_Z
-//  	   << endl;
-// 
-// 	
-// 	   cout << "Particle check: " << PDGtype(produced_X) << "       " << PDGtype(recoil_nucleon) << endl;
-// 
-
 
 }
 
@@ -996,14 +916,7 @@ void Pi0_Production::Pi0_Lund_Output() {
 
 void Pi0_Production::Pi0_Decay_Lund_Output() {
 
-//	 cout << rNEvents << endl;
-//	 cout << "-----------+++++++++++++-------------------" << endl;
-//	 exit(0);
-
-
-
-
-     ppiOut << "4"
+     DEMPOut << "4"
  	   << " \t " << fPhi           // var 1
  	   << " \t " << fPhiS          // var 2
  	   << " \t " << fx             // var 3
@@ -1015,25 +928,9 @@ void Pi0_Production::Pi0_Decay_Lund_Output() {
  	   << " \t " << fEventWeight   // var 8	   
  	   << endl;
        
-//     // Produced Particle X
-//     ppiOut << setw(10) << "1" 
-// 	   << setw(10) << "1" 
-// 	   << setw(10) << "1" 
-// 	   << setw(10) << PDGtype(produced_X)
-// 	   << setw(10) << "0" 
-// 	   << setw(10) << "0" 
-// 	   << setw(16) << r_lX_g.X()
-// 	   << setw(16) << r_lX_g.Y()   
-// 	   << setw(16) << r_lX_g.Z()  
-// 	   << setw(16) << r_lX_g.E()
-// 	   << setw(16) << fX_Mass_GeV
-// 	   << setw(16) << fVertex_X
-// 	   << setw(16) << fVertex_Y
-// 	   << setw(16) << fVertex_Z
-// 	   << endl;
      
      // Scattered electron
-     ppiOut << setw(10) << "2" 
+     DEMPOut << setw(10) << "2" 
  	   << setw(10) << "-1" 
  	   << setw(10) << "1" 
  	   << setw(10) << "11" 
@@ -1050,24 +947,24 @@ void Pi0_Production::Pi0_Decay_Lund_Output() {
  	   << endl;
  	  
       // Recoiled neutron
-      ppiOut << setw(10) << "3" 
+      DEMPOut << setw(10) << "3" 
   	   << setw(10) << "1" 
   	   << setw(10) << "1" 
-  	   << setw(10) << PDGtype(recoil_nucleon)
+  	   << setw(10) << PDGtype(recoil_hadron)
   	   << setw(10) << "0" 
   	   << setw(10) << "0" 
-  	   << setw(16) << r_l_scat_nucleon_g.X() 
-  	   << setw(16) << r_l_scat_nucleon_g.Y()
-  	   << setw(16) << r_l_scat_nucleon_g.Z()
-  	   << setw(16) << r_l_scat_nucleon_g.E()
-  	   << setw(16) << f_Scat_Nucleon_Mass_GeV
+  	   << setw(16) << r_l_scat_hadron_g.X() 
+  	   << setw(16) << r_l_scat_hadron_g.Y()
+  	   << setw(16) << r_l_scat_hadron_g.Z()
+  	   << setw(16) << r_l_scat_hadron_g.E()
+  	   << setw(16) << f_Scat_hadron_Mass_GeV
   	   << setw(16) << fVertex_X
   	   << setw(16) << fVertex_Y
   	   << setw(16) << fVertex_Z
   	   << endl;
 
      // Photon 1
-     ppiOut << setw(10) << "3" 
+     DEMPOut << setw(10) << "3" 
  	   << setw(10) << "1" 
  	   << setw(10) << "1" 
  	   << setw(10) << "22"                       
@@ -1084,7 +981,7 @@ void Pi0_Production::Pi0_Decay_Lund_Output() {
  	   << endl;
 
      // Photon 2
-     ppiOut << setw(10) << "4" 
+     DEMPOut << setw(10) << "4" 
  	   << setw(10) << "1" 
  	   << setw(10) << "1" 
  	   << setw(10) << "22"                       
@@ -1114,13 +1011,13 @@ void Pi0_Production::Pi0_Decay_Pythia6_Out_Init() {
 
 	print_itt = 0;
 
-//	ppiOut << "PYTHIA EVENT FILE" << endl;
-	ppiOut << "SIMPLE Event FILE" << endl;
-	ppiOut << "============================================" << endl;
-	ppiOut << "I, ievent, nParticles" << endl;
-	ppiOut << "============================================" << endl;
-	ppiOut << "I  K(I,1)  K(I,2)  K(I,3)  K(I,4)  K(I,5)  P(I,1)  P(I,2)  P(I,3)  P(I,4)  P(I,5)  V(I,1)  V(I,2)  V(I,3)" << endl;
-	ppiOut << "============================================" << endl;
+//	DEMPOut << "PYTHIA EVENT FILE" << endl;
+	DEMPOut << "SIMPLE Event FILE" << endl;
+	DEMPOut << "============================================" << endl;
+	DEMPOut << "I, ievent, nParticles" << endl;
+	DEMPOut << "============================================" << endl;
+	DEMPOut << "I  K(I,1)  K(I,2)  K(I,3)  K(I,4)  K(I,5)  P(I,1)  P(I,2)  P(I,3)  P(I,4)  P(I,5)  V(I,1)  V(I,2)  V(I,3)" << endl;
+	DEMPOut << "============================================" << endl;
 
 }
 
@@ -1130,7 +1027,7 @@ void Pi0_Production::Pi0_Decay_Pythia6_Output() {
 
 
 
-//     ppiOut << "4"
+//     DEMPOut << "4"
 // 	   << " \t " << fPhi           // var 1
 // 	   << " \t " << fPhiS          // var 2
 // 	   << " \t " << fx             // var 3
@@ -1143,16 +1040,16 @@ void Pi0_Production::Pi0_Decay_Pythia6_Output() {
 // 	   << endl;
 
 
-    ppiOut << "0" << " \t\t\t\ "  << print_itt << " \t\t\t " << "1" << endl;           // var 1
+    DEMPOut << "0" << " \t\t\t\ "  << print_itt << " \t\t\t " << "1" << endl;           // var 1
 
 	print_itt++;
 
-	ppiOut << "============================================" << endl;
+	DEMPOut << "============================================" << endl;
 
  	///*--------------------------------------------------*/
   	// Initial State
  
-      ppiOut  << "1" 
+      DEMPOut  << "1" 
   	   << setw(6) << "21" 
   	   << setw(6) << "11"
   	   << setw(6) << "0" 
@@ -1169,7 +1066,7 @@ void Pi0_Production::Pi0_Decay_Pythia6_Output() {
   	   << setw(6) << fVertex_Z
   	   << endl;
 
-      ppiOut << "2" 
+      DEMPOut << "2" 
   	   << setw(6) << "21" 
   	   << setw(6) << "2212"
   	   << setw(6) << "0" 
@@ -1186,7 +1083,7 @@ void Pi0_Production::Pi0_Decay_Pythia6_Output() {
   	   << setw(6) << fVertex_Z
   	   << endl;
 
-      ppiOut << "3" 
+      DEMPOut << "3" 
   	   << setw(6) << "21" 
   	   << setw(6) << "22"
   	   << setw(6) << "1" 
@@ -1208,7 +1105,7 @@ void Pi0_Production::Pi0_Decay_Pythia6_Output() {
   	// Final State
       
       // Scattered electron
-      ppiOut << "4" 
+      DEMPOut << "4" 
   	   << setw(6) << "1" 
   	   << setw(6) << "11" 
   	   << setw(6) << "1" 
@@ -1225,26 +1122,26 @@ void Pi0_Production::Pi0_Decay_Pythia6_Output() {
   	   << setw(6) << fVertex_Z
   	   << endl;
   	  
-      // Recoiled nucleon
-      ppiOut << "5" 
+      // Recoiled hadron
+      DEMPOut << "5" 
   	   << setw(6) << "1" 
-  	   << setw(6) << PDGtype(recoil_nucleon)
+  	   << setw(6) << PDGtype(recoil_hadron)
   	   << setw(6) << "2" 
   	   << setw(6) << "0"
   	   << setw(6) << "0"
  
-  	   << setw(14) << r_l_scat_nucleon_g.X() 
-  	   << setw(14) << r_l_scat_nucleon_g.Y()
-  	   << setw(14) << r_l_scat_nucleon_g.Z()
-  	   << setw(14) << r_l_scat_nucleon_g.E()
-  	   << setw(14) << f_Scat_Nucleon_Mass_GeV
+  	   << setw(14) << r_l_scat_hadron_g.X() 
+  	   << setw(14) << r_l_scat_hadron_g.Y()
+  	   << setw(14) << r_l_scat_hadron_g.Z()
+  	   << setw(14) << r_l_scat_hadron_g.E()
+  	   << setw(14) << f_Scat_hadron_Mass_GeV
   	   << setw(6) << fVertex_X
   	   << setw(6) << fVertex_Y
   	   << setw(6) << fVertex_Z
   	   << endl;
  
       // Produced Particle X
-      ppiOut << "6" 
+      DEMPOut << "6" 
   	   << setw(6) << "1" 
   	   << setw(6) << PDGtype(produced_X)
   	   << setw(6) << "2" 
@@ -1261,7 +1158,7 @@ void Pi0_Production::Pi0_Decay_Pythia6_Output() {
   	   << setw(6) << fVertex_Z
   	   << endl;
 
-	ppiOut << "=============== Event finished ===============" << endl;
+	DEMPOut << "=============== Event finished ===============" << endl;
 
 }
 

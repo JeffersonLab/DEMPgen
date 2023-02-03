@@ -12,6 +12,8 @@
 #include "TRandom2.h"
 #include "TRandom3.h"
 
+using std::vector;
+
 class pim {
 
   public:
@@ -132,8 +134,10 @@ extern double fEBeam;
 extern double fPBeam;
 extern double fScatElec_Theta_I;
 extern double fScatElec_Theta_F;
-extern double fPion_Theta_I;
+extern double fPion_Theta_I; // SJDK 19/12/22 - These should be removed in future, specific to pion reaction cases. Should be generic MesonX
 extern double fPion_Theta_F;
+extern double fEjectileX_Theta_I;
+extern double fEjectileX_Theta_F;
 extern double fScatElec_E_Hi;
 extern double fScatElec_E_Lo;
 extern double fPSF;
@@ -641,7 +645,6 @@ extern double fPion_MomX_RF_GeV;
 extern double fPion_MomY_RF_GeV;
 extern double fPion_MomZ_RF_GeV;
 
-
 extern double fT_Para;
 extern double fT_Para_GeV;
 extern double fT;
@@ -833,6 +836,9 @@ extern double fProb[300];
 extern double conserve;      // 16/06/21 AU -> New Variables for conservation law checks
 extern double ene;
 extern double mom;
+
+// 27/01/22 - Love Preet - Adding in vector of cross section parameters
+extern vector<vector<vector<vector<double>>>> SigPar;
 
 //extern double fProb[300] = {    
 //6.03456,    6.02429,    6.01155,    5.99636,    5.97873,    5.95869,    5.93626,    5.91147,    5.88435,    5.85493,
