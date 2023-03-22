@@ -23,11 +23,11 @@
     //**************************************
     /// This section if for EIC simulation only
     "Kinematics_type" : 1,         // Kinematics type (1->FF, 2->TSSA)
-    "particle": "Pion+", 		   // Choices: omega, pi+, pi0, K+
+    "particle": "Pi0", 		   // Choices: omega, pi+, pi0, K+
     "hadron": "",                // Choices: Empty OR Lambda or Sigma0 - For K+ production only!
     "ebeam": 5,                         // Electron beam energy in GeV
-    "hbeam": 41,                        // Hadron beam energy in GeV
+    "hbeam": 100,                        // Hadron beam energy in GeV
     //"hbeam_part":"proton",           // Hadron beam particle, proton, deut or helium3, work in progress, will need to be added to shell script later on as an argument
-    "det_location": "ip8",		   // choices: ip6 for STAR, ip8 for PHENIX
+    "det_location": "ip6",		   // choices: ip6 for STAR, ip8 for PHENIX
     "OutputType": "Pythia6",		   // choices: LUND (Docker), Pythia6 (ECCE Fun4All) or HEPMC3 (Athena)   
 }
