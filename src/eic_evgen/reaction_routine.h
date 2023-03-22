@@ -226,6 +226,14 @@ class PiPlus_Production {
   int Solve();
   int Solve(double theta, double phi);
 
+  ///*--------------------------------------------------*/ 
+  // Needed for the Solve function 
+  double pars[9];
+
+  Particle* VertBeamElec ;
+  Particle* VertScatElec ;
+  Particle* Photon       ;
+
 }; 
 
 //	
@@ -444,6 +452,9 @@ class KPlus_Production {
   Double_t r_fSig_L;
 
   unsigned long long int print_itt;
+
+
+
 
 };
 

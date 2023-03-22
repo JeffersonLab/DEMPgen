@@ -175,6 +175,27 @@ void PiPlus_Production::Init() {
   Proton_Particle = new Particle();
 
 
+  ///*--------------------------------------------------*/ 
+  /// For testing
+
+  proton_mass_mev = fProton_Mass;
+  pion_mass_mev = 139.57;
+
+  Interaction = new Particle();
+  Target      = new Particle();
+  Initial     = new Particle();
+  Final       = new Particle();
+
+  VertBeamElec = new Particle();
+  VertScatElec = new Particle();
+  Photon       = new Particle();
+
+  VertBeamElec->SetPxPyPzE(0,      0,       11000,  11000);
+  VertScatElec->SetPxPyPzE(15.934, 1106.06, 2281.09, 2535.16);
+  Target->SetPxPyPzE(0,  0,  0,  939.565);
+
+
+
 }
 
 void PiPlus_Production::Processing_Event() {
@@ -273,30 +294,11 @@ void PiPlus_Production::Processing_Event() {
   // Pion momentum in collider frame, analytic solution starts
   // ---------------------------------------------------------
 
-
-   proton_mass_mev = fProton_Mass;
-   pion_mass_mev = 139.57;
-
-   Interaction = new Particle();
-   Target      = new Particle();
-   Initial     = new Particle();
-   Final       = new Particle();
-
-   Particle* VertBeamElec = new Particle();
-   Particle* VertScatElec = new Particle();
-
-   Particle* Photon = new Particle();
-
-   VertBeamElec->SetPxPyPzE(0,      0,       11000,  11000);
-   VertScatElec->SetPxPyPzE(15.934, 1106.06, 2281.09, 2535.16);
-   Target->SetPxPyPzE(0,  0,  0,  939.565);
-
    *Photon = *VertBeamElec - *VertScatElec;
    *Interaction = *Photon;
 
    Solve();
-
-
+ 
 //
 //   Float_t pion_theta_i, pion_phi_i;
 //
@@ -1350,9 +1352,7 @@ int PiPlus_Production::Solve(double theta, double phi)
   UnitVect->SetTheta(theta);
   UnitVect->SetPhi(phi);
   UnitVect->SetMag(1);
-
-
-  double pars[9];
+  
   pars[0] = UnitVect->X();
   pars[1] = UnitVect->Y();
   pars[2] = UnitVect->Z();
@@ -1375,6 +1375,8 @@ int PiPlus_Production::Solve(double theta, double phi)
   cout << pars[6] << "  " << pars[7]  << "  " << pars[8] << endl;
 
 
+  cout << "P6   " << pars[6] << endl;
+
   F->SetParameters(pars);
 
   double P = F->GetX(0, 0, pars[6], 0.0001, 10000);
@@ -1394,7 +1396,12 @@ int PiPlus_Production::Solve(double theta, double phi)
 
   cout << Pion->E() << "   " << Proton_Particle->E() << endl;
 
+  cout << "AAAAAAAA++++ " <<  SolnCheck() <<  endl;
+  cout << "AAAAAAAA++++   " << P << "    " << TMath::Abs(F->Eval(P))  <<  endl;
+
   if (TMath::Abs(F->Eval(P)) > 1){
+
+    cout << "++++ " <<  SolnCheck() <<  endl;
     delete Pion1;
     delete Proton1;
     return 1;
@@ -1418,6 +1425,7 @@ int PiPlus_Production::Solve(double theta, double phi)
     return 0;
   }
 
+  exit(0);
 
   //Try second solution
   Particle * Pion2 = new Particle(pion_mass_mev,
