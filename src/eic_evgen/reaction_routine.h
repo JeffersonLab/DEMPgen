@@ -125,6 +125,9 @@ class PiPlus_Production {
   TLorentzVector r_lX;
   TLorentzVector r_lX_g;
 
+  Particle* r_lX_solved;
+  Particle* r_l_scat_nucleon_solved;
+
   double fX_Mass;
   double fX_Mass_GeV;
 
@@ -170,10 +173,12 @@ class PiPlus_Production {
   /// Center of Mass parameters for particle X
 
   double fBeta_CM_RF, fGamma_CM_RF, fX_Energy_CM, fX_Mom_CM, fX_Energy_CM_GeV, fX_Mom_CM_GeV;
-
+  double_t Theta_cm;
   TLorentzVector lt;
   TLorentzVector ltg;
-		
+  TLorentzVector lu;
+  TLorentzVector lug;
+
   ///////////////////////////////////////////
 
   TVector3 v3Photon;   
@@ -201,16 +206,18 @@ class PiPlus_Production {
   ///*--------------------------------------------------*/ 
   // Rory Check algorithm
   
-  Float_t proton_mass_mev, pion_mass_mev;
-  
-  Particle* Pion;
-  Particle* Proton_Particle;
+//  Particle* Pion;
+//  Particle* Proton_Particle;
 
   Particle* Interaction;
   Particle* Target;
 
   Particle* Initial;
   Particle* Final;
+
+  Particle* VertBeamElec;
+  Particle* VertScatElec;
+  Particle* Photon;
 
   bool SolnCheck();
   double W_in(); 
@@ -228,11 +235,18 @@ class PiPlus_Production {
 
   ///*--------------------------------------------------*/ 
   // Needed for the Solve function 
-  double pars[9];
 
-  Particle* VertBeamElec ;
-  Particle* VertScatElec ;
-  Particle* Photon       ;
+
+  double theta;
+  double phi;
+  double P;
+  double P2;
+
+  double tc;
+  double tc_GeV;
+  double uc;
+  double uc_GeV;
+  ///*--------------------------------------------------*/ 
 
 }; 
 
@@ -278,6 +292,12 @@ class Pi0_Production:PiPlus_Production{
 
   void Pi0_Decay_Pythia6_Out_Init();
   void Pi0_Decay_Pythia6_Output();
+  
+  ///----------------------------------------------------*/
+  /// Output algorithm into HEPMC3 format
+
+  void Pi0_HEPMC3_Out_Init();
+  void Pi0_HEPMC3_Output();
 
   unsigned long long int print_itt;
 
@@ -389,6 +409,7 @@ class KPlus_Production {
   TLorentzVector r_lphotong;
   TLorentzVector r_lX;
   TLorentzVector r_lX_g;
+
   double fX_Mass;
   double fX_Mass_GeV;
   double f_Scat_hadron_Mass;
@@ -452,10 +473,6 @@ class KPlus_Production {
   Double_t r_fSig_L;
 
   unsigned long long int print_itt;
-
-
-
-
 };
 
 
