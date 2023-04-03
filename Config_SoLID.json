@@ -4,8 +4,10 @@
     // and degrees for angles.
     // n_events indicates number of attempts
     // SJDK 17/06/22 - This is an old .json I found from DEMPEvGen, I believe these are still valid options for DEMPGen
+    "experiment" : "solid",
     "output_file" : "Test.root",
     "n_events" : 10000,
+    "particle": "Pion+",
     "beam_energy": 11000,
     "targ_pol_x": 0.865,
     "targ_pol_y": 0,

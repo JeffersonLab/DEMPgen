@@ -174,6 +174,25 @@ void eic(Json::Value obj) {
 	  hadron = "";
 	}
 
+	// SJDK 03/04/23 - Change to how Qsq range is set/chosen, could add as an override variable later too
+	// Set min/max Qsq values depending upon particle type
+	if (particle == "pi+" || particle == "Pion+" || particle == "Pi+"){
+	  fQsq_Min = 5.0; fQsq_Max = 35.0;
+	  fW_Min = 3.0; fW_Max = 10.6;
+	}
+	else if (particle == "pi0" || particle == "Pion0" || particle == "Pi0"){
+	  fQsq_Min = 5.0; fQsq_Max = 1000.0;
+	  fW_Min = 2.0; fW_Max = 10.0;
+	}
+	else if (particle == "K+"){
+	  fQsq_Min = 1.0; fQsq_Max = 35.0;
+	  fW_Min = 2.0; fW_Max = 10.0;
+	}
+	else{
+	  fQsq_Min = 5.0; fQsq_Max = 35.0;
+	  fW_Min = 2.0; fW_Max = 10.0;
+	}
+
 	// SJDK - 01/06/21
 	// Set beam energies from .json read in
 	if (obj.isMember("ebeam")){
@@ -213,8 +232,8 @@ void eic(Json::Value obj) {
 	}
 	else{
 	  cout << "Output type not specified in .json file!" << endl;
-	  cout << "Setting output type to Pythia6 by default!" << endl;
-	  gOutputType = "Pythia6";
+	  cout << "Setting output type to HEPMC3 by default!" << endl;
+	  gOutputType = "HEPMC3";
 	}
 	///*--------------------------------------------------*/
 	/// The detector selection is determined here
@@ -284,21 +303,10 @@ void eic(Json::Value obj) {
 	}
 	else{
 	  fEjectileX_Theta_F = 60.0 * fDEG2RAD;
-	  cout << "Max  ejectile X theta not specified in .json file, defaulting to 60 degrees." << endl;
+	  cout << "Max ejectile X theta not specified in .json file, defaulting to 60 degrees." << endl;
 	}
-
-	// 18/01/23 - SJDK - I think this would probably be the best point to set the parameter read in for cross section calculations, once the particle and hadron are set, it can then read in the relevant parameter array. For example, assign "sigParArray" to the output of "ReadCrossSectionPar"
-	        
-        //vector<vector<vector<vector<double>>>> sig;
-        SigPar = ReadCrossSectionPar(particle, hadron);
-	/*
-        cout << "!!!!!!!!!!!!!!!!!! TEST - EIC.CC !!!!!!!!!!!!!!!!!!" << endl;
-        cout<<SigPar[0][3][4][5]<<endl;
-	cout << "!!!!!!!!!!!!!!!!!! TEST - EIC.CC !!!!!!!!!!!!!!!!!!" << endl;
-        cout << "!!!!!!!!!!!!!!!!!! TEST - EIC.CC !!!!!!!!!!!!!!!!!!" << endl;
-        cout<<SigPar[1][3][4][6]<<endl;
-	cout << "!!!!!!!!!!!!!!!!!! TEST - EIC.CC !!!!!!!!!!!!!!!!!!" << endl;
-	*/  
+        
+	SigPar = ReadCrossSectionPar(particle, hadron);
 
         if(particle != "pi0"){ // Default case now
 	  Reaction* r1 = new Reaction(particle, hadron);

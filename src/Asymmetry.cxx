@@ -79,7 +79,6 @@ int Asymmetry::Parameterize(vector<double> in_Qsq)
 
     n = GK_Raw->Draw(tempname2, tempname3, "goff");
 
-
     // The previous version of this parameterization used
     // only one TF1. As a result, the parameters were
     // initialized by the previous fit.
