@@ -282,15 +282,17 @@ void DEMP_Reaction::Processing_Event() {
     w_ev++;
     return;
   }
-  
+
+  // SJDK - 17/04/23 - To use the solve function, comment out lines 301-351, uncomment lines 293-295 and 357-358
+
   ///*--------------------------------------------------*/ 
   /// Modifier: Ishan Goel 
   /// Date: March 22, 2023
   /// This Solve function is the same as the one implemented in the SoLID generator part
   // Removing cases with no solution
-  if(!Solve()){
-    return;
-  }
+  // if(!Solve()){
+  //   return;
+  // }
 
   // ---------------------------------------------------------
   // Pion momentum in collider frame, analytic solution starts
@@ -337,23 +339,23 @@ void DEMP_Reaction::Processing_Event() {
   /// And obtain recoiled proton in collider (lab) frame
   ///---------------------------------------------------------
 
-  //  r_lX.SetPxPyPzE( (sqrt( pow( fepi1 , 2) - pow(fX_Mass , 2) ) ) * sin(fX_Theta_Col) * cos(fX_Phi_Col),
-  //		   ( sqrt( pow( fepi1 , 2) - pow(fX_Mass , 2) ) ) * sin(fX_Theta_Col) * sin(fX_Phi_Col),
-  //		   ( sqrt( pow( fepi1 , 2) - pow(fX_Mass , 2) ) ) * cos(fX_Theta_Col),
-  //		   fepi1 );
-  //
-  //  r_l_scat_hadron.SetPxPyPzE( ( r_lproton + r_lelectron - r_lscatelec - r_lX).X(),
-  //			       ( r_lproton + r_lelectron - r_lscatelec - r_lX ).Y(),
-  //			       ( r_lproton + r_lelectron - r_lscatelec - r_lX ).Z(),
-  //			       sqrt( pow( ( ( ( r_lproton + r_lelectron - r_lscatelec - r_lX ).Vect() ).Mag()),2) +
-  //				     pow( f_Scat_Hadron_Mass , 2) ) );
+   r_lX.SetPxPyPzE( (sqrt( pow( fepi1 , 2) - pow(fX_Mass , 2) ) ) * sin(fX_Theta_Col) * cos(fX_Phi_Col),
+  		   ( sqrt( pow( fepi1 , 2) - pow(fX_Mass , 2) ) ) * sin(fX_Theta_Col) * sin(fX_Phi_Col),
+  		   ( sqrt( pow( fepi1 , 2) - pow(fX_Mass , 2) ) ) * cos(fX_Theta_Col),
+  		   fepi1 );
+  
+   r_l_scat_hadron.SetPxPyPzE( ( r_lproton + r_lelectron - r_lscatelec - r_lX).X(),
+  			       ( r_lproton + r_lelectron - r_lscatelec - r_lX ).Y(),
+  			       ( r_lproton + r_lelectron - r_lscatelec - r_lX ).Z(),
+  			       sqrt( pow( ( ( ( r_lproton + r_lelectron - r_lscatelec - r_lX ).Vect() ).Mag()),2) +
+  				     pow( f_Scat_hadron_Mass , 2) ) );
 
   ///--------------------------------------------------
   /// Output with the Solve Function
   /// Setting the solution values to X and recoiled hadron
 
-   r_lX.SetPxPyPzE(r_lX_solved->Px(), r_lX_solved->Py(), r_lX_solved->Pz(), r_lX_solved->E());
-   r_l_scat_hadron.SetPxPyPzE(r_l_scat_hadron_solved->Px(), r_l_scat_hadron_solved->Py(), r_l_scat_hadron_solved->Pz(), r_l_scat_hadron_solved->E());
+   // r_lX.SetPxPyPzE(r_lX_solved->Px(), r_lX_solved->Py(), r_lX_solved->Pz(), r_lX_solved->E());
+   // r_l_scat_hadron.SetPxPyPzE(r_l_scat_hadron_solved->Px(), r_l_scat_hadron_solved->Py(), r_l_scat_hadron_solved->Pz(), r_l_scat_hadron_solved->E());
 
   ///--------------------------------------------------
   
@@ -440,7 +442,6 @@ void DEMP_Reaction::Processing_Event() {
   //                                          End                                           //
   // Transformation of e', pi- and recoil proton to target's rest frmae without energy loss //
   ////////////////////////////////////////////////////////////////////////////////////////////
-
 
   // -----------------------------------------------------------------------------------------
   // Calculate -t

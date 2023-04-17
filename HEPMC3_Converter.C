@@ -19,7 +19,7 @@
 #include <TTree.h>
 
 // SJDK - 04/03/23 - Read in a few things as arguments
-void HEPMC3_Converter(Int_t nEvents = 0, string InputHEPMC3File = "", string OutputRootFile = "", string FileType = ""){
+void HEPMC3_Converter(Long_t nEvents = -1, string InputHEPMC3File = "", string OutputRootFile = "", string FileType = ""){
   
   // 04/04/23 - SJDK - Explicitly set batch mode so it doesn't spam stuff to screen
   gROOT->SetBatch(kTRUE);
@@ -40,17 +40,16 @@ void HEPMC3_Converter(Int_t nEvents = 0, string InputHEPMC3File = "", string Out
     cout << "Enter a root file to write to: ";
     cin >> OutputRootFile;
   }
-
   if(FileType == ""){
     cout << "File type not specified, enter raw or AB. Raw for DEMPGen output, AB for afterburned files." << endl << "Defaulting to raw." << endl;
     FileType = "raw";
   }
-  else if (FileType != "raw" | FileType != "AB"){
+  else if (FileType != "raw" && FileType != "AB"){
     cout << "Invalid file type specified, enter only raw or AB. Defaulting to raw." << endl;
     FileType = "raw";  
   } 
-  
-  Int_t nSkip; // SJDK - 04/04/23 - Number of lines to skip, depends upon file type
+
+  Long_t nSkip; // SJDK - 04/04/23 - Number of lines to skip, depends upon file type
   if (FileType == "raw"){
     nSkip = 2;
   }
@@ -74,9 +73,10 @@ void HEPMC3_Converter(Int_t nEvents = 0, string InputHEPMC3File = "", string Out
   //.............................................................................................................................................     
   string s;     
   vector<string> v;
-  Int_t nLines;
-   
-  for (int i = 0; i <nSkip; i++){ // Skip the first 21 lines - NOTE - Only valid for afterburner! 
+  Long_t nLines = 0;
+  Long_t nEvents_read = 0;
+
+  for (Long_t i = 0; i <nSkip; i++){ // Skip the first 21 lines - NOTE - Only valid for afterburner! 
     getline(HEPMC3In,s);
   }
  
@@ -85,13 +85,20 @@ void HEPMC3_Converter(Int_t nEvents = 0, string InputHEPMC3File = "", string Out
     if (HEPMC3In.eof()) break;
     v.push_back(s);  // store all the file to the vector
   }
+
+  if (FileType == "raw"){
+    nEvents_read = nLines/9; // 04/04/23 - Number of events in the file is the number of lines read divided by 9 (each event is 9 lines)
+  }
+
+  else if (FileType == "AB"){
+    nEvents_read = (nLines-2)/9; // 04/04/23 - Number of events in the file is the number of lines read (-2, AB has two tailing lines) divided by 9 (each event is 9 lines)
+  }
   
-  Int_t nEvents_read = nLines/9; // 04/04/23 - Number of events in the file is the number of lines read divided by 9 (each event is 9 lines)
   HEPMC3In.close();
 
   // 04/04/23 - Check number of events doesn't exceed number in the file!
   if (nEvents > nEvents_read){
-    cerr << "!!!!! ERROR !!!!! " << endl << "Requested to process more events than are actually in the file! Double check and try again!" << endl <<  "!!!!! ERRROR !!!!!" << endl;
+    cerr << "!!!!! ERROR !!!!! " << endl << "Requested to process more events - ("<< nEvents << ") than are actually in the file - (" << nEvents_read << ")" << endl << "Double check and try again!" << endl <<  "!!!!! ERRROR !!!!!" << endl;
     exit;
   }
   else if (nEvents != nEvents_read){
