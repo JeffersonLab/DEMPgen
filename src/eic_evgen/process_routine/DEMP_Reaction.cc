@@ -255,8 +255,6 @@ void DEMP_Reaction::Processing_Event() {
   r_lphotong = r_lelectrong - r_lscatelecg;
 
   fQsq_GeV = -1.* r_lphotong.Mag2();
-  // SJDK 31/01/23 - Again, should this be a user defined/set range?
-  // SJDK 30/01/23 - Changed Qsq range to match new validity range from Love's paramaterisation
   // SJDK 03/04/23 - Qsq an W ranges now variables set by particle type in .json read in. See eic.cc
   if ( fQsq_GeV < fQsq_Min || fQsq_GeV > fQsq_Max ) {
     qsq_ev++;
@@ -277,22 +275,21 @@ void DEMP_Reaction::Processing_Event() {
     return;
   }    
 
-  //if ( fW_GeV < 3.0 || fW_GeV > 10.6 ) { // SJDK 31/01/23 - Previous range utilised - K+ was 2-10
   if ( fW_GeV < fW_Min || fW_GeV > fW_Max ) { // SJDK 03/04/23 - Switched to the new variable, set by particle type
     w_ev++;
     return;
   }
 
-  // SJDK - 17/04/23 - To use the solve function, comment out lines 301-351, uncomment lines 293-295 and 357-358
+  // SJDK - 17/04/23 - To use the solve function, comment out lines 298-349, uncomment lines 290-292 and 354-355
 
   ///*--------------------------------------------------*/ 
   /// Modifier: Ishan Goel 
   /// Date: March 22, 2023
   /// This Solve function is the same as the one implemented in the SoLID generator part
   // Removing cases with no solution
-  // if(!Solve()){
-  //   return;
-  // }
+   // if(!Solve()){
+   //   return;
+   // }
 
   // ---------------------------------------------------------
   // Pion momentum in collider frame, analytic solution starts
@@ -311,13 +308,13 @@ void DEMP_Reaction::Processing_Event() {
   double fc = r_lphoton.E() + fProton_Mass;
  
   fa = ( fa - std::abs( (r_lproton.Vect()).Mag() ) * ( ( ( r_lproton.X() / (r_lproton.Vect()).Mag() ) * fupx ) + 
- 						       ( ( r_lproton.Y() / (r_lproton.Vect()).Mag() ) * fupy ) + 
- 						       ( ( r_lproton.Z() / (r_lproton.Vect()).Mag() ) * fupz ) ) );
+  						       ( ( r_lproton.Y() / (r_lproton.Vect()).Mag() ) * fupy ) + 
+  						       ( ( r_lproton.Z() / (r_lproton.Vect()).Mag() ) * fupz ) ) );
      
   double factor = ( pow( (r_lproton.Vect()).Mag() , 2 ) + 2.0 * (r_lphoton.Vect()).Mag() * (r_lproton.Vect()).Mag() *  
-		    ( ( ( r_lproton.X() / (r_lproton.Vect()).Mag() ) * fuqx ) + 
-		      ( ( r_lproton.Y() / (r_lproton.Vect()).Mag() ) * fuqy ) + 
-		      ( ( r_lproton.Z() / (r_lproton.Vect()).Mag() ) * fuqz ) ) );
+  		    ( ( ( r_lproton.X() / (r_lproton.Vect()).Mag() ) * fuqx ) + 
+  		      ( ( r_lproton.Y() / (r_lproton.Vect()).Mag() ) * fuqy ) + 
+  		      ( ( r_lproton.Z() / (r_lproton.Vect()).Mag() ) * fuqz ) ) );
      
   fb =  fb + factor;  
   fc = r_lphoton.E() + r_lproton.E();
@@ -361,7 +358,6 @@ void DEMP_Reaction::Processing_Event() {
   
   r_lX_g = r_lX * fm;
   r_l_scat_hadron_g = r_l_scat_hadron * fm;
-
 
   // ----------------------------------------------------------------------------------------------
   // Calculate w = (proton + photon)^2
