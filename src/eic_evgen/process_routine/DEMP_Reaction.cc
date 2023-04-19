@@ -175,9 +175,8 @@ void DEMP_Reaction::Init() {
 
   char AngleGenName[100] = "AngleGen";
   double dummy[2] = {0,1};
-  double ThetaRange[2] = {obj["prod_pion_thetamin"].asDouble()*TMath::DegToRad(),
-                          obj["prod_pion_thetamax"].asDouble()*TMath::DegToRad()};
-
+  // Changed the theta range here to match the one actually provided in the input .json file, these are already converted to radians in eic.cc (see ~ line 293)
+  double ThetaRange[2] = {fX_Theta_I, fX_Theta_F};
   double PhiRange[2] = {0, 360*TMath::DegToRad()};
   AngleGen = new CustomRand(AngleGenName, dummy,
                             ThetaRange, PhiRange);
