@@ -26,7 +26,6 @@ ProductGen::ProductGen(Particle* inInteraction, Particle* inTarget):
 
   extern Json::Value obj;
 
-
   char AngleGenName[100] = "AngleGen";
   double dummy[2] = {0,1};
   double ThetaRange[2] = {obj["prod_pion_thetamin"].asDouble()*TMath::DegToRad(),
@@ -126,8 +125,6 @@ int ProductGen::Solve(double theta, double phi)
                                   P*pars[1],
                                   P*pars[2]);
   *Pion = *Pion1;
-
-  //std::cout << Pion->E() << std::endl;
 
   Particle * Proton1 = new Particle();
   *Proton1 = *Initial-*Pion;

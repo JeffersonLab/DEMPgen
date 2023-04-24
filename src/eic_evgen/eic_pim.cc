@@ -39,7 +39,8 @@ int fWLessShell, fWLess1P9, fSDiff;
 
 unsigned long long int fNEvents, fNRecorded, fNGenerated, fWSqNeg, fNMomConserve, fNSigmaNeg, fNaN, fConserve, fNWeightUnphys, fNWeightReject, fLundRecorded, fNFile;
 
-double fK, fm, fElectron_Kin_Col_GeV, fElectron_Kin_Col, fRand, fLumi, fuBcm2, fPI, fDEG2RAD, fRAD2DEG, fEBeam, fPBeam, fScatElec_Theta_I, fScatElec_Theta_F, fPion_Theta_I, fPion_Theta_F, fEjectileX_Theta_I, fEjectileX_Theta_F, fScatElec_E_Hi, fScatElec_E_Lo, fPSF; 
+// SJDK 03/04/23 - Added in Qsq Min/Max and W Min/Max
+double fK, fm, fElectron_Kin_Col_GeV, fElectron_Kin_Col, fRand, fLumi, fuBcm2, fPI, fDEG2RAD, fRAD2DEG, fEBeam, fPBeam, fScatElec_Theta_I, fScatElec_Theta_F, fPion_Theta_I, fPion_Theta_F, fEjectileX_Theta_I, fEjectileX_Theta_F, fScatElec_E_Hi, fScatElec_E_Lo, fPSF, fQsq_Min, fQsq_Max, fW_Min, fW_Max; 
 
 double fOmega_Theta_I, fOmega_Theta_F, fOmega_Theta_Col, fOmega_Phi_Col;
 
@@ -205,8 +206,6 @@ pim::pim(int aaa) {
 
 }
 
-
-
 /*--------------------------------------------------*/
 /*--------------------------------------------------*/
 
@@ -236,7 +235,7 @@ void pim::Initilize() {
     kFSI                                        = false;
     kMSele                                      = false;
     kMS                                         = false;
-    // 18/01/23 - The luminosity below is some default assumtpion, more up to date values are set in PiPlus prod and depend upon beam energy combinations if they are specified
+    // 18/01/23 - The luminosity below is some default assumtpion, more up to date values are set in DEMP prod and depend upon beam energy combinations if they are specified
     // See slide 11 in https://indico.cern.ch/event/1072579/contributions/4796856/attachments/2456676/4210776/CAP-EIC-June-7-2022-Seryi-r2.pdf for more info
 //    fLumi                                     = 0.374e33; // Jlab design
     //fLumi                                       = 1e34; // https://eic.jlab.org/wiki/index.php/EIC_luminosity - OUTDATED
@@ -245,7 +244,8 @@ void pim::Initilize() {
     fPI                                         = 3.1415926;
     fDEG2RAD                                    = fPI/180.0;
     fRAD2DEG                                   = 180.0/fPI;
-
+    
+    // SJDK 21/12/22 - Set by .json read in
     //fScatElec_Theta_I                           = 60.0 * fDEG2RAD;
     //fScatElec_Theta_F                           = 175.0 * fDEG2RAD;
     // SJDK 29/11/22 - Updated comment on two variables below

@@ -16,6 +16,10 @@
 
 #include "TCanvas.h"
 
+#include "Particle.hxx"
+#include "CustomRand.hxx"
+
+
 class Reaction{
 
  public:
@@ -60,6 +64,7 @@ class DEMP_Reaction {
   void DEMPReact_HEPMC3_Output();
 
   TRandom2* rRanBd;
+  TRandom2* rRand;
 		
   Particle_t recoil_hadron;
   Particle_t produced_X;
@@ -122,6 +127,9 @@ class DEMP_Reaction {
   TLorentzVector r_lX;
   TLorentzVector r_lX_g;
 
+  Particle* r_lX_solved;
+  Particle* r_l_scat_hadron_solved;
+
   double fX_Mass;
   double fX_Mass_GeV;
 
@@ -133,7 +141,7 @@ class DEMP_Reaction {
 
   TLorentzVector r_lw;
 
-  TLorentzVector lwp;	
+  TLorentzVector lwp;
 
   TLorentzVector fsini;
   TLorentzVector fsfin;
@@ -170,7 +178,9 @@ class DEMP_Reaction {
 
   TLorentzVector lt;
   TLorentzVector ltg;
-		
+  TLorentzVector lu;
+  TLorentzVector lug;
+
   ///////////////////////////////////////////
 
   TVector3 v3Photon;   
@@ -195,7 +205,52 @@ class DEMP_Reaction {
 
   unsigned long long int print_itt;
 
+  ///*--------------------------------------------------*/ 
+  // Rory Check algorithm
+  
+  //  Particle* Pion;
+  //  Particle* Proton_Particle;
+
+  Particle* Interaction;
+  Particle* Target;
+
+  Particle* Initial;
+  Particle* Final;
+
+  Particle* VertBeamElec;
+  Particle* VertScatElec;
+  Particle* Photon;
+
+  bool SolnCheck();
+  double W_in(); 
+  double W_out();
+  double W_in_val;
+
+  TRandom3* CoinToss;
+  CustomRand* AngleGen;
+ 
+  TF1* F;
+  TVector3* UnitVect;
+
+  int Solve();
+  int Solve(double theta, double phi);
+
+  ///*--------------------------------------------------*/ 
+  // Needed for the Solve function
+
+  double theta;
+  double phi;
+  double P;
+  double P2;
+
+  double tc;
+  double tc_GeV;
+  double uc;
+  double uc_GeV;
+  ///*--------------------------------------------------*/ 
+
 };
+
 
 class Pi0_Production:DEMP_Reaction{
  
@@ -215,6 +270,12 @@ class Pi0_Production:DEMP_Reaction{
 
   void Pi0_Decay_Pythia6_Out_Init();
   void Pi0_Decay_Pythia6_Output();
+  
+  ///----------------------------------------------------*/
+  /// Output algorithm into HEPMC3 format
+
+  void Pi0_HEPMC3_Out_Init();
+  void Pi0_HEPMC3_Output();
 
   unsigned long long int print_itt;
 
