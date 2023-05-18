@@ -237,7 +237,7 @@ void pim::Initilize() {
     kMS                                         = false;
     // 18/01/23 - The luminosity below is some default assumtpion, more up to date values are set in DEMP prod and depend upon beam energy combinations if they are specified
     // See slide 11 in https://indico.cern.ch/event/1072579/contributions/4796856/attachments/2456676/4210776/CAP-EIC-June-7-2022-Seryi-r2.pdf for more info
-//    fLumi                                     = 0.374e33; // Jlab design
+    //fLumi                                     = 0.374e33; // Jlab design
     //fLumi                                       = 1e34; // https://eic.jlab.org/wiki/index.php/EIC_luminosity - OUTDATED
     fLumi                                       = 1e33; // 18/01/23, this seems a better default based upon more up to date info, see link above
     fuBcm2                                      = 1.0e-30;
@@ -288,7 +288,7 @@ void pim::Initilize() {
     fOmega_Mass                                 = 782.65;
     fOmega_Mass_GeV                             = fOmega_Mass/1000.0;
 
-    fDiff                                       = 0.5;
+    fDiff                                       = 0.00001; // 10/05/23 - Love Preet - Changed from 0.5
     // 02/06/21 - SJDK
     // Set to 0, now set in PiPlusProd.cc
     fElectron_Kin_Col_GeV                       = 0;
@@ -934,8 +934,8 @@ void pim::Initilize() {
     fSig_2Phi_Plus_PhiS_Col                     = 0;
     // SJDK 08/02/22 - New variables Ali added for conservation law checks
     conserve                                    = 0;
-    ene                                         = 0;
-    mom                                         = 0;
+    //ene                                         = 0;
+    //mom                                         = 0;
 
 }
 
@@ -962,7 +962,7 @@ double pim::fermiMomentum() {
 }
 
 // SJDK - 08/02/22 - Original version where there is no separate energy difference
-int pim::CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, TLorentzVector P_pim, TLorentzVector P_pro) {
+/*int pim::CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, TLorentzVector P_pim, TLorentzVector P_pro) {
 
     double energy_check = (P_t.E() + P_E0.E()) - (P_e.E()+P_pim.E()+P_pro.E());
     double px_check =(P_t.Px() + P_E0.Px()) - (P_e.Px()+P_pim.Px()+P_pro.Px()); 
@@ -990,10 +990,10 @@ int pim::CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, 
 	mom++;
       }
     return err;
-}
+    }*/
 
 // SJDK - 08/02/22 - Set the energy tolerance is a parameter that is fed in
-int pim::CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, TLorentzVector P_pim, TLorentzVector P_pro, double fDiff_E) {
+/*int pim::CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, TLorentzVector P_pim, TLorentzVector P_pro, double fDiff_E) {
 
     double energy_check = (P_t.E() + P_E0.E()) - (P_e.E()+P_pim.E()+P_pro.E());
     double px_check =(P_t.Px() + P_E0.Px()) - (P_e.Px()+P_pim.Px()+P_pro.Px()); 
@@ -1021,11 +1021,30 @@ int pim::CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, 
 	mom++;
       }
     return err;
-}
+    }*/
+
+//-> 10/05/23 - Love added a slimmed down, simpler to read version of the CheckLaws fn
+
+int pim::CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, TLorentzVector P_pim, TLorentzVector P_pro) {
+
+  double energy_check = (P_t.E() + P_E0.E()) - (P_e.E()+P_pim.E()+P_pro.E());
+  double px_check =(P_t.Px() + P_E0.Px()) - (P_e.Px()+P_pim.Px()+P_pro.Px()); 
+  double py_check =(P_t.Py() + P_E0.Py()) - (P_e.Py()+P_pim.Py()+P_pro.Py()); 
+  double pz_check =(P_t.Pz() + P_E0.Pz()) - (P_e.Pz()+P_pim.Pz()+P_pro.Pz()); 
+                                                                                                 
+  Int_t err = -1;
+  if( fabs( energy_check ) < fDiff &&
+      fabs( px_check )     < fDiff &&
+      fabs( py_check )     < fDiff &&
+      fabs( pz_check )     < fDiff){
+    conserve++;
+    err = 1;
+  }
+
+  return err;
+  }
 
 ///*--------------------------------------------------*/
-
-
 
 void pim::setrootfile( string rootFile ){ 
 
