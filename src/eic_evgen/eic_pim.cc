@@ -934,8 +934,8 @@ void pim::Initilize() {
     fSig_2Phi_Plus_PhiS_Col                     = 0;
     // SJDK 08/02/22 - New variables Ali added for conservation law checks
     conserve                                    = 0;
-    //ene                                         = 0;
-    //mom                                         = 0;
+    ene                                         = 0;
+    mom                                         = 0;
 
 }
 
