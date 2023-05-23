@@ -171,13 +171,10 @@ void DEMP_Reaction::Init() {
               "[6]-sqrt([7]**2+x**2)-sqrt([8]**2+([3]-[0]*x)**2+([4]-[1]*x)**2+([5]-[2]*x)**2)",
               0, 12000);
 
-  extern Json::Value obj;
-
   char AngleGenName[100] = "AngleGen";
   double dummy[2] = {0,1};
-  double ThetaRange[2] = {obj["prod_pion_thetamin"].asDouble()*TMath::DegToRad(),
-                          obj["prod_pion_thetamax"].asDouble()*TMath::DegToRad()};
-
+  // Changed the theta range here to match the one actually provided in the input .json file, these are already converted to radians in eic.cc (see ~ line 293)
+  double ThetaRange[2] = {fX_Theta_I, fX_Theta_F};
   double PhiRange[2] = {0, 360*TMath::DegToRad()};
   AngleGen = new CustomRand(AngleGenName, dummy,
                             ThetaRange, PhiRange);
@@ -280,17 +277,17 @@ void DEMP_Reaction::Processing_Event() {
     return;
   }
 
-  // SJDK - 17/04/23 - To use the solve function, comment out lines 298-349, uncomment lines 290-292 and 354-355
+  // SJDK - 17/04/23 - To use the solve function, comment out lines 295-346, uncomment lines 287-289 and 351-352
 
   ///*--------------------------------------------------*/ 
   /// Modifier: Ishan Goel 
   /// Date: March 22, 2023
   /// This Solve function is the same as the one implemented in the SoLID generator part
   // Removing cases with no solution
-   // if(!Solve()){
-   //   return;
-   // }
-
+  //  if(!Solve()){
+  //  return;
+  // }
+   
   // ---------------------------------------------------------
   // Pion momentum in collider frame, analytic solution starts
   // ---------------------------------------------------------
@@ -319,7 +316,7 @@ void DEMP_Reaction::Processing_Event() {
   fb =  fb + factor;  
   fc = r_lphoton.E() + r_lproton.E();
      
-  double ft = fc * fc - fb + fX_Mass * fX_Mass - fProton_Mass * fProton_Mass;
+  double ft = fc * fc - fb + fX_Mass * fX_Mass - f_Scat_hadron_Mass * f_Scat_hadron_Mass; // 15/05/23 - Love - Switched from proton mass to scat hadron mass (should be of the the recoiling hadron)
      
   double fQA = 4.0 * ( fa * fa - fc * fc );
   double fQB = 4.0 * fc * ft;
@@ -391,18 +388,23 @@ void DEMP_Reaction::Processing_Event() {
     kSConserve = true;
   }
   // SJDK 27/01/23 - For Kaon events, 0.5 is too stringent for conservation law check with the current (Ahmed) method to determine meson properties
-  // Hopefully, Rory's method will be better here and we can utilise the same conservation law check for both particles
-  if (rParticle == "Pi+" || rParticle == "Pi0"){
-    if ( pd->CheckLaws( r_lelectron, r_lproton, r_lscatelec, r_lX, r_l_scat_hadron, 0.5) != 1 ){
-      fConserve++;
-      return;
-    }
-    else if (rParticle == "K+"){
-      if ( pd->CheckLaws( r_lelectron, r_lproton, r_lscatelec, r_lX, r_l_scat_hadron, 10) != 1 ){
-	fConserve++;
-	return;
-      }
-    }
+  // if (rParticle == "Pi+" || rParticle == "Pi0"){
+  //   if ( pd->CheckLaws( r_lelectron, r_lproton, r_lscatelec, r_lX, r_l_scat_hadron, 0.5) != 1 ){
+  //     fConserve++;
+  //     return;
+  //   }
+  //   else if (rParticle == "K+"){
+  //     if ( pd->CheckLaws( r_lelectron, r_lproton, r_lscatelec, r_lX, r_l_scat_hadron, 10) != 1 ){
+  // 	fConserve++;
+  // 	return;
+  //     }
+  //   }
+  // }
+
+  // 10/05/23 - Love - Following fixes to calculations above, don't need different checks for different particles, uses new, simpler CheckLaws fn
+  if ( pd->CheckLaws( r_lelectron, r_lproton, r_lscatelec, r_lX, r_l_scat_hadron) != 1 ){
+    fConserve++;
+    return;
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
@@ -442,7 +444,7 @@ void DEMP_Reaction::Processing_Event() {
   // -----------------------------------------------------------------------------------------
   // Calculate -t
   // -----------------------------------------------------------------------------------------
- 
+  // 18/05/23 - SJDK - Should these be proton mass still or not?
   fBeta_CM_RF        = (lphoton_rf.Vect()).Mag() / (lphoton_rf.E() + fProton_Mass );
   fGamma_CM_RF       = (lphoton_rf.E() + fProton_Mass) / fW;
   fX_Energy_CM       = (pow(fW, 2) + pow(fX_Mass,2) - pow(f_Scat_hadron_Mass,2) ) / (2.0* fW);    
@@ -815,7 +817,7 @@ void DEMP_Reaction::Lund_Output() {
 	  << setw(16) << r_lX_g.Y()   
 	  << setw(16) << r_lX_g.Z()  
 	  << setw(16) << r_lX_g.E()
-	  << setw(16) << fX_Mass_GeV
+	  << setw(16) << r_lX_g.M() //15/05/23 - Love - Was fX_Mass_GeV
 	  << setw(16) << fVertex_X
 	  << setw(16) << fVertex_Y
 	  << setw(16) << fVertex_Z
@@ -832,7 +834,7 @@ void DEMP_Reaction::Lund_Output() {
 	  << setw(16) << r_lscatelecg.Y() 
 	  << setw(16) << r_lscatelecg.Z() 
 	  << setw(16) << r_lscatelecg.E()
-	  << setw(16) << fElectron_Mass_GeV
+	  << setw(16) << r_lscatelecg.M() //15/05/23 - Love- Was fElectron_Mass_GeV
 	  << setw(16) << fVertex_X
 	  << setw(16) << fVertex_Y
 	  << setw(16) << fVertex_Z
@@ -849,7 +851,7 @@ void DEMP_Reaction::Lund_Output() {
 	  << setw(16) << r_l_scat_hadron_g.Y()
 	  << setw(16) << r_l_scat_hadron_g.Z()
 	  << setw(16) << r_l_scat_hadron_g.E()
-	  << setw(16) << f_Scat_hadron_Mass_GeV
+	  << setw(16) << r_l_scat_hadron_g.M()// 15/05/23 - Love - Was f_Scat_hadron_Mass_GeV
 	  << setw(16) << fVertex_X
 	  << setw(16) << fVertex_Y
 	  << setw(16) << fVertex_Z
@@ -891,7 +893,7 @@ void DEMP_Reaction::DEMPReact_Pythia6_Output() {
 	  << setw(14) << r_lelectrong.Y()   
 	  << setw(14) << r_lelectrong.Z()  
 	  << setw(14) << r_lelectrong.E()
-	  << setw(14) << fElectron_Mass_GeV
+	  << setw(14) << r_lelectrong.M() // 15/05/23 - Love - Was fElectron_Mass_GeV
 	  << setw(6) << fVertex_X
 	  << setw(6) << fVertex_Y
 	  << setw(6) << fVertex_Z
@@ -908,7 +910,7 @@ void DEMP_Reaction::DEMPReact_Pythia6_Output() {
 	 << setw(14) << r_lprotong.Y()   
 	 << setw(14) << r_lprotong.Z()  
 	 << setw(14) << r_lprotong.E()
-	 << setw(14) << fProton_Mass_GeV
+	 << setw(14) << r_lprotong.M() // 15/05/23 - Love - Was fProton_Mass_GeV
 	 << setw(6) << fVertex_X
 	 << setw(6) << fVertex_Y
 	 << setw(6) << fVertex_Z
@@ -947,7 +949,7 @@ void DEMP_Reaction::DEMPReact_Pythia6_Output() {
 	 << setw(14) << r_lscatelecg.Y() 
 	 << setw(14) << r_lscatelecg.Z() 
 	 << setw(14) << r_lscatelecg.E()
-	 << setw(14) << fElectron_Mass_GeV
+	 << setw(14) << r_lscatelecg.M() // 15/05/23 - Love - Was fElectron_Mass_GeV
 	 << setw(6) << fVertex_X
 	 << setw(6) << fVertex_Y
 	 << setw(6) << fVertex_Z
@@ -965,7 +967,7 @@ void DEMP_Reaction::DEMPReact_Pythia6_Output() {
 	 << setw(14) << r_l_scat_hadron_g.Y()
 	 << setw(14) << r_l_scat_hadron_g.Z()
 	 << setw(14) << r_l_scat_hadron_g.E()
-	 << setw(14) << f_Scat_hadron_Mass_GeV
+	 << setw(14) << r_l_scat_hadron_g.M() // 15/05/23 - Love - Was f_Scat_hadron_Mass_GeV
 	 << setw(6) << fVertex_X
 	 << setw(6) << fVertex_Y
 	 << setw(6) << fVertex_Z
@@ -983,7 +985,7 @@ void DEMP_Reaction::DEMPReact_Pythia6_Output() {
 	 << setw(14) << r_lX_g.Y()   
 	 << setw(14) << r_lX_g.Z()  
 	 << setw(14) << r_lX_g.E()
-	 << setw(14) << fX_Mass_GeV
+	 << setw(14) << r_lX_g.M() // 15/05/23 - Love - Was fX_Mass_GeV
 	 << setw(6) << fVertex_X
 	 << setw(6) << fVertex_Y
 	 << setw(6) << fVertex_Z
@@ -1017,17 +1019,17 @@ void DEMP_Reaction::DEMPReact_HEPMC3_Output() {
   // Third line, optional attributes, the weight
   DEMPOut << "A" << " " << "0" << " " << "weight" << " " <<  fEventWeight << endl;
   // Beam particles, particle line - P - Particle ID - Parent Vertex ID - PDG id - px - py - pz - energy - particle mass - status (4, incoming beam particle)
-  DEMPOut << "P" << " " << "1" << " " << "0" << " " << "11" << " " << r_lelectrong.X() << " " << r_lelectrong.Y() << " " << r_lelectrong.Z() << " " << r_lelectrong.E() << " " << fElectron_Mass_GeV << " " << "4" << endl;
-  DEMPOut << "P" << " " << "2" << " " << "0" << " " << "2212" << " " << r_lprotong.X() << " " << r_lprotong.Y() << " " << r_lprotong.Z() << " " << r_lprotong.E() << " " << fProton_Mass_GeV << " " << "4" << endl;
+  DEMPOut << "P" << " " << "1" << " " << "0" << " " << "11" << " " << r_lelectrong.X() << " " << r_lelectrong.Y() << " " << r_lelectrong.Z() << " " << r_lelectrong.E() << " " << r_lelectrong.M() << " " << "4" << endl;
+  DEMPOut << "P" << " " << "2" << " " << "0" << " " << "2212" << " " << r_lprotong.X() << " " << r_lprotong.Y() << " " << r_lprotong.Z() << " " << r_lprotong.E() << " " <<  r_lprotong.M()<< " " << "4" << endl;
   // Vertex line - V - 1 - 0 - [1,2]
   DEMPOut << "V" << " " << "-1" << " " << "0" << " " << "[1,2]" << endl;
   // Output particles, particle line - P - Particle ID - Parent Vertex ID - PDG id - px - py - pz - energy - particle mass - status (1, undecayed physical particle)
   // Scattered electron
-  DEMPOut << "P" << " " << "3" << " " << "-1" << " " << "11" << " " << r_lscatelecg.X() << " "  << r_lscatelecg.Y() << " "  << r_lscatelecg.Z() << " " << r_lscatelecg.E() << " " << fElectron_Mass_GeV << " " << "1" << endl;
+  DEMPOut << "P" << " " << "3" << " " << "-1" << " " << "11" << " " << r_lscatelecg.X() << " "  << r_lscatelecg.Y() << " "  << r_lscatelecg.Z() << " " << r_lscatelecg.E() << " " << r_lscatelecg.M() << " " << "1" << endl;
   // Produced meson
-  DEMPOut << "P" << " " << "4" << " " << "-1" << " " << PDGtype(produced_X) << " " << r_lX_g.X() << " "  << r_lX_g.Y() << " "  << r_lX_g.Z() << " " << r_lX_g.E() << " " << fX_Mass_GeV << " " << "1" << endl;
+  DEMPOut << "P" << " " << "4" << " " << "-1" << " " << PDGtype(produced_X) << " " << r_lX_g.X() << " "  << r_lX_g.Y() << " "  << r_lX_g.Z() << " " << r_lX_g.E() << " " <<  r_lX_g.M() << " " << "1" << endl;
   // Recoil hadron
-  DEMPOut << "P" << " " << "5" << " " << "-1" << " " << PDGtype(recoil_hadron) << " " << r_l_scat_hadron_g.X() << " "  << r_l_scat_hadron_g.Y() << " "  << r_l_scat_hadron_g.Z() << " " << r_l_scat_hadron_g.E() << " " << f_Scat_hadron_Mass_GeV << " " << "1" << endl;
+  DEMPOut << "P" << " " << "5" << " " << "-1" << " " << PDGtype(recoil_hadron) << " " << r_l_scat_hadron_g.X() << " "  << r_l_scat_hadron_g.Y() << " "  << r_l_scat_hadron_g.Z() << " " << r_l_scat_hadron_g.E() << " " << r_l_scat_hadron_g.M() << " " << "1" << endl;
   
 }
 
@@ -1095,19 +1097,16 @@ int DEMP_Reaction::Solve()
 //  phi = 3.49651;
 //  cout << " Theta Phi: "<< theta << "   " << phi << endl; 
 
-
   // Setting the initial values for solve function
   VertBeamElec->SetPxPyPzE(r_lelectron.Px(), r_lelectron.Py(), r_lelectron.Pz(), r_lelectron.E());
   VertScatElec->SetPxPyPzE(r_lscatelec.Px(), r_lscatelec.Py(), r_lscatelec.Pz(), r_lscatelec.E());
   Target->SetPxPyPzE(r_lproton.Px(), r_lproton.Py(), r_lproton.Pz(), r_lproton.E());
-
   *Photon = *VertBeamElec - *VertScatElec;
   *Interaction = *Photon;
 
   *Initial = *Interaction+*Target;
 
   /*--------------------------------------------------*/ 
-
   theta = fX_Theta_Col;
   phi = fX_Phi_Col;
 
@@ -1119,7 +1118,6 @@ int DEMP_Reaction::Solve()
 
 int DEMP_Reaction::Solve(double theta, double phi)
 {
-
 
   W_in_val = W_in();
 
@@ -1166,11 +1164,11 @@ int DEMP_Reaction::Solve(double theta, double phi)
       return 1;
     }
   }
-
+  
   ///*--------------------------------------------------*/ 
   /// Modifier: Ishan Goel
   /// Date: March 22, 2023
-  /// Commenting out second solution as it is not giving any solution ever
+  /// Commenting out second solution as it is not giving any solution ever - MAYBE this works for the kaon and we need it for that?
   /// Check for Second solution:
   // P2 = F->GetX(0, P+100, pars[6], 0.0001, 10000);
   ///Try second solution
