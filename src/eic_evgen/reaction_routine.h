@@ -29,14 +29,14 @@ class Reaction{
   ~Reaction();
 
   void process_reaction();		
-  TString GetParticle() {return rParticle;};		
-  TString GetHadron() {return rHadron;};
+  TString GetParticle() {return rEjectile;};		
+  TString GetHadron() {return rRecoil;};
   
  protected:
   TStopwatch tTime;
 
-  TString rParticle;
-  TString rHadron;
+  TString rEjectile;
+  TString rRecoil;
 
 };
 
@@ -48,8 +48,8 @@ class DEMP_Reaction {
   ~DEMP_Reaction();
 
   void process_reaction();		
-  TString GetParticle() {return rParticle;};		
-  TString GetHadron() {return rHadron;};
+  TString GetParticle() {return rEjectile;};		
+  TString GetHadron() {return rRecoil;};
 
  protected:
 
@@ -80,10 +80,10 @@ class DEMP_Reaction {
   // Parameters
 
   TStopwatch tTime;
-  TString rParticle;
-  TString rParticle_charge;
-  TString rParticle_scat_hadron;
-  TString rHadron;
+  TString rEjectile;
+  TString rEjectile_charge;
+  TString rEjectile_scat_hadron;
+  TString rRecoil;
 
   std::string sTFile;   /// Generator output files. For documentation and monitoring purposes 
   std::string sLFile;   /// Lund input file into the EIC simulation
@@ -99,7 +99,7 @@ class DEMP_Reaction {
 
   double rDEG2RAD;
                    
-  double fX_Theta_I, fX_Theta_F;
+  double f_Ejectile_Theta_I, f_Ejectile_Theta_F;
 
   TLorentzVector GetProtonVector_lab();
   TLorentzVector GetElectronVector_lab();
@@ -116,7 +116,7 @@ class DEMP_Reaction {
 
   Double_t rFermiMomentum;
 
-  Double_t fX_Theta_Col, fX_Phi_Col;
+  Double_t f_Ejectile_Theta_Col, f_Ejectile_Phi_Col;
 
   TLorentzVector r_lscatelec; 
   TLorentzVector r_lscatelecg;
@@ -124,20 +124,24 @@ class DEMP_Reaction {
   TLorentzVector r_lphoton;
   TLorentzVector r_lphotong;
     
-  TLorentzVector r_lX;
-  TLorentzVector r_lX_g;
+  TLorentzVector r_l_Ejectile;
+  TLorentzVector r_l_Ejectile_g;
 
-  Particle* r_lX_solved;
-  Particle* r_l_scat_hadron_solved;
+//  Particle* r_l_Ejectile_solved;
+//  Particle* l_Recoil_solved;
 
-  double fX_Mass;
-  double fX_Mass_GeV;
 
-  double f_Scat_hadron_Mass;     
-  double f_Scat_hadron_Mass_GeV;
+  TLorentzVector r_l_Ejectile_solved;
+  TLorentzVector l_Recoil_solved;
 
-  TLorentzVector r_l_scat_hadron;
-  TLorentzVector r_l_scat_hadron_g;
+  double f_Ejectile_Mass;
+  double f_Ejectile_Mass_GeV;
+
+  double f_Recoil_Mass;     
+  double f_Recoil_Mass_GeV;
+
+  TLorentzVector l_Recoil;
+  TLorentzVector l_Recoil_g;
 
   TLorentzVector r_lw;
 
@@ -165,8 +169,8 @@ class DEMP_Reaction {
   TLorentzVector lphoton_rf;
   TLorentzVector lphoton_rfg;
 
-  TLorentzVector lX_rf;
-  TLorentzVector lX_rfg;
+  TLorentzVector l_Ejectile_rf;
+  TLorentzVector l_Ejectile_rfg;
 
   TLorentzVector l_scat_hadron_rf;
   TLorentzVector l_scat_hadron_rf_g;
@@ -174,7 +178,7 @@ class DEMP_Reaction {
   ///////////////////////////////////////////
   /// Center of Mass parameters for particle X
 
-  double fBeta_CM_RF, fGamma_CM_RF, fX_Energy_CM, fX_Mom_CM, fX_Energy_CM_GeV, fX_Mom_CM_GeV;
+  double fBeta_CM_RF, fGamma_CM_RF, f_Ejectile_Energy_CM, f_Ejectile_Mom_CM, f_Ejectile_Energy_CM_GeV, f_Ejectile_Mom_CM_GeV;
 
   TLorentzVector lt;
   TLorentzVector ltg;
@@ -208,22 +212,31 @@ class DEMP_Reaction {
   ///*--------------------------------------------------*/ 
   // Rory Check algorithm
   
-  //  Particle* Pion;
-  //  Particle* Proton_Particle;
 
-  Particle* Interaction;
-  Particle* Target;
+  //  Particle* Interaction;
+  //  Particle* Target;
+  //
+  //  Particle* Initial;
+  //  Particle* Final;
+  //
+  //  Particle* VertBeamElec;
+  //  Particle* VertScatElec;
+  //  Particle* Photon;
 
-  Particle* Initial;
-  Particle* Final;
 
-  Particle* VertBeamElec;
-  Particle* VertScatElec;
-  Particle* Photon;
+  TLorentzVector Interaction_Solve;
+  TLorentzVector Target_Solve;
+  
+  TLorentzVector Initial;
+  TLorentzVector Final;
+  
+  TLorentzVector VertBeamElec;
+  TLorentzVector VertScatElec;
+  TLorentzVector Photon;
 
   bool SolnCheck();
-  double W_in(); 
-  double W_out();
+  double W_in_Solve(); 
+  double W_out_Solve();
   double W_in_val;
 
   TRandom3* CoinToss;
