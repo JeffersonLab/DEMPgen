@@ -242,7 +242,6 @@ void DEMP_Reaction::Processing_Event() {
     return;
   }
 
-
   // ---------------------------------------------------------
   // Pion momentum in collider frame, analytic solution starts
   // ---------------------------------------------------------
@@ -357,9 +356,6 @@ void DEMP_Reaction::Processing_Event() {
      fConserve++;
      return;
    }	
-
-
-
 
   ////////////////////////////////////////////////////////////////////////////////////////////
   //                                          Start                                         //
@@ -772,7 +768,7 @@ void DEMP_Reaction::Lund_Output() {
 	  << setw(16) << r_l_Ejectile_g.Y()   
 	  << setw(16) << r_l_Ejectile_g.Z()  
 	  << setw(16) << r_l_Ejectile_g.E()
-	  << setw(16) << r_l_Ejectile_g.M()
+	  << setw(16) << r_l_Ejectile_g.M() //15/05/23 - Love - Was fX_Mass_GeV
 	  << setw(16) << fVertex_X
 	  << setw(16) << fVertex_Y
 	  << setw(16) << fVertex_Z
@@ -789,7 +785,7 @@ void DEMP_Reaction::Lund_Output() {
 	  << setw(16) << r_lscatelecg.Y() 
 	  << setw(16) << r_lscatelecg.Z() 
 	  << setw(16) << r_lscatelecg.E()
-	  << setw(16) << r_lscatelecg.M()
+	  << setw(16) << r_lscatelecg.M() //15/05/23 - Love- Was fElectron_Mass_GeV
 	  << setw(16) << fVertex_X
 	  << setw(16) << fVertex_Y
 	  << setw(16) << fVertex_Z
@@ -806,7 +802,7 @@ void DEMP_Reaction::Lund_Output() {
 	  << setw(16) << l_Recoil_g.Y()
 	  << setw(16) << l_Recoil_g.Z()
 	  << setw(16) << l_Recoil_g.E()
-	  << setw(16) << l_Recoil_g.M()
+	  << setw(16) << l_Recoil_g.M() // 15/05/23 - Love - Was f_Scat_hadron_Mass_GeV
 	  << setw(16) << fVertex_X
 	  << setw(16) << fVertex_Y
 	  << setw(16) << fVertex_Z
@@ -848,7 +844,7 @@ void DEMP_Reaction::DEMPReact_Pythia6_Output() {
 	  << setw(14) << r_lelectrong.Y()   
 	  << setw(14) << r_lelectrong.Z()  
 	  << setw(14) << r_lelectrong.E()
-	  << setw(14) <<  r_lelectrong.M()
+	  << setw(14) <<  r_lelectrong.M() // 15/05/23 - Love - Was fElectron_Mass_GeV
 	  << setw(6) << fVertex_X
 	  << setw(6) << fVertex_Y
 	  << setw(6) << fVertex_Z
@@ -865,7 +861,7 @@ void DEMP_Reaction::DEMPReact_Pythia6_Output() {
 	 << setw(14) << r_lprotong.Y()   
 	 << setw(14) << r_lprotong.Z()  
 	 << setw(14) << r_lprotong.E()
-	 << setw(14) <<  r_lprotong.M()
+	 << setw(14) << r_lprotong.M() // 15/05/23 - Love - Was fProton_Mass_GeV
 	 << setw(6) << fVertex_X
 	 << setw(6) << fVertex_Y
 	 << setw(6) << fVertex_Z
@@ -904,7 +900,7 @@ void DEMP_Reaction::DEMPReact_Pythia6_Output() {
 	 << setw(14) << r_lscatelecg.Y() 
 	 << setw(14) << r_lscatelecg.Z() 
 	 << setw(14) << r_lscatelecg.E()
-	 << setw(14) << r_lscatelecg.M() 
+	 << setw(14) << r_lscatelecg.M() // 15/05/23 - Love - Was fElectron_Mass_GeV
 	 << setw(6) << fVertex_X
 	 << setw(6) << fVertex_Y
 	 << setw(6) << fVertex_Z
@@ -917,12 +913,12 @@ void DEMP_Reaction::DEMPReact_Pythia6_Output() {
 	 << setw(6) << "2" 
 	 << setw(6) << "0"
 	 << setw(6) << "0"
- 
+
 	 << setw(14) << l_Recoil_g.X() 
 	 << setw(14) << l_Recoil_g.Y()
 	 << setw(14) << l_Recoil_g.Z()
 	 << setw(14) << l_Recoil_g.E()
-	 << setw(14) <<  l_Recoil_g.M()
+	 << setw(14) <<  l_Recoil_g.M() // 15/05/23 - Love - Was f_Scat_hadron_Mass_GeV
 	 << setw(6) << fVertex_X
 	 << setw(6) << fVertex_Y
 	 << setw(6) << fVertex_Z
@@ -940,7 +936,7 @@ void DEMP_Reaction::DEMPReact_Pythia6_Output() {
 	 << setw(14) << r_l_Ejectile_g.Y()   
 	 << setw(14) << r_l_Ejectile_g.Z()  
 	 << setw(14) << r_l_Ejectile_g.E()
-	 << setw(14) <<  r_l_Ejectile_g.M()
+	 << setw(14) <<  r_l_Ejectile_g.M() // 15/05/23 - Love - Was fX_Mass_GeV
 	 << setw(6) << fVertex_X
 	 << setw(6) << fVertex_Y
 	 << setw(6) << fVertex_Z

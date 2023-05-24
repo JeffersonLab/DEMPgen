@@ -990,7 +990,7 @@ double pim::fermiMomentum() {
 	mom++;
       }
     return err;
-}*/
+    }*/
 
 // SJDK - 08/02/22 - Set the energy tolerance is a parameter that is fed in
 /*int pim::CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, TLorentzVector P_pim, TLorentzVector P_pro, double fDiff_E) {
@@ -1021,7 +1021,7 @@ double pim::fermiMomentum() {
 	mom++;
       }
     return err;
-}*/
+    }*/
 
 //-> 10/05/23 - Love added a slimmed down, simpler to read version of the CheckLaws fn
 
@@ -1031,7 +1031,7 @@ int pim::CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, 
   double px_check =(P_t.Px() + P_E0.Px()) - (P_e.Px()+P_pim.Px()+P_pro.Px()); 
   double py_check =(P_t.Py() + P_E0.Py()) - (P_e.Py()+P_pim.Py()+P_pro.Py()); 
   double pz_check =(P_t.Pz() + P_E0.Pz()) - (P_e.Pz()+P_pim.Pz()+P_pro.Pz()); 
-
+                                                                                                 
   Int_t err = -1;
   if( fabs( energy_check ) < fDiff &&
       fabs( px_check )     < fDiff &&
