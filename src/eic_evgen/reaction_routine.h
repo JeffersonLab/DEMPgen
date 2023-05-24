@@ -130,7 +130,6 @@ class DEMP_Reaction {
 //  Particle* r_l_Ejectile_solved;
 //  Particle* l_Recoil_solved;
 
-
   TLorentzVector r_l_Ejectile_solved;
   TLorentzVector l_Recoil_solved;
 
@@ -212,7 +211,6 @@ class DEMP_Reaction {
   ///*--------------------------------------------------*/ 
   // Rory Check algorithm
   
-
   //  Particle* Interaction;
   //  Particle* Target;
   //
