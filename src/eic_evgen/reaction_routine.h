@@ -109,6 +109,12 @@ class DEMP_Reaction {
 
   TLorentzVector r_lelectron;   // Electron in collider (lab) frame
   TLorentzVector r_lelectrong;	
+
+  TLorentzVector r_lhadron_beam;	
+  TLorentzVector r_lhadron_beamg;
+
+  Double_t r_lhadron_beam_mass;	
+  Double_t r_lhadron_beam_massg;	
 		
   TVector3 beta_col_rf; // Boost vector from collider (lab) frame to protons rest frame (Fix target)
 

@@ -26,6 +26,7 @@ int gKinematics_type;
 bool gPi0_decay;
 string gDet_location;
 string gOutputType; // SJDK 12/01/22 - Added output type as a variable you can specify in the .json file
+string gBeamPart; // SJDK 12/01/22 - Added output type as a variable you can specify in the .json file
 float fProton_incidence_phi;
 
 TString gfile_name;
@@ -961,70 +962,16 @@ double pim::fermiMomentum() {
     return fMom;
 }
 
-// SJDK - 08/02/22 - Original version where there is no separate energy difference
-/*int pim::CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, TLorentzVector P_pim, TLorentzVector P_pro) {
-
-    double energy_check = (P_t.E() + P_E0.E()) - (P_e.E()+P_pim.E()+P_pro.E());
-    double px_check =(P_t.Px() + P_E0.Px()) - (P_e.Px()+P_pim.Px()+P_pro.Px()); 
-    double py_check =(P_t.Py() + P_E0.Py()) - (P_e.Py()+P_pim.Py()+P_pro.Py()); 
-    double pz_check =(P_t.Pz() + P_E0.Pz()) - (P_e.Pz()+P_pim.Pz()+P_pro.Pz()); 
-    
-    Int_t err = -1;
-    if( fabs( energy_check ) < fDiff &&
-        fabs( px_check )     < fDiff &&
-        fabs( py_check )     < fDiff &&
-        fabs( pz_check )     < fDiff )
-      {
-        conserve++;
-        err = 1;
-      }
-    else if (fabs( energy_check ) >= fDiff_E)
-         { 
-	   ene++;
-         } 
-    
-    else (fabs( px_check )     >= fDiff ||
-          fabs( py_check )     >= fDiff ||
-          fabs( pz_check )     >= fDiff );
-      {
-	mom++;
-      }
-    return err;
-    }*/
-
-// SJDK - 08/02/22 - Set the energy tolerance is a parameter that is fed in
-/*int pim::CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, TLorentzVector P_pim, TLorentzVector P_pro, double fDiff_E) {
-
-    double energy_check = (P_t.E() + P_E0.E()) - (P_e.E()+P_pim.E()+P_pro.E());
-    double px_check =(P_t.Px() + P_E0.Px()) - (P_e.Px()+P_pim.Px()+P_pro.Px()); 
-    double py_check =(P_t.Py() + P_E0.Py()) - (P_e.Py()+P_pim.Py()+P_pro.Py()); 
-    double pz_check =(P_t.Pz() + P_E0.Pz()) - (P_e.Pz()+P_pim.Pz()+P_pro.Pz()); 
-    
-    Int_t err = -1;
-    if( fabs( energy_check ) < fDiff_E &&
-        fabs( px_check )     < fDiff &&
-        fabs( py_check )     < fDiff &&
-        fabs( pz_check )     < fDiff )
-      {
-        conserve++;
-        err = 1;
-      }
-    else if (fabs( energy_check ) >= fDiff_E)
-         { 
-	   ene++;
-         } 
-    
-    else (fabs( px_check )     >= fDiff ||
-          fabs( py_check )     >= fDiff ||
-          fabs( pz_check )     >= fDiff );
-      {
-	mom++;
-      }
-    return err;
-    }*/
-
+///*--------------------------------------------------*/ 
 //-> 10/05/23 - Love added a slimmed down, simpler to read version of the CheckLaws fn
-
+// 
+// To check the conservation of the energy and momentum, there two methods avalaible:
+// Method 1: Give the four-vectors of the initial and final states partciles, 
+//           tolerance factor will be defaulted 1e-6 MeV
+// Method 2: Give the four-vectors of the initial and final states partciles, 
+//           and the prefered tolerance factor.
+//
+                                                      
 int pim::CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, TLorentzVector P_pim, TLorentzVector P_pro) {
 
   double energy_check = (P_t.E() + P_E0.E()) - (P_e.E()+P_pim.E()+P_pro.E());
@@ -1044,7 +991,27 @@ int pim::CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, 
   return err;
   }
 
-///*--------------------------------------------------*/
+int pim::CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, TLorentzVector P_pim, TLorentzVector P_pro, double fdiff_E) {
+
+  double energy_check = (P_t.E() + P_E0.E()) - (P_e.E()+P_pim.E()+P_pro.E());
+  double px_check =(P_t.Px() + P_E0.Px()) - (P_e.Px()+P_pim.Px()+P_pro.Px()); 
+  double py_check =(P_t.Py() + P_E0.Py()) - (P_e.Py()+P_pim.Py()+P_pro.Py()); 
+  double pz_check =(P_t.Pz() + P_E0.Pz()) - (P_e.Pz()+P_pim.Pz()+P_pro.Pz()); 
+                                                                                                 
+  Int_t err = -1;
+  if( fabs( energy_check ) < fdiff_E &&
+      fabs( px_check )     < fdiff_E &&
+      fabs( py_check )     < fdiff_E &&
+      fabs( pz_check )     < fdiff_E ) {
+    conserve++;
+    err = 1;
+  }
+
+  return err;
+}
+
+
+///****************************************
 
 void pim::setrootfile( string rootFile ){ 
 

@@ -37,9 +37,6 @@ class pim {
 
 };
 
-
-
-
 //extern TRandom2 *fRandom;                    
 
 extern TRandom3 *fRandom;                    
@@ -55,6 +52,7 @@ extern TString gHadron;
 extern bool gPi0_decay;
 extern std::string gDet_location;
 extern std::string gOutputType;
+extern std::string gBeamPart;
 extern float fProton_incidence_phi;
 
 extern int fSeed;

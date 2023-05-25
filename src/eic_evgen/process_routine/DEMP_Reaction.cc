@@ -29,7 +29,7 @@ DEMP_Reaction::~DEMP_Reaction() {
 void DEMP_Reaction::process_reaction() {
  
   Init();
-  
+
   if (gOutputType == "Pythia6"){
     DEMPReact_Pythia6_Out_Init();
   }
@@ -83,6 +83,15 @@ void DEMP_Reaction::Init() {
 
   r_lproton = GetProtonVector_lab();
   r_lprotong = GetProtonVector_lab() * fm;
+
+  // Getting the mass of the hadron beam
+  r_lhadron_beam_mass = ParticleMass(ParticleEnum(gBeamPart.c_str()))*1000; // in MeV
+
+//  cout << gBeamPart << endl;
+//  cout << ParticleEnum(gBeamPart.c_str()) << endl; 
+//  cout << ParticleMass(ParticleEnum(gBeamPart.c_str())) << endl; 
+//  cout << r_lhadron_beam_mass << endl;
+//  exit(0);
 
   // ----------------------------------------------------
   // Electron in collider (lab) frame
@@ -161,7 +170,8 @@ void DEMP_Reaction::Init() {
   else{
     cout << "!!! Notice !!! The beam energy combination simulated does not match an expected case, a default luminosity value of - " << fLumi << " cm^2s^-1 has been assumed. !!! Notice !!!" << endl;
   }
-  
+ 
+
 }
 
 void DEMP_Reaction::Processing_Event() {
@@ -270,7 +280,6 @@ void DEMP_Reaction::Processing_Event() {
   fb =  fb + factor;  
   fc = r_lphoton.E() + r_lproton.E();
      
-//  double ft = fc * fc - fb + f_Ejectile_Mass * f_Ejectile_Mass - fProton_Mass * fProton_Mass;
   double ft = fc * fc - fb + f_Ejectile_Mass * f_Ejectile_Mass - f_Recoil_Mass * f_Recoil_Mass;
      
   double fQA = 4.0 * ( fa * fa - fc * fc );
@@ -335,22 +344,16 @@ void DEMP_Reaction::Processing_Event() {
   if( std::abs( fsinig.Mag() - fsfing.Mag() ) < fDiff ) {
     kSConserve = true;
   }
-  // SJDK 27/01/23 - For Kaon events, 0.5 is too stringent for conservation law check with the current (Ahmed) method to determine meson properties
-  // Hopefully, Rory's method will be better here and we can utilise the same conservation law check for both particles
-//  if (rEjectile == "Pi+" || rEjectile == "Pi0"){
-//    if ( pd->CheckLaws( r_lelectron, r_lproton, r_lscatelec, r_l_Ejectile, l_Recoil, 0.5) != 1 ){
-//      fConserve++;
-//      return;
-//    }
-//    else if (rEjectile == "K+"){
-//      if ( pd->CheckLaws( r_lelectron, r_lproton, r_lscatelec, r_l_Ejectile, l_Recoil, 10) != 1 ){
-//	fConserve++;
-//	return;
-//      }
-//    }
-//  }
 
-  // 10/05/23 - Love - Following fixes to calculations above, don't need different checks for different particles, uses new, simpler CheckLaws fn
+///*--------------------------------------------------*/ 
+//-> 10/05/23 - Love added a slimmed down, simpler to read version of the CheckLaws fn
+// 
+// To check the conservation of the energy and momentum, there two methods avalaible:
+// Method 1: Give the four-vectors of the initial and final states partciles, 
+//           tolerance factor will be defaulted 1e-6 MeV
+// Method 2: Give the four-vectors of the initial and final states partciles, 
+//           and the prefered tolerance factor.
+//
 
    if( pd->CheckLaws(r_lelectron, r_lproton, r_lscatelec, r_l_Ejectile, l_Recoil) !=1 ){
      fConserve++;
@@ -396,8 +399,9 @@ void DEMP_Reaction::Processing_Event() {
   // -----------------------------------------------------------------------------------------
   // 18/05/23 - SJDK - Should these be proton mass still or not?
 
-  fBeta_CM_RF        = (lphoton_rf.Vect()).Mag() / (lphoton_rf.E() + fProton_Mass );
-  fGamma_CM_RF       = (lphoton_rf.E() + fProton_Mass) / fW;
+  fBeta_CM_RF        = (lphoton_rf.Vect()).Mag() / (lphoton_rf.E() + r_lhadron_beam_mass);
+
+  fGamma_CM_RF       = (lphoton_rf.E() + r_lhadron_beam_mass) / fW;
   f_Ejectile_Energy_CM       = (pow(fW, 2) + pow(f_Ejectile_Mass,2) - pow(f_Recoil_Mass,2) ) / (2.0* fW);    
   f_Ejectile_Mom_CM          = sqrt(pow(f_Ejectile_Energy_CM,2) - pow(f_Ejectile_Mass,2));    
   f_Ejectile_Energy_CM_GeV   = f_Ejectile_Energy_CM / 1000.0;
