@@ -151,10 +151,6 @@ int main(int argc, char** argv){
 
 //     cout << "aaa  " << VertScatElec->Px() << "  " << VertScatElec->Py() << "  " 
 //        << VertScatElec->Pz() << "  " << VertScatElec->E() << "  " << VertScatElec->GetMass() << endl;
-
-     cout << "aaa  " << Photon->Px() << "  " << Photon->Py() << "  " 
-        << Photon->Pz() << "  " << Photon->E() << "  " << Photon->GetMass() << endl;
-
    
      Particle* FSIProt = new Particle(proton_mass_mev, "FSIProt", pid_prot);
    
@@ -183,14 +179,7 @@ int main(int argc, char** argv){
        Particle * Photon = new Particle();
        VertEvent->VirtPhot = Photon;
      */
-   
-//     cout << "bbb  " << VertScatElec->Px() << "  " << VertScatElec->Py() << "  " 
-//        << VertScatElec->Pz() << "  " << VertScatElec->E() << "  " << VertScatElec->GetMass() << endl;
 
-     cout << "aaa  " << Photon->Px() << "  " << Photon->Py() << "  " 
-        << Photon->Pz() << "  " << Photon->E() << "  " << Photon->GetMass() << endl;
-
-   
      ProductGen * ProtonPionGen = new ProductGen(Photon,
                                                  VertTargNeut);
    
