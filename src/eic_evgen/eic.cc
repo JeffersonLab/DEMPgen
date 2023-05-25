@@ -108,7 +108,7 @@ void eic() {
 	  delete r1;
 	}
 }
-/*
+*/
 
 /*--------------------------------------------------*/
 /*--------------------------------------------------*/
@@ -177,8 +177,8 @@ void eic(Json::Value obj) {
 	// SJDK 03/04/23 - Change to how Qsq range is set/chosen, could add as an override variable later too
 	// Set min/max Qsq values depending upon particle type
 	if (particle == "pi+" || particle == "Pion+" || particle == "Pi+"){
-	  fQsq_Min = 5.0; fQsq_Max = 35.0;
-	  fW_Min = 3.0; fW_Max = 10.6;
+	  fQsq_Min = 3.0; fQsq_Max = 35.0;
+	  fW_Min = 2.0; fW_Max = 10.2;
 	}
 	else if (particle == "pi0" || particle == "Pion0" || particle == "Pi0"){
 	  fQsq_Min = 5.0; fQsq_Max = 1000.0;
@@ -209,6 +209,13 @@ void eic(Json::Value obj) {
 	  fPBeam = 100;
 	  cout << "Ion beam energy not specified in .json file, defaulting to 100 GeV." << endl;
 	}
+
+	if (obj.isMember("hbeam_part")){
+	  gBeamPart = obj["hbeam_part"].asString();
+	} 
+    else {
+      gBeamPart = "Proton";
+    }
 
 	// SJDK - 12/01/22
 	// Set output type as a .json read in

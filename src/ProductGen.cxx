@@ -49,6 +49,9 @@ ProductGen::ProductGen(Particle* inInteraction, Particle* inTarget):
               "[6]-sqrt([7]**2+x**2)-sqrt([8]**2+([3]-[0]*x)**2+([4]-[1]*x)**2+([5]-[2]*x)**2)",
               0, 12000);
 
+//  cout << "CCCC "<< inInteraction->Px() << "  " << inInteraction->Py() << "  " << inInteraction->Pz() << "  " << inInteraction->E() << "  " << inInteraction->GetMass() << endl;
+
+
 }
 
 void ProductGen::SetInteraction(Particle * inInteraction)
@@ -83,6 +86,11 @@ int ProductGen::Solve()
   double theta = AngleGen->Theta();
   double phi = AngleGen->Phi();
 
+//  theta = 0.282478;   
+//  phi = 3.49651;
+
+//  cout << " Theta Phi: "<< theta << "   " << phi << endl; 
+
   return this->Solve(theta, phi);
 }
 
@@ -114,11 +122,22 @@ int ProductGen::Solve(double theta, double phi)
   pars[7] = pion_mass_mev;
   pars[8] = proton_mass_mev;
 
+//  cout << Interaction->Px() << "  " << Interaction->Py() << "  " << Interaction->Pz() << "  " << Interaction->E() << "  " << Interaction->GetMass() << endl;
+//
+//  cout << Target->Px() << "  " << Target->Py() << "  " << Target->Pz() << "  " << Target->E() << "  " << Target->GetMass() << endl;
+//
+//  cout << endl;
+//  cout << pars[0] << "  " << pars[1]  << "  " << pars[2] << endl;
+//  cout << pars[3] << "  " << pars[4]  << "  " << pars[5] << endl;
+//  cout << pars[6] << "  " << pars[7]  << "  " << pars[8] << endl;
+
+
   F->SetParameters(pars);
 
   double P = F->GetX(0, 0, pars[6], 0.0001, 10000);
 
   //std::cout << "Zero: " << F->Eval(P) << std::endl;
+
 
   Particle * Pion1 = new Particle(pion_mass_mev,
                                   P*pars[0],
@@ -130,17 +149,21 @@ int ProductGen::Solve(double theta, double phi)
   *Proton1 = *Initial-*Pion;
   *Proton = *Proton1;
 
+//  cout << Pion->E() << "   " << Proton->E() << endl;
+
   if (TMath::Abs(F->Eval(P)) > 1){
     delete Pion1;
     delete Proton1;
     return 1;
   }
+//  cout << "AAAAAAAA " <<  SolnCheck() <<  endl;
 
   if (!SolnCheck()){
     delete Pion1;
     delete Proton1;
     return 1;
   }
+
 
   //Check for Second solution:
   double P2 = F->GetX(0, P+100, pars[6], 0.0001, 10000);
@@ -185,6 +208,7 @@ int ProductGen::Solve(double theta, double phi)
   delete Proton1;
   delete Proton2;
 
+//  exit(0);
   return 0;
 }
 

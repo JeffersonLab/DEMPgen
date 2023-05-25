@@ -16,7 +16,7 @@ Pi0_Production::Pi0_Production() {
 
 Pi0_Production::Pi0_Production(TString particle_str) { 
 
-  rParticle = particle_str;
+  rEjectile = particle_str;
   
   Init();
 
@@ -99,11 +99,11 @@ void Pi0_Production::Processing_Event() {
   // ----------------------------------------------------
   
   /// The generic produced particle in the exclusive reaction is labelled as X 
-  fX_Theta_Col      = acos( fRandom->Uniform( cos(fX_Theta_I), cos(fX_Theta_F ) ) );
-  fX_Phi_Col        = fRandom->Uniform( 0 , 2.0 * fPi );
+  f_Ejectile_Theta_Col      = acos( fRandom->Uniform( cos(f_Ejectile_Theta_I), cos(f_Ejectile_Theta_F ) ) );
+  f_Ejectile_Phi_Col        = fRandom->Uniform( 0 , 2.0 * fPi );
 
-  // fX_Theta_Col      = fRandom->Uniform( 0.0 , 0.9 );
-  // fX_Phi_Col        = fRandom->Uniform( -0.0000001 + fPi , 0.0000001 + fPi );
+  // f_Ejectile_Theta_Col      = fRandom->Uniform( 0.0 , 0.9 );
+  // f_Ejectile_Phi_Col        = fRandom->Uniform( -0.0000001 + fPi , 0.0000001 + fPi );
 
 	// ---------------------------------------------------------------------
     // Specify the energy and solid angle of scatterd electron in Collider (lab) frame
@@ -151,17 +151,17 @@ void Pi0_Production::Processing_Event() {
   // Pion momentum in collider frame, analytic solution starts
   // ---------------------------------------------------------
 
-  if(!Solve()){
-    return;
-  }
+//  if(!Solve()){
+//    retur;
+//  }
 
   // ---------------------------------------------------------
   // Pion momentum in collider frame, analytic solution starts
   // ---------------------------------------------------------
 
-  double fupx = sin( fX_Theta_Col ) * cos( fX_Phi_Col );
-  double fupy = sin( fX_Theta_Col ) * sin( fX_Phi_Col );
-  double fupz = cos( fX_Theta_Col );
+  double fupx = sin( f_Ejectile_Theta_Col ) * cos( f_Ejectile_Phi_Col );
+  double fupy = sin( f_Ejectile_Theta_Col ) * sin( f_Ejectile_Phi_Col );
+  double fupz = cos( f_Ejectile_Theta_Col );
  
   double fuqx = sin( r_lphoton.Theta() ) * cos( r_lphoton.Phi() );
   double fuqy = sin( r_lphoton.Theta() ) * sin( r_lphoton.Phi() );
@@ -183,22 +183,22 @@ void Pi0_Production::Processing_Event() {
   fb =  fb + factor;  
   fc = r_lphoton.E() + r_lproton.E();
 
-  double e_X_rf      = lX_rf.E();
+  double e_X_rf      = l_Ejectile_rf.E();
   double e_photon_rf = lphoton_rf.E();
   
   
-  double ft = fc * fc - fb + fX_Mass * fX_Mass - fProton_Mass * fProton_Mass;
+  double ft = fc * fc - fb + f_Ejectile_Mass * f_Ejectile_Mass - fProton_Mass * fProton_Mass;
   
-  double fu = lproton_rf.Dot(lproton_rf) + lX_rf.Dot(lX_rf) - lproton_rf.Dot(lX_rf);
+  double fu = lproton_rf.Dot(lproton_rf) + l_Ejectile_rf.Dot(l_Ejectile_rf) - lproton_rf.Dot(l_Ejectile_rf);
 
-  ft_min = -fQsq_GeV + pow(fX_Mass, 2) -2.*(e_X_rf*e_photon_rf -sqrt( (pow(e_X_rf, 2) - pow(fX_Mass, 2)) * (pow(e_photon_rf,2)+fQsq) ));
+  ft_min = -fQsq_GeV + pow(f_Ejectile_Mass, 2) -2.*(e_X_rf*e_photon_rf -sqrt( (pow(e_X_rf, 2) - pow(f_Ejectile_Mass, 2)) * (pow(e_photon_rf,2)+fQsq) ));
   
-  fu_min = -fQsq_GeV + pow(f_Scat_hadron_Mass, 2) -2.*(e_X_rf*e_photon_rf -sqrt( (pow(e_X_rf, 2) - pow(f_Scat_hadron_Mass , 2))*(pow(e_photon_rf,2)+fQsq) ));
+  fu_min = -fQsq_GeV + pow(f_Recoil_Mass, 2) -2.*(e_X_rf*e_photon_rf -sqrt( (pow(e_X_rf, 2) - pow(f_Recoil_Mass , 2))*(pow(e_photon_rf,2)+fQsq) ));
 
   double fQA = 4.0 * ( fa * fa - fc * fc );
   double fQB = 4.0 * fc * ft;
 
-  double fQC = -4.0 * fa * fa * fX_Mass * fX_Mass - ft * ft;    
+  double fQC = -4.0 * fa * fa * f_Ejectile_Mass * f_Ejectile_Mass - ft * ft;    
  
   fradical = fQB * fQB - 4.0 * fQA * fQC;
  
@@ -210,28 +210,28 @@ void Pi0_Production::Processing_Event() {
   /// And obtain recoiled proton in collider (lab) frame
   ///---------------------------------------------------------
        
-  //r_lX.SetPxPyPzE( (sqrt( pow( fepi1 , 2) - pow(fX_Mass , 2) ) ) * sin(fX_Theta_Col) * cos(fX_Phi_Col),
-  //		  ( sqrt( pow( fepi1 , 2) - pow(fX_Mass , 2) ) ) * sin(fX_Theta_Col) * sin(fX_Phi_Col),
-  //		  ( sqrt( pow( fepi1 , 2) - pow(fX_Mass , 2) ) ) * cos(fX_Theta_Col),
-  //		  fepi1 );
-  //
-  // r_l_scat_hadron.SetPxPyPzE( ( r_lproton + r_lelectron - r_lscatelec - r_lX).X(),
-  // 		     ( r_lproton + r_lelectron - r_lscatelec - r_lX ).Y(),
-  // 		     ( r_lproton + r_lelectron - r_lscatelec - r_lX ).Z(),
-  // 		     sqrt( pow( ( ( ( r_lproton + r_lelectron - r_lscatelec - r_lX ).Vect() ).Mag()),2) +
-  // 			   pow( f_Scat_Hadron_Mass ,2 ) ) );
+  r_l_Ejectile.SetPxPyPzE( (sqrt( pow( fepi1 , 2) - pow(f_Ejectile_Mass , 2) ) ) * sin(f_Ejectile_Theta_Col) * cos(f_Ejectile_Phi_Col),
+  		  ( sqrt( pow( fepi1 , 2) - pow(f_Ejectile_Mass , 2) ) ) * sin(f_Ejectile_Theta_Col) * sin(f_Ejectile_Phi_Col),
+  		  ( sqrt( pow( fepi1 , 2) - pow(f_Ejectile_Mass , 2) ) ) * cos(f_Ejectile_Theta_Col),
+  		  fepi1 );
+  
+   l_Recoil.SetPxPyPzE( ( r_lproton + r_lelectron - r_lscatelec - r_l_Ejectile).X(),
+   		     ( r_lproton + r_lelectron - r_lscatelec - r_l_Ejectile ).Y(),
+   		     ( r_lproton + r_lelectron - r_lscatelec - r_l_Ejectile ).Z(),
+   		     sqrt( pow( ( ( ( r_lproton + r_lelectron - r_lscatelec - r_l_Ejectile ).Vect() ).Mag()),2) +
+   			   pow( f_Recoil_Mass ,2 ) ) );
 
   ///--------------------------------------------------
   /// Output with the Solve Function
   /// Setting the solution values to X and recoiled nucleon
 
-  r_lX.SetPxPyPzE(r_lX_solved->Px(), r_lX_solved->Py(), r_lX_solved->Pz(), r_lX_solved->E());
-  r_l_scat_hadron.SetPxPyPzE(r_l_scat_hadron_solved->Px(), r_l_scat_hadron_solved->Py(), r_l_scat_hadron_solved->Pz(),  r_l_scat_hadron_solved->E());
+//  r_l_Ejectile.SetPxPyPzE(r_l_Ejectile_solved->Px(), r_l_Ejectile_solved->Py(), r_l_Ejectile_solved->Pz(), r_l_Ejectile_solved->E());
+//  l_Recoil.SetPxPyPzE(l_Recoil_solved->Px(), l_Recoil_solved->Py(), l_Recoil_solved->Pz(),  l_Recoil_solved->E());
 
   ///--------------------------------------------------
 
-  r_lX_g = r_lX * fm;
-  r_l_scat_hadron_g = r_l_scat_hadron * fm;
+  r_l_Ejectile_g = r_l_Ejectile * fm;
+  l_Recoil_g = l_Recoil * fm;
 
   // ----------------------------------------------------------------------------------------------
   // Calculate w = (proton + photon)^2
@@ -250,11 +250,11 @@ void Pi0_Production::Processing_Event() {
   // Calculate w prime w' = (proton + photon - pion)^2                                             
   // ----------------------------------------------------------------------------------------------
 
-  lwp = r_lprotong + r_lphotong - r_lX_g;
+  lwp = r_lprotong + r_lphotong - r_l_Ejectile_g;
   fW_Prime_GeV = lwp.Mag();    
 
   fsini = r_lelectron + r_lproton;
-  fsfin = r_lscatelec + r_lX + r_l_scat_hadron;
+  fsfin = r_lscatelec + r_l_Ejectile + l_Recoil;
   
   fsinig = fsini * fm;
   fsfing = fsfin * fm; 
@@ -263,7 +263,7 @@ void Pi0_Production::Processing_Event() {
 
   //*--------------------------------------------------*/ 
   // SJDK 15/06/21 - Added integer counters for conservation law check and for NaN check
-  if (r_lX.E() != r_lX.E()){ // SJDK 15/06/21 - If the energy of the produced meson is not a number, return and add to counter
+  if (r_l_Ejectile.E() != r_l_Ejectile.E()){ // SJDK 15/06/21 - If the energy of the produced meson is not a number, return and add to counter
     fNaN++;
     return;
   }
@@ -273,7 +273,7 @@ void Pi0_Production::Processing_Event() {
     kSConserve = true;
   }
         
-  if ( pd->CheckLaws( r_lelectron, r_lproton, r_lscatelec, r_lX, r_l_scat_hadron) != 1 ){
+  if ( pd->CheckLaws( r_lelectron, r_lproton, r_lscatelec, r_l_Ejectile, l_Recoil) != 1 ){
     fConserve++;
     return;
   }
@@ -299,11 +299,11 @@ void Pi0_Production::Processing_Event() {
   lphoton_rf.Boost(-beta_col_rf);
   lphoton_rfg = lphoton_rf * fm;
   
-  lX_rf = r_lX;
-  lX_rf.Boost(-beta_col_rf);
-  lX_rfg = lX_rf * fm;
+  l_Ejectile_rf = r_l_Ejectile;
+  l_Ejectile_rf.Boost(-beta_col_rf);
+  l_Ejectile_rfg = l_Ejectile_rf * fm;
       
-  l_scat_hadron_rf = r_l_scat_hadron;
+  l_scat_hadron_rf = l_Recoil;
   l_scat_hadron_rf.Boost(-beta_col_rf);
   l_scat_hadron_rf_g = l_scat_hadron_rf * fm;
   
@@ -311,7 +311,7 @@ void Pi0_Production::Processing_Event() {
   /// Doing pi0 decay 
   
   if (if_pi0_decay) {
-      Pi0_decay(r_lX);
+      Pi0_decay(r_l_Ejectile);
   } 
 
 
@@ -331,15 +331,15 @@ void Pi0_Production::Processing_Event() {
 // 		cout << fQsq_GeV << "  " <<  fWSq_GeV << "  ";             
 // 
 // 		cout << r_lscatelecg.Vect().Theta()       << "  " <<  r_lscatelecg.Vect().Mag()    << "  " 
-// 			 << r_l_scat_hadron_g.Vect().Theta() << "  " << r_l_scat_hadron_g.Vect().Mag() << "  " 
-//              << r_lX_g.Vect().Theta()             << "  " << r_lX_g.Vect().Mag()                  
+// 			 << l_Recoil_g.Vect().Theta() << "  " << l_Recoil_g.Vect().Mag() << "  " 
+//              << r_l_Ejectile_g.Vect().Theta()             << "  " << r_l_Ejectile_g.Vect().Mag()                  
 // 			 << endl; 
 		
     polar_out << fQsq_GeV << "  " <<  fWSq_GeV << "  ";             
   
     polar_out << r_lscatelecg.Vect().Theta()  << "  " <<  r_lscatelecg.Vect().Mag()      << "  " 
-  	      << r_l_scat_hadron_g.Vect().Theta() << "  " << r_l_scat_hadron_g.Vect().Mag() << "  " 
-          << r_lX_g.Vect().Theta()             << "  " << r_lX_g.Vect().Mag()             << "  "                
+  	      << l_Recoil_g.Vect().Theta() << "  " << l_Recoil_g.Vect().Mag() << "  " 
+          << r_l_Ejectile_g.Vect().Theta()             << "  " << r_l_Ejectile_g.Vect().Mag()             << "  "                
           << l_photon_1.Vect().Theta()         << "  " << l_photon_1.Vect().Mag()         << "  "                
           << l_photon_2.Vect().Theta()         << "  " << l_photon_2.Vect().Mag()                  
   	      << endl; 
@@ -355,14 +355,14 @@ void Pi0_Production::Processing_Event() {
 /*--------------------------------------------------*/
 /*--------------------------------------------------*/
 
-  e_X_rf      = lX_rf.E();
+  e_X_rf      = l_Ejectile_rf.E();
   e_photon_rf = lphoton_rf.E();
   double e_p_rf      = lproton_rf.E();
 
   double e_photCM = (fWSq_GeV - fQsq_GeV - pow(fProton_Mass/1000, 2))/fW_GeV/2.;
-  double e_pCM = (fWSq_GeV  + pow(fProton_Mass/1000, 2) - pow(f_Scat_hadron_Mass/1000, 2))/fW_GeV/2.;
+  double e_pCM = (fWSq_GeV  + pow(fProton_Mass/1000, 2) - pow(f_Recoil_Mass/1000, 2))/fW_GeV/2.;
 
-  ft_min = -fQsq_GeV + pow(fX_Mass/1000, 2) -2.*(e_X_rf/1000*e_photon_rf/1000 -sqrt( (pow(e_X_rf/1000, 2) - pow(fX_Mass/1000, 2)) * (pow(e_photon_rf/1000,2)+fQsq_GeV) ));
+  ft_min = -fQsq_GeV + pow(f_Ejectile_Mass/1000, 2) -2.*(e_X_rf/1000*e_photon_rf/1000 -sqrt( (pow(e_X_rf/1000, 2) - pow(f_Ejectile_Mass/1000, 2)) * (pow(e_photon_rf/1000,2)+fQsq_GeV) ));
 
   fu_min = -fQsq_GeV + pow(fProton_Mass/1000, 2) -2.*(e_pCM*e_photCM -sqrt( (pow(e_pCM/1000, 2) - pow(fProton_Mass/1000 , 2))*(pow(e_photCM/1000,2)+fQsq_GeV) ));
 
@@ -370,7 +370,7 @@ void Pi0_Production::Processing_Event() {
   // Cut on centre of mass angle of meson X
   // ----------------------------------------------------------------------------------------------
 
-  // Theta_cm = r_lX.Vect().Angle(r_lphoton.Vect());
+  // Theta_cm = r_l_Ejectile.Vect().Angle(r_lphoton.Vect());
 
   // if (Theta_cm < 90*TMath::Pi()/180) {
   //   return;
@@ -382,16 +382,16 @@ void Pi0_Production::Processing_Event() {
 
   fBeta_CM_RF        = (lphoton_rf.Vect()).Mag() / ( lphoton_rf.E() + fProton_Mass );
   fGamma_CM_RF       = ( lphoton_rf.E() + fProton_Mass ) / fW;
-  fX_Energy_CM       = ( pow( fW , 2) + pow(fX_Mass , 2) - pow(f_Scat_hadron_Mass , 2) ) / ( 2.0 * fW);    
-  fX_Mom_CM          = sqrt( pow(fX_Energy_CM , 2) - pow(fX_Mass , 2));    
-  fX_Energy_CM_GeV   = fX_Energy_CM / 1000.0;
-  fX_Mom_CM_GeV      = fX_Mom_CM / 1000.0;
+  f_Ejectile_Energy_CM       = ( pow( fW , 2) + pow(f_Ejectile_Mass , 2) - pow(f_Recoil_Mass , 2) ) / ( 2.0 * fW);    
+  f_Ejectile_Mom_CM          = sqrt( pow(f_Ejectile_Energy_CM , 2) - pow(f_Ejectile_Mass , 2));    
+  f_Ejectile_Energy_CM_GeV   = f_Ejectile_Energy_CM / 1000.0;
+  f_Ejectile_Mom_CM_GeV      = f_Ejectile_Mom_CM / 1000.0;
 
   // this equation is valid for parallel kinematics only!
-  fT_Para = ( pow(((r_lphoton.Vect()).Mag() - (r_lX.Vect()).Mag()),2) - pow((r_lphoton.E() - r_lX.E()),2));
+  fT_Para = ( pow(((r_lphoton.Vect()).Mag() - (r_l_Ejectile.Vect()).Mag()),2) - pow((r_lphoton.E() - r_l_Ejectile.E()),2));
   fT_Para_GeV = fT_Para/1000000.0;
 
-  lt = r_lphoton - r_lX;
+  lt = r_lphoton - r_l_Ejectile;
   ltg = lt * fm;
 
   fT = -1.*lt.Mag2();
@@ -400,7 +400,7 @@ void Pi0_Production::Processing_Event() {
   tc = -1.*lt.Mag2();
   tc_GeV = -1.*ltg.Mag2();
 
-  lu = r_lproton - r_lX;
+  lu = r_lproton - r_l_Ejectile;
   lug = lu * fm;
 
   uc = -1.*lu.Mag2();
@@ -436,7 +436,7 @@ void Pi0_Production::Processing_Event() {
 
   fx = fQsq_GeV / ( 2.0 * r_lprotong.Dot( r_lphotong ) );
   fy = r_lprotong.Dot( r_lphotong ) / r_lprotong.Dot( r_lelectrong );
-  fz = r_lX.E()/r_lphoton.E();    
+  fz = r_l_Ejectile.E()/r_lphoton.E();    
 
   // -------------------------------------------------------------------------------------------------------
   // Calculation of Phi  ( azimuthal angle of pion momentum w.r.t lepton plane in target's rest frame)
@@ -451,9 +451,9 @@ void Pi0_Production::Processing_Event() {
   v3Electron.SetY( lelectron_rfg.Y() ); 
   v3Electron.SetZ( lelectron_rfg.Z() );
 
-  v3X.SetX( lX_rfg.X() ) ;        
-  v3X.SetY( lX_rfg.Y() ) ;        
-  v3X.SetZ( lX_rfg.Z() );
+  v3X.SetX( l_Ejectile_rfg.X() ) ;        
+  v3X.SetY( l_Ejectile_rfg.Y() ) ;        
+  v3X.SetZ( l_Ejectile_rfg.Z() );
 
   v3S.SetX( -1 );                       
   v3S.SetY( 0 );                        
@@ -494,7 +494,7 @@ void Pi0_Production::Processing_Event() {
 
   /// meson produced angle with respect to the Q-vector
 
-  theta_X_rf = (lX_rf.Vect()).Angle(lphoton_rf.Vect());
+  theta_X_rf = (l_Ejectile_rf.Vect()).Angle(lphoton_rf.Vect());
 
   // ----------------------------------------------------
   // Virtual Photon flux factor in units of 1/(GeV*Sr)
@@ -513,22 +513,22 @@ void Pi0_Production::Processing_Event() {
 
   fJacobian_CM = ( (lphoton_rfg.Vect()).Mag() - fBeta_CM_RF * lphoton_rfg.E() ) / ( fGamma_CM_RF * ( 1.0 - pow(fBeta_CM_RF,2) ) );
 
-  fA = fJacobian_CM * fX_Mom_CM_GeV / fPi;
+  fA = fJacobian_CM * f_Ejectile_Mom_CM_GeV / fPi;
 
-  double fttt = r_lprotong * r_lprotong - 2 * r_lprotong * r_l_scat_hadron_g  + r_l_scat_hadron_g * r_l_scat_hadron_g;
-  double fuuu = r_lprotong * r_lprotong - 2 * r_lprotong * r_lX_g + r_lX_g * r_lX_g;
+  double fttt = r_lprotong * r_lprotong - 2 * r_lprotong * l_Recoil_g  + l_Recoil_g * l_Recoil_g;
+  double fuuu = r_lprotong * r_lprotong - 2 * r_lprotong * r_l_Ejectile_g + r_l_Ejectile_g * r_l_Ejectile_g;
 
   // ----------------------------------------------------
   // Jacobian dOmega* / dOmega dimensionless
   // ----------------------------------------------------
 
-  fJacobian_CM_RF  = ( pow((lX_rf.Vect()).Mag(),2)*fW) / 
-    ( fX_Mom_CM * std::abs( ( fProton_Mass + lphoton_rf.E()) * (lX_rf.Vect()).Mag() - 
-			    ( lX_rf.E() * (lphoton_rf.Vect()).Mag() * cos( lX_rf.Theta() ) ) ) );
+  fJacobian_CM_RF  = ( pow((l_Ejectile_rf.Vect()).Mag(),2)*fW) / 
+    ( f_Ejectile_Mom_CM * std::abs( ( fProton_Mass + lphoton_rf.E()) * (l_Ejectile_rf.Vect()).Mag() - 
+			    ( l_Ejectile_rf.E() * (lphoton_rf.Vect()).Mag() * cos( l_Ejectile_rf.Theta() ) ) ) );
 
-  fJacobian_CM_Col = ( ( pow((r_lX.Vect()).Mag(),2) * fW ) /
-		       ( fX_Mom_CM * std::abs( ( fProton_Mass + r_lphoton.E() ) * (r_lX.Vect()).Mag() -
-					       ( r_lX.E() * (r_lphoton.Vect()).Mag() * cos( r_lX.Theta() ) ) ) ) );
+  fJacobian_CM_Col = ( ( pow((r_l_Ejectile.Vect()).Mag(),2) * fW ) /
+		       ( f_Ejectile_Mom_CM * std::abs( ( fProton_Mass + r_lphoton.E() ) * (r_l_Ejectile.Vect()).Mag() -
+					       ( r_l_Ejectile.E() * (r_lphoton.Vect()).Mag() * cos( r_l_Ejectile.Theta() ) ) ) ) );
 
   // ------------------------------------------------------------------------------------------
   // CKY sigma L and T starts
@@ -650,11 +650,11 @@ void Pi0_Production::Pi0_Lund_Output() {
 	 << setw(10) << PDGtype(produced_X)
 	 << setw(10) << "0"
 	 << setw(10) << "0"
-	 << setw(16) << r_lX_g.X()
-	 << setw(16) << r_lX_g.Y()
-	 << setw(16) << r_lX_g.Z()
-	 << setw(16) << r_lX_g.E()
-	 << setw(16) << fX_Mass_GeV
+	 << setw(16) << r_l_Ejectile_g.X()
+	 << setw(16) << r_l_Ejectile_g.Y()
+	 << setw(16) << r_l_Ejectile_g.Z()
+	 << setw(16) << r_l_Ejectile_g.E()
+	 << setw(16) << f_Ejectile_Mass_GeV
 	 << setw(16) << fVertex_X
 	 << setw(16) << fVertex_Y
 	 << setw(16) << fVertex_Z
@@ -677,18 +677,18 @@ void Pi0_Production::Pi0_Lund_Output() {
 	 << setw(16) << fVertex_Z
 	 << endl;
 
-  // Recoiled neutron
+  // Recoiled baryon
   DEMPOut << setw(10) << "5"
 	 << setw(10) << "1"
 	 << setw(10) << "1"
 	 << setw(10) << PDGtype(recoil_hadron)
 	 << setw(10) << "0"
 	 << setw(10) << "0"
-	 << setw(16) << r_l_scat_hadron_g.X()
-	 << setw(16) << r_l_scat_hadron_g.Y()
-	 << setw(16) << r_l_scat_hadron_g.Z()
-	 << setw(16) << r_l_scat_hadron_g.E()
-	 << setw(16) << f_Scat_hadron_Mass_GeV
+	 << setw(16) << l_Recoil_g.X()
+	 << setw(16) << l_Recoil_g.Y()
+	 << setw(16) << l_Recoil_g.Z()
+	 << setw(16) << l_Recoil_g.E()
+	 << setw(16) << f_Recoil_Mass_GeV
 	 << setw(16) << fVertex_X
 	 << setw(16) << fVertex_Y
 	 << setw(16) << fVertex_Z
@@ -730,18 +730,18 @@ void Pi0_Production::Pi0_Decay_Lund_Output() {
 	 << setw(16) << fVertex_Z
 	 << endl;
 
-  // Recoiled neutron
+  // Recoiled baryon
   DEMPOut << setw(10) << "3"
 	 << setw(10) << "1"
 	 << setw(10) << "1"
 	 << setw(10) << PDGtype(recoil_hadron)
 	 << setw(10) << "0"
 	 << setw(10) << "0"
-	 << setw(16) << r_l_scat_hadron_g.X()
-	 << setw(16) << r_l_scat_hadron_g.Y()
-	 << setw(16) << r_l_scat_hadron_g.Z()
-	 << setw(16) << r_l_scat_hadron_g.E()
-	 << setw(16) << f_Scat_hadron_Mass_GeV
+	 << setw(16) << l_Recoil_g.X()
+	 << setw(16) << l_Recoil_g.Y()
+	 << setw(16) << l_Recoil_g.Z()
+	 << setw(16) << l_Recoil_g.E()
+	 << setw(16) << f_Recoil_Mass_GeV
 	 << setw(16) << fVertex_X
 	 << setw(16) << fVertex_Y
 	 << setw(16) << fVertex_Z
@@ -886,7 +886,7 @@ void Pi0_Production::Pi0_Decay_Pythia6_Output() {
 	 << setw(6) << fVertex_Z
 	 << endl;
 
-  // Recoiled nucleon
+  // Recoiled baryon
   DEMPOut << "5"
 	 << setw(6) << "1"
 	 << setw(6) << PDGtype(recoil_hadron)
@@ -894,11 +894,11 @@ void Pi0_Production::Pi0_Decay_Pythia6_Output() {
 	 << setw(6) << "0"
 	 << setw(6) << "0"
 
-	 << setw(14) << r_l_scat_hadron_g.X()
-	 << setw(14) << r_l_scat_hadron_g.Y()
-	 << setw(14) << r_l_scat_hadron_g.Z()
-	 << setw(14) << r_l_scat_hadron_g.E()
-	 << setw(14) << f_Scat_hadron_Mass_GeV
+	 << setw(14) << l_Recoil_g.X()
+	 << setw(14) << l_Recoil_g.Y()
+	 << setw(14) << l_Recoil_g.Z()
+	 << setw(14) << l_Recoil_g.E()
+	 << setw(14) << f_Recoil_Mass_GeV
 	 << setw(6) << fVertex_X
 	 << setw(6) << fVertex_Y
 	 << setw(6) << fVertex_Z
@@ -912,11 +912,11 @@ void Pi0_Production::Pi0_Decay_Pythia6_Output() {
 	 << setw(6) << "0"
 	 << setw(6) << "0"
 
-	 << setw(14) << r_lX_g.X()
-	 << setw(14) << r_lX_g.Y()
-	 << setw(14) << r_lX_g.Z()
-	 << setw(14) << r_lX_g.E()
-	 << setw(14) << fX_Mass_GeV
+	 << setw(14) << r_l_Ejectile_g.X()
+	 << setw(14) << r_l_Ejectile_g.Y()
+	 << setw(14) << r_l_Ejectile_g.Z()
+	 << setw(14) << r_l_Ejectile_g.E()
+	 << setw(14) << f_Ejectile_Mass_GeV
 	 << setw(6) << fVertex_X
 	 << setw(6) << fVertex_Y
 	 << setw(6) << fVertex_Z
@@ -956,9 +956,9 @@ void Pi0_Production::Pi0_HEPMC3_Output() {
   // Scattered electron
   DEMPOut << "P" << " " << "3" << " " << "-1" << " " << "11" << " " << r_lscatelecg.X() << " "  << r_lscatelecg.Y() << " "  << r_lscatelecg.Z() << " " << r_lscatelecg.E() << " " << fElectron_Mass_GeV << " " << "1" << endl;
   // Produced meson
-  DEMPOut << "P" << " " << "4" << " " << "-1" << " " << PDGtype(produced_X) << " " << r_lX_g.X() << " "  << r_lX_g.Y() << " "  << r_lX_g.Z() << " " << r_lX_g.E() << " " << fX_Mass_GeV << " " << "1" << endl;
+  DEMPOut << "P" << " " << "4" << " " << "-1" << " " << PDGtype(produced_X) << " " << r_l_Ejectile_g.X() << " "  << r_l_Ejectile_g.Y() << " "  << r_l_Ejectile_g.Z() << " " << r_l_Ejectile_g.E() << " " << f_Ejectile_Mass_GeV << " " << "1" << endl;
   // Recoil nucleon
-  DEMPOut << "P" << " " << "5" << " " << "-1" << " " << PDGtype(recoil_hadron) << " " << r_l_scat_hadron_g.X() << " "  << r_l_scat_hadron_g.Y() << " "  << r_l_scat_hadron_g.Z() << " " << r_l_scat_hadron_g.E() << " " << f_Scat_hadron_Mass_GeV << " " << "1" << endl;
+  DEMPOut << "P" << " " << "5" << " " << "-1" << " " << PDGtype(recoil_hadron) << " " << l_Recoil_g.X() << " "  << l_Recoil_g.Y() << " "  << l_Recoil_g.Z() << " " << l_Recoil_g.E() << " " << f_Recoil_Mass_GeV << " " << "1" << endl;
 
 }
 
