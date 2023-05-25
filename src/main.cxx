@@ -177,10 +177,6 @@ int main(int argc, char** argv){
        VertEvent->VirtPhot = Photon;
      */
 
-     cout << "aaa  " << Photon->Px() << "  " << Photon->Py() << "  " 
-        << Photon->Pz() << "  " << Photon->E() << "  " << Photon->GetMass() << endl;
-
-   
      ProductGen * ProtonPionGen = new ProductGen(Photon,
                                                  VertTargNeut);
    
