@@ -45,7 +45,7 @@ double fK, fm, fElectron_Kin_Col_GeV, fElectron_Kin_Col, fRand, fLumi, fuBcm2, f
 
 double fOmega_Theta_I, fOmega_Theta_F, fOmega_Theta_Col, fOmega_Phi_Col;
 
-double fDiff_E, conserve, ene, mom;     // 18/06/21 AU -> New variables to count envents passing/not passing conservation laws
+double fDiff_E, conserve, ene, mom, ene_mom;     // 18/06/21 AU -> New variables to count envents passing/not passing conservation laws
 
 double fMandSConserve, fTop_Pion_Mom, fBot_Pion_Mom, fPion_Mom_Same, fEnergyConserve, fXMomConserve, fYMomConserve, fZMomConserve, fXMomConserve_RF, fYMomConserve_RF, fZMomConserve_RF, fEnergyConserve_RF; 
 
@@ -934,9 +934,10 @@ void pim::Initilize() {
     fSig_3Phi_Minus_PhiS_Col                    = 0;
     fSig_2Phi_Plus_PhiS_Col                     = 0;
     // SJDK 08/02/22 - New variables Ali added for conservation law checks
-    conserve                                    = 0;
-    ene                                         = 0;
-    mom                                         = 0;
+    conserve                                    = 0; // This is the number that PASS both conservation check
+    ene                                         = 0; // The number that FAIL due to failing energy conservation check ONLY
+    mom                                         = 0; // The number that FAIL due to failing the momentum conservation check ONLY
+    ene_mom                                     = 0; // The number that FAIL BOTH energy and momentum check
 
 }
 
@@ -971,45 +972,65 @@ double pim::fermiMomentum() {
 // Method 2: Give the four-vectors of the initial and final states partciles, 
 //           and the prefered tolerance factor.
 //
-                                                      
 int pim::CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, TLorentzVector P_pim, TLorentzVector P_pro) {
 
   double energy_check = (P_t.E() + P_E0.E()) - (P_e.E()+P_pim.E()+P_pro.E());
-  double px_check =(P_t.Px() + P_E0.Px()) - (P_e.Px()+P_pim.Px()+P_pro.Px()); 
-  double py_check =(P_t.Py() + P_E0.Py()) - (P_e.Py()+P_pim.Py()+P_pro.Py()); 
-  double pz_check =(P_t.Pz() + P_E0.Pz()) - (P_e.Pz()+P_pim.Pz()+P_pro.Pz()); 
+  double px_check =(P_t.Px() + P_E0.Px()) - (P_e.Px()+P_pim.Px()+P_pro.Px());
+  double py_check =(P_t.Py() + P_E0.Py()) - (P_e.Py()+P_pim.Py()+P_pro.Py());
+  double pz_check =(P_t.Pz() + P_E0.Pz()) - (P_e.Pz()+P_pim.Pz()+P_pro.Pz());
                                                                                                  
   Int_t err = -1;
-  if( fabs( energy_check ) < fDiff &&
-      fabs( px_check )     < fDiff &&
-      fabs( py_check )     < fDiff &&
-      fabs( pz_check )     < fDiff){
+  if( fabs( energy_check ) < fDiff  && fabs( px_check ) < fDiff  &&  fabs( py_check ) < fDiff && fabs( pz_check ) < fDiff){  // if both momentum components and energy pass the conservation check (simultaneously)
     conserve++;
     err = 1;
   }
 
-  return err;
-  }
-
-int pim::CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, TLorentzVector P_pim, TLorentzVector P_pro, double fdiff_E) {
-
-  double energy_check = (P_t.E() + P_E0.E()) - (P_e.E()+P_pim.E()+P_pro.E());
-  double px_check =(P_t.Px() + P_E0.Px()) - (P_e.Px()+P_pim.Px()+P_pro.Px()); 
-  double py_check =(P_t.Py() + P_E0.Py()) - (P_e.Py()+P_pim.Py()+P_pro.Py()); 
-  double pz_check =(P_t.Pz() + P_E0.Pz()) - (P_e.Pz()+P_pim.Pz()+P_pro.Pz()); 
-                                                                                                 
-  Int_t err = -1;
-  if( fabs( energy_check ) < fdiff_E &&
-      fabs( px_check )     < fdiff_E &&
-      fabs( py_check )     < fdiff_E &&
-      fabs( pz_check )     < fdiff_E ) {
-    conserve++;
-    err = 1;
+  else{
+    if((fabs( px_check ) < fDiff  &&  fabs( py_check ) < fDiff && fabs( pz_check ) < fDiff) == false ){ // If momentum check fails, check if energy also failed, add counters accordingly
+      if ( (fabs( energy_check ) < fDiff) == false ){
+	ene_mom++; // Both failed
+      }
+      else{
+	mom++; // Only momentum failed
+      }
+    }
+    else{ // If check did not pass, but it wasn't momentum, must have been energy
+      ene++; // Energy failed, add to counter
+    }
   }
 
   return err;
 }
+// SJDK - 01/06/23 - This should actually be even more flexible, add an fDiff_mom too - Set momentum and energy differences separately
+int pim::CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, TLorentzVector P_pim, TLorentzVector P_pro, double fDiff_E) {
 
+  double energy_check = (P_t.E() + P_E0.E()) - (P_e.E()+P_pim.E()+P_pro.E());
+  double px_check =(P_t.Px() + P_E0.Px()) - (P_e.Px()+P_pim.Px()+P_pro.Px());
+  double py_check =(P_t.Py() + P_E0.Py()) - (P_e.Py()+P_pim.Py()+P_pro.Py());
+  double pz_check =(P_t.Pz() + P_E0.Pz()) - (P_e.Pz()+P_pim.Pz()+P_pro.Pz());
+                                                                                                 
+  Int_t err = -1;
+  if( fabs( energy_check ) < fDiff_E  && fabs( px_check ) < fDiff_E  &&  fabs( py_check ) < fDiff_E && fabs( pz_check ) < fDiff_E){  // if both momentum components and energy pass the conservation check (simultaneously)
+    conserve++;
+    err = 1;
+  }
+
+  else{
+    if((fabs( px_check ) < fDiff_E  &&  fabs( py_check ) < fDiff_E && fabs( pz_check ) < fDiff_E) == false ){ // If momentum check fails, check if energy also failed, add counters accordingly
+      if ( (fabs( energy_check ) < fDiff_E) == false ){
+	ene_mom++; // Both failed
+      }
+      else{
+	mom++; // Only momentum failed
+      }
+    }
+    else{ // If check did not pass, but it wasn't momentum, must have been energy
+      ene++; // Energy failed, add to counter
+    }
+  }
+
+  return err;
+}
 
 ///****************************************
 

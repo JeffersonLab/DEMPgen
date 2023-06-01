@@ -747,9 +747,10 @@ void DEMP_Reaction::Detail_Output() {
   DEMPDetails << "Number of events with " << fQsq_Min << " < qsq < " << fQsq_Max << "                           " << setw(20) << qsq_ev << endl;
   DEMPDetails << "Number of events with Meson (X) energy NaN                   " << setw(20) << fNaN          << endl;
   DEMPDetails << "Number of events failing conservation law check              " << setw(20) << fConserve     << endl;
-  DEMPDetails << "Total events passing conservation laws                       " << setw(20) << conserve   << endl;
-  DEMPDetails << "Total events failed energy conservation                      " << setw(20) << ene   << endl; 
-  DEMPDetails << "Total events failed momentum conservation                   " << setw(20) << mom   << endl;
+  DEMPDetails << "Total events passing conservation law check with tolerance " << fDiff << setw(17) << conserve   << endl;
+  DEMPDetails << "Total events failing energy conservation check ONLY          " << setw(20) << ene   << endl; 
+  DEMPDetails << "Total events failing momentum conservation check ONLY        " << setw(20) << mom   << endl;
+  DEMPDetails << "Total events failing momentum and energy conservation checks " << setw(20) << ene_mom   << endl;
   DEMPDetails << "Number of events with -t > 2 (K+) or -t > 1.3 (Pi+) GeV      " << setw(20) << t_ev          << endl;
   DEMPDetails << "Number of events with w less than threshold                  " << setw(20) << fWSqNeg       << endl;
   DEMPDetails << "Number of events with mom not conserve                       " << setw(20) << fNMomConserve << endl;
@@ -1003,5 +1004,3 @@ void DEMP_Reaction::DEMPReact_HEPMC3_Output() {
   DEMPOut << "P" << " " << "5" << " " << "-1" << " " << PDGtype(recoil_hadron) << " " << l_Recoil_g.X() << " "  << l_Recoil_g.Y() << " "  << l_Recoil_g.Z() << " " << l_Recoil_g.E() << " " <<  l_Recoil_g.M() << " " << "1" << endl;
 
 }
-
-
