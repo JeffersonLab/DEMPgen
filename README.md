@@ -21,9 +21,7 @@ Event generator for Deep Exclusive Meson Production
 
   - cd data/
   - ./../build/DEMPgen ../Config.json
-  - Date will be saved under data/OutputFiles/ , the default format is in HEMPC3 Ascii format.
-
-
+  - Data will be saved under data/OutputFiles/ , the default format is in HEMPC3 Ascii format.
 
 ### Building on the iFarm
 
