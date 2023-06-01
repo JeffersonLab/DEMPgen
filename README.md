@@ -127,10 +127,10 @@ This script copies Config_EIC.json and formats a new file based upon this, DO NO
   
 ### Batch_Submission_EIC.sh
 
-- This script creates and submits batch jobs. It is designed for use with the torque queueing system on Lark at the University of Regina. However, it could quickly be adapted for use on the JLab iFarm for example if desired.
+- This script creates and submits batch jobs. It is designed for use with the torque queueing system on Lark at the University of Regina.
 The jobs the script creates and submits all execute the Process_EIC.csh script described above. This script requries a very similar set of arguments -  
 
-    - Arg 1 - NumFiles -> The batch script is designed to run X jobs of Y events, this number is just X, the number of files you want to run  
+  - Arg 1 - NumFiles -> The batch script is designed to run X jobs of Y events, this number is just X, the number of files you want to run  
   - Arg 2 - NumEvents -> The number of events thrown for this file, set this to whatever you want to run. For reference, with the Pi+/K+ generator, 1B files takes ~1 hour  
   - Arg 3 - EBeamE -> The electron beam energy, set this to whatever you want, typically, we use 5, 10 or 18 (the nominal max for the EIC)  
   - Arg 4 - HBeamE -> The hadron beam energy, again, set this to whatevr you want. Typically we use 41, 100 or 275 (41 and 275 being the nominal min/max)  
