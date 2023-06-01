@@ -78,8 +78,8 @@ eval $DEMPGENPath/build/DEMPgen $ConfigFilename
 sleep 5
 
 # Filename as it's created is a bit odd, so rename it
-set OriginalOutput = $DEMPGENPath'/data/LundFiles/eic_input_DEMPGen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Particle$Hadron'_'$NumEvents'_'$FileNum'.dat'
-set RenamedOutput =  $DEMPGENPath'/data/LundFiles/eic_DEMPGen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Particle$Hadron'_'$NumEvents'_'$FileNum'.dat'
+set OriginalOutput = $DEMPGENPath'/data/OutputFiles/eic_input_DEMPGen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Particle$Hadron'_'$NumEvents'_'$FileNum'.dat'
+set RenamedOutput =  $DEMPGENPath'/data/OutputFiles/eic_DEMPGen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Particle$Hadron'_'$NumEvents'_'$FileNum'.dat'
 
 mv $OriginalOutput $RenamedOutput
 
