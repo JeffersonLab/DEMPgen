@@ -62,6 +62,6 @@ sleep 5
 # Filename as it's created is a bit odd, so rename it
 set OriginalOutput = 'eic_input_DEMPGen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Particle$Hadron'_'$NumEvents'_'$FileNum'.dat'
 set RenamedOutput = 'eic_DEMPGen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Particle$Hadron'_'$NumEvents'_'$FileNum'.dat'
-mv "LundFiles/"$OriginalOutput "LundFiles/"$RenamedOutput
+mv "OutputFiles/"$OriginalOutput "OutputFiles/"$RenamedOutput
 
 rm -rf ../$ConfigFilename
