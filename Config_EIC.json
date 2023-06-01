@@ -18,18 +18,22 @@
 
     "file_name" : "DEMPGen_EIC_test",
     "n_events" : 100000000,
-    "output_file" : "RootFiles/Test.root",
     "generator_seed": 1234567,
 
     //**************************************
     /// This section if for EIC simulation only
-    "Targ_dir" : 1,                // Target Direction (1->Up, 2->Down)
     "Kinematics_type" : 1,         // Kinematics type (1->FF, 2->TSSA)
     "particle": "Pion+", 		   // Choices: omega, pi+, pi0, K+
-    "hadron": "",                // Choices: Empty OR Lambda or Sigma0 - For K+ production only!
+    "hadron": "neutron",                // Choices: Neutron, proton, Lambda or Sigma0
     "ebeam": 5,                         // Electron beam energy in GeV
-    "hbeam": 41,                        // Hadron beam energy in GeV
-    //"hbeam_part":"proton",           // Hadron beam particle, proton, deut or helium3, work in progress, will need to be added to shell script later on as an argument
-    "det_location": "ip8",		   // choices: ip6 for STAR, ip8 for PHENIX
-    "OutputType": "Pythia6",		   // choices: LUND (Docker), Pythia6 (ECCE Fun4All) or HEPMC3 (Athena)   
+    "hbeam": 100,                        // Hadron beam energy in GeV
+    "hbeam_part":"Proton",           // Hadron beam particle, proton, deut or helium3, work in progress, will need to be added to shell script later on as an argument
+    "OutputType": "HEPMC3",		   // choices: LUND (Docker), Pythia6 (ECCE Fun4All) or HEPMC3 (Athena)   
+    "det_location": "ip6",		   // choices: ip6 for STAR, ip8 for PHENIX
+    "Ee_Low": 0.5, // The minimum scattered electron energy that will be generated as a fraction of the electron beam energy
+    "Ee_High": 2.5, // The maximum scattered electron energy that will be generated as a fraction of the electron beam energy
+    "e_Theta_Low": 60.0, // The minimum scattered electron angle (theta) that will be generated in degrees
+    "e_Theta_High": 175.0, // The maximum scattered electron angle (theta) that will be generated in degrees
+    "EjectileX_Theta_Low": 0.0, // The minimum ejectile angle (theta) that will be generated in degrees
+    "EjectileX_Theta_High": 50.0, // The maximum ejectile angle (theta) that will be generated in degrees
 }

@@ -1,64 +1,66 @@
 #include "reaction_routine.h"
+
 #include "eic.h"
 
 using namespace std;
 
-KPlus_Production::KPlus_Production() { 
+PiPlus_Production::PiPlus_Production() { 
 
   cout << "Program Start" << endl;
 
 }
 
-/// KPlus_Production 
-// 09/02/22 - SJDK - Added new hadron string argument
-KPlus_Production::KPlus_Production(TString particle_str, TString hadron_str) { 
+/*--------------------------------------------------*/
+/// PiPlus_Production 
+
+PiPlus_Production::PiPlus_Production(TString particle_str) { 
 
   rParticle = particle_str;
-  rHadron = hadron_str;
 
 }
 
-KPlus_Production::~KPlus_Production() {
+PiPlus_Production::~PiPlus_Production() {
 
   ppiOut.close();
   ppiDetails.close();
 
 }
 
-void KPlus_Production::process_reaction() {
- 
+void PiPlus_Production::process_reaction() {
+
   Init();
 
   if (gOutputType == "Pythia6"){
-    KPlus_Pythia6_Out_Init();
+    PiPlus_Pythia6_Out_Init();
   }
   else if (gOutputType == "HEPMC3"){
-    KPlus_HEPMC3_Out_Init();
+    PiPlus_HEPMC3_Out_Init();
   }
 
   for( long long int i = 0; i < rNEvents; i++ ) {
- 
+
     rNEvent_itt = i;
     fNGenerated ++;
  
     Progress_Report();  // This is happens at each 10% of the total event is processed
     Processing_Event();
   }
- 
+
   Detail_Output();
  
 }
 
-void KPlus_Production::Init() {
-  
+void PiPlus_Production::Init() {
+
   pim* myPim;
-  
+
   pd = dynamic_cast<pim*>(myPim);
+	
   rParticle_charge = ExtractCharge(rParticle);
 
   sTFile = Form("./LundFiles/eic_%s.txt", gfile_name.Data());
   sLFile= Form("./LundFiles/eic_input_%s.dat", gfile_name.Data());
-   
+
   ppiOut.open( sLFile.c_str() );
   ppiDetails.open( sTFile.c_str() );
 	
@@ -76,12 +78,14 @@ void KPlus_Production::Init() {
 	
   rFermiMomentum = pd->fermiMomentum();
 
+  // ----------------------------------------------------
   // Proton in collider (lab) frame
 
   r_lproton = GetProtonVector_lab();
   r_lprotong = GetProtonVector_lab() * fm;
 
-  /// Electron in collider (lab) frame
+  // ----------------------------------------------------
+  // Electron in collider (lab) frame
 
   cout << "Fermi momentum: " << rFermiMomentum << endl;
 
@@ -90,8 +94,7 @@ void KPlus_Production::Init() {
 
   ///*--------------------------------------------------*/
   /// Getting the particle mass from the data base
-  /// Particle X is the produced meson, in this case, the K+
-  ///*--------------------------------------------------*/
+ 
   produced_X = ParticleEnum(rParticle);
   fX_Mass = ParticleMass(produced_X)*1000; //MeV
   fX_Mass_GeV = fX_Mass/1000; //GeV
@@ -99,72 +102,104 @@ void KPlus_Production::Init() {
   cout << rParticle << "  " << produced_X << "  " << fX_Mass_GeV <<  endl;
   cout << rParticle_charge << endl;
 
-  if(rHadron == "Lambda"){
-    rParticle_scat_hadron  = "Lambda"; 
-    recoil_hadron  = Lambda;
-    f_Scat_hadron_Mass = fLambda_Mass;
-    f_Scat_hadron_Mass_GeV = f_Scat_hadron_Mass/1000;
-    cout<<"Particle = "<<rParticle_scat_hadron<<" with mass = "<< f_Scat_hadron_Mass << endl;
+
+  ///*--------------------------------------------------*/
+  /// This rParticle_charge is referring to the charge of the produced meson
+
+  if (rParticle_charge == "+" ) {
+    rParticle_scat_nucleon  = "Neutron"; 
+    recoil_nucleon  = Neutron; 
+    f_Scat_Nucleon_Mass     = fNeutron_Mass;
+    f_Scat_Nucleon_Mass_GeV = f_Scat_Nucleon_Mass/1000;
   }
-  else if (rHadron == "Sigma0"){
-    rParticle_scat_hadron  = "Sigma0";
-    recoil_hadron  = Sigma0;
-    f_Scat_hadron_Mass  = fSigma_Mass;
-    f_Scat_hadron_Mass_GeV = f_Scat_hadron_Mass/1000;
-    cout<<"Particle = "<<rParticle_scat_hadron<<" with mass = "<< f_Scat_hadron_Mass << endl;
-  }
-  else{
-    cout << "Error, expect Lambda or Sigma0 specified as hadron for K+ production module." << endl;
-    cout << "Defaulting to Lambda production." << endl;
-    rParticle_scat_hadron  = "Lambda"; 
-    recoil_hadron  = Lambda;
-    f_Scat_hadron_Mass = fLambda_Mass;
-    f_Scat_hadron_Mass_GeV = f_Scat_hadron_Mass/1000;
-    cout<<"Particle = "<<rParticle_scat_hadron<<" with mass = "<< f_Scat_hadron_Mass << endl;
+  else if (rParticle_charge == "0" ) {	
+    rParticle_scat_nucleon  = "Proton"; 
+    recoil_nucleon  = Proton;
+    f_Scat_Nucleon_Mass     = fProton_Mass;
+    f_Scat_Nucleon_Mass_GeV = f_Scat_Nucleon_Mass/1000;
+  } 
+  else {
+    cerr << "Is the overall charge of the reaction conserved? " << endl;
+    cerr << "Please double check the input file and processes!" << endl;
+    cerr << "Exiting the program!" << endl;
+    exit(0);
   }
 
   rDEG2RAD   = fPI/180.0;
 
   fX_Theta_I = 0.0 * rDEG2RAD ;
-  fX_Theta_F = 43.0 * rDEG2RAD;
+  fX_Theta_F = 50.0 * rDEG2RAD;
 
   cout << "Produced particle in exclusive production: " << rParticle << ";  with mass: " << fX_Mass << " MeV "<< endl;
   cout << fEBeam << " GeV electrons on " << fPBeam << " GeV ions" << endl;
 
-  // Depending upon beam energy combination, set the value for the max weight from the non normalised version to then generate unit weights
-  // The values were determined from a set of 100 x 1B events thrown runs, the mean weight value + 6.5 sigma was taken as the "max" weight for a given beam energy combination
-  // Probability of being more than 6.5 sigma away is over 1 in 12.5B
-  // The weight has to be scaled by the number thrown in the current calculation 
-  // fEventWeight is now independent of the number of events thrown
+  // Set luminosity value based upon beam energy combination
+  // See slide 11 in https://indico.cern.ch/event/1072579/contributions/4796856/attachments/2456676/4210776/CAP-EIC-June-7-2022-Seryi-r2.pdf
+  if ((fEBeam == 5.0 ) && (fPBeam == 41.0) ){
+    fLumi = 0.44e33;
+  }
+  else if ((fEBeam == 5.0 ) && (fPBeam == 100.0) ){
+    fLumi = 3.68e33;
+  }
+  else if ((fEBeam == 10.0 ) && (fPBeam == 100.0) ){
+    fLumi = 4.48e33;
+  }
+  else if ((fEBeam == 18.0 ) && (fPBeam == 275.0) ){
+    fLumi = 1.54e33;
+  }
 
-  // SJDK 21/06/21 - Commented out for now, reverting to old weighting method
 
-  // if ((fEBeam == 5.0 ) && (fPBeam == 41.0) ){
-  //   //fEventWeightCeil = 0.0221836 * (1000000000); // Old value
-  //   fEventWeightCeil = 0.002296 * (1000000000);
-  // }
 
-  // else if ((fEBeam == 5.0 ) && (fPBeam == 100.0) ){
-  //   //fEventWeightCeil = 0.30281 * (1000000000); // Old value
-  //   fEventWeightCeil = 0.023960 * (1000000000);
-  // }
+  /*--------------------------------------------------*/ 
 
-  // else if ((fEBeam == 10.0 ) && (fPBeam == 100.0) ){
-  //   //fEventWeightCeil = 1.77775 * (1000000000); // Old value
-  //   fEventWeightCeil = 0.201569 * (1000000000);
-  // }
-  // else {
-  //   fEventWeightCeil = 1.0 * (100000000);
-  //   cout << endl << "!!!!! WARNING !!!!!" << endl;
-  //   cout << "Beam energy combination not recognised, weight ceiling set to 1." << endl;
-  //   cout << "!!!!! WARNING !!!!!" << endl << endl;
-  // }
+  CoinToss = new TRandom3();
+
+  F = new TF1("F",
+              "[6]-sqrt([7]**2+x**2)-sqrt([8]**2+([3]-[0]*x)**2+([4]-[1]*x)**2+([5]-[2]*x)**2)",
+              0, 12000);
+
+  extern Json::Value obj;
+
+  char AngleGenName[100] = "AngleGen";
+  double dummy[2] = {0,1};
+  double ThetaRange[2] = {obj["prod_pion_thetamin"].asDouble()*TMath::DegToRad(),
+                          obj["prod_pion_thetamax"].asDouble()*TMath::DegToRad()};
+
+  double PhiRange[2] = {0, 360*TMath::DegToRad()};
+  AngleGen = new CustomRand(AngleGenName, dummy,
+                            ThetaRange, PhiRange);
+
+  UnitVect = new TVector3(0,0,1);
+
+  ///*--------------------------------------------------*/ 
+  // Produced hadron and recoilded nucleon from the solve function 
+
+  r_lX_solved = new Particle();
+  r_l_scat_nucleon_solved = new Particle();
+
+  Interaction = new Particle();
+  Target      = new Particle();
+  Initial     = new Particle();
+  Final       = new Particle();
+
+  VertBeamElec = new Particle();
+  VertScatElec = new Particle();
+
+  Photon = new Particle();
+
+//  ///*--------------------------------------------------*/ 
+//  /// For testing
+//  Photon       = new Particle();
+//  VertBeamElec->SetPxPyPzE(0,      0,       11000,  11000);
+//  VertScatElec->SetPxPyPzE(15.934, 1106.06, 2281.09, 2535.16);
+//  Target->SetPxPyPzE(0,  0,  0,  939.565);
+//  //*--------------------------------------------------*/ 
+
+
 
 }
 
-/*--------------------------------------------------*/
-
-void KPlus_Production::Processing_Event() {
+void PiPlus_Production::Processing_Event() {
 
   // ----------------------------------------------------
   // Considering Fermi momentum for the proton
@@ -172,7 +207,6 @@ void KPlus_Production::Processing_Event() {
 
   if( kCalcFermi ) {
     Consider_Proton_Fermi_Momentum();
- 
   }
 
   // ----------------------------------------------------
@@ -192,7 +226,6 @@ void KPlus_Production::Processing_Event() {
   // ----------------------------------------------------
   // Produced Particle X in Collider frame
   // ----------------------------------------------------  
-
 
   /// The generic produced particle in the exclusive reaction is labelled as X 
   fX_Theta_Col      = acos( fRandom->Uniform( cos(fX_Theta_I), cos(fX_Theta_F ) ) ); 
@@ -233,16 +266,30 @@ void KPlus_Production::Processing_Event() {
   lwg = r_lprotong + r_lphotong;
   fW_GeV    = lwg.Mag();
   fWSq_GeV  = lwg.Mag2();
-    
+
+
   if ( fWSq_GeV < 0 ) { 
     w_neg_ev++;
     return;
   }    
- 
+  
+  ///*--------------------------------------------------*/ 
+  // 13/12/22 - SJDK - This is the start of the block that will need to be replaced by the ROOT function Rory used to determine the pion momentum
   // ---------------------------------------------------------
-  // Kaon momentum in collider frame, analytic solution starts
+  // pion momentum in collider frame, analytic solution starts
   // ---------------------------------------------------------
- 
+
+  ///*--------------------------------------------------*/ 
+  /// Modifier: Ishan Goel 
+  /// Date: March 22, 2023
+  /// This Solve function is the same as the one implemented in the SoLID generator part
+  // Removing cases with no solution
+  if(!Solve()){
+    return;
+  }
+
+  /*--------------------------------------------------*/ 
+
   double fupx = sin( fX_Theta_Col ) * cos( fX_Phi_Col );
   double fupy = sin( fX_Theta_Col ) * sin( fX_Phi_Col );
   double fupz = cos( fX_Theta_Col );
@@ -268,7 +315,7 @@ void KPlus_Production::Processing_Event() {
   fc = r_lphoton.E() + r_lproton.E();
      
   double ft = fc * fc - fb + fX_Mass * fX_Mass - fProton_Mass * fProton_Mass;
-    
+     
   double fQA = 4.0 * ( fa * fa - fc * fc );
   double fQB = 4.0 * fc * ft;
 
@@ -278,34 +325,39 @@ void KPlus_Production::Processing_Event() {
  
   fepi1 = ( -fQB - sqrt( fradical ) ) / ( 2.0 * fQA );
   fepi2 = ( -fQB + sqrt( fradical ) ) / ( 2.0 * fQA );
- 
-  // ---------------------------------------------------------
-  // Particle X momentum in collider frame, analytic solution ends
-  // ---------------------------------------------------------
+
+  ///---------------------------------------------------------
+  /// Particle X momentum in collider frame, analytic solution
+  /// And obtain recoiled proton in collider (lab) frame
+  ///---------------------------------------------------------
          
-  r_lX.SetPxPyPzE( (sqrt( pow( fepi1 , 2) - pow(fX_Mass , 2) ) ) * sin(fX_Theta_Col) * cos(fX_Phi_Col),
-		   ( sqrt( pow( fepi1 , 2) - pow(fX_Mass , 2) ) ) * sin(fX_Theta_Col) * sin(fX_Phi_Col),
-		   ( sqrt( pow( fepi1 , 2) - pow(fX_Mass , 2) ) ) * cos(fX_Theta_Col),
-		   fepi1 );
+//  r_lX.SetPxPyPzE( (sqrt( pow( fepi1 , 2) - pow(fX_Mass , 2) ) ) * sin(fX_Theta_Col) * cos(fX_Phi_Col),
+//		   ( sqrt( pow( fepi1 , 2) - pow(fX_Mass , 2) ) ) * sin(fX_Theta_Col) * sin(fX_Phi_Col),
+//		   ( sqrt( pow( fepi1 , 2) - pow(fX_Mass , 2) ) ) * cos(fX_Theta_Col),
+//		   fepi1 );
+//
+//  r_l_scat_nucleon.SetPxPyPzE( ( r_lproton + r_lelectron - r_lscatelec - r_lX).X(),
+//			       ( r_lproton + r_lelectron - r_lscatelec - r_lX ).Y(),
+//			       ( r_lproton + r_lelectron - r_lscatelec - r_lX ).Z(),
+//			       sqrt( pow( ( ( ( r_lproton + r_lelectron - r_lscatelec - r_lX ).Vect() ).Mag()),2) +
+//				     pow( f_Scat_Nucleon_Mass , 2) ) );
 
-  r_lX_g = r_lX * fm;
+  ///--------------------------------------------------
+  /// Output with the Solve Function
+  /// Setting the solution values to X and recoiled nucleon
 
-  // ----------------------------------------------------
-  // Scattered proton collider (lab) frame
-  // ----------------------------------------------------
+   r_lX.SetPxPyPzE(r_lX_solved->Px(), r_lX_solved->Py(), r_lX_solved->Pz(), r_lX_solved->E());
+   r_l_scat_nucleon.SetPxPyPzE(r_l_scat_nucleon_solved->Px(), r_l_scat_nucleon_solved->Py(), r_l_scat_nucleon_solved->Pz(), r_l_scat_nucleon_solved->E());
+
+  ///--------------------------------------------------
   
-  r_l_scat_hadron.SetPxPyPzE( ( r_lproton + r_lelectron - r_lscatelec - r_lX).X(),
-			       ( r_lproton + r_lelectron - r_lscatelec - r_lX ).Y(),
-			       ( r_lproton + r_lelectron - r_lscatelec - r_lX ).Z(),
- 			       sqrt( pow( ( ( ( r_lproton + r_lelectron - r_lscatelec - r_lX ).Vect() ).Mag()),2) +
-  				     pow( f_Scat_hadron_Mass ,2 ) ) );
-
-  r_l_scat_hadron_g = r_l_scat_hadron * fm;
+  r_lX_g = r_lX * fm;
+  r_l_scat_nucleon_g = r_l_scat_nucleon * fm;
 
   // ----------------------------------------------------------------------------------------------
   // Calculate w = (proton + photon)^2
   // ----------------------------------------------------------------------------------------------
-     
+
   if ( fW_GeV < 3.0 || fW_GeV > 10.6 ) {
     w_ev++;
     return;
@@ -313,7 +365,6 @@ void KPlus_Production::Processing_Event() {
 
   r_lw = r_lproton + r_lphoton;
   fW = r_lw.Mag();
-
 
   // ----------------------------------------------------------------------------------------------
   // Calculate w prime w' = (proton + photon - pion)^2                                             
@@ -323,7 +374,7 @@ void KPlus_Production::Processing_Event() {
   fW_Prime_GeV = lwp.Mag();    
 
   fsini = r_lelectron + r_lproton;
-  fsfin = r_lscatelec + r_lX + r_l_scat_hadron;
+  fsfin = r_lscatelec + r_lX + r_l_scat_nucleon;
      
   fsinig = fsini * fm;
   fsfing = fsfin * fm; 
@@ -334,13 +385,13 @@ void KPlus_Production::Processing_Event() {
   if (r_lX.E() != r_lX.E()){ // SJDK 15/06/21 - If the energy of the produced meson is not a number, return and add to counter
     fNaN++;
     return;
-  }  
+  }
   kSConserve = false;
   if( std::abs( fsinig.Mag() - fsfing.Mag() ) < fDiff ) {
     kSConserve = true;
   }
-  // For the Kaon case, the energy difference threshold is set higher for now
-  if ( pd->CheckLaws( r_lelectron, r_lproton, r_lscatelec, r_lX, r_l_scat_hadron, 10) != 1 ){
+        
+  if ( pd->CheckLaws( r_lelectron, r_lproton, r_lscatelec, r_lX, r_l_scat_nucleon, 0.5) != 1 ){
     fConserve++;
     return;
   }
@@ -370,9 +421,9 @@ void KPlus_Production::Processing_Event() {
   lX_rf.Boost(-beta_col_rf);
   lX_rfg = lX_rf * fm;
          
-  l_scat_hadron_rf = r_l_scat_hadron;
-  l_scat_hadron_rf.Boost(-beta_col_rf);
-  l_scat_hadron_rf_g = l_scat_hadron_rf * fm;
+  l_scat_nucleon_rf = r_l_scat_nucleon;
+  l_scat_nucleon_rf.Boost(-beta_col_rf);
+  l_scat_nucleon_rf_g = l_scat_nucleon_rf * fm;
 
   ////////////////////////////////////////////////////////////////////////////////////////////
   //                                          End                                           //
@@ -383,11 +434,11 @@ void KPlus_Production::Processing_Event() {
   // -----------------------------------------------------------------------------------------
   // Calculate -t
   // -----------------------------------------------------------------------------------------
-
-  fBeta_CM_RF           = (lphoton_rf.Vect()).Mag() / ( lphoton_rf.E() + fProton_Mass );
-  fGamma_CM_RF          = ( lphoton_rf.E() + fProton_Mass ) / fW;
-  fX_Energy_CM       = ( pow( fW , 2) + pow(fX_Mass , 2) - pow(f_Scat_hadron_Mass , 2) ) / ( 2.0 * fW);    
-  fX_Mom_CM          = sqrt( pow(fX_Energy_CM , 2) - pow(fX_Mass , 2));    
+ 
+  fBeta_CM_RF        = (lphoton_rf.Vect()).Mag() / (lphoton_rf.E() + fProton_Mass );
+  fGamma_CM_RF       = (lphoton_rf.E() + fProton_Mass) / fW;
+  fX_Energy_CM       = (pow(fW , 2) + pow(fX_Mass , 2) - pow(f_Scat_Nucleon_Mass , 2) ) / ( 2.0 * fW);    
+  fX_Mom_CM          = sqrt(pow(fX_Energy_CM , 2) - pow(fX_Mass , 2));    
   fX_Energy_CM_GeV   = fX_Energy_CM / 1000.0;
   fX_Mom_CM_GeV      = fX_Mom_CM / 1000.0;
 
@@ -401,7 +452,7 @@ void KPlus_Production::Processing_Event() {
   fT = -1.*lt.Mag2();
   fT_GeV = -1.*ltg.Mag2();
 
-  if ( gKinematics_type == 1 && fT_GeV > 1.2 ) {
+  if ( gKinematics_type == 1 && fT_GeV > 0.5 ) {
     t_ev++;
     return;
   }
@@ -410,7 +461,7 @@ void KPlus_Production::Processing_Event() {
     t_ev++;
     return;
   }
-
+ 
   fx = fQsq_GeV / ( 2.0 * r_lprotong.Dot( r_lphotong ) );
   fy = r_lprotong.Dot( r_lphotong ) / r_lprotong.Dot( r_lelectrong );
   fz = r_lX.E()/r_lphoton.E();    
@@ -447,9 +498,11 @@ void KPlus_Production::Processing_Event() {
   v3QUnitxP    = v3PhotonUnit.Cross(v3X);
   v3QUnitxS    = v3PhotonUnit.Cross(v3S);
 
+  /*--------------------------------------------------*/
   // Get the Phi scattering angle with respect to the electron scattering plane
   fPhi   = Get_Phi_X_LeptonPlane_RF ();
 
+  /*--------------------------------------------------*/
   // Get the Phi scattering angle with respect to the electron scattering plane
   fPhiS  = Get_Phi_TargPol_LeptonPlane_RF();
 
@@ -480,20 +533,20 @@ void KPlus_Production::Processing_Event() {
   // ----------------------------------------------------
   //  Jacobian  dt/dcos(theta*)dphi in units of GeV2/sr
   // ----------------------------------------------------
-  fJacobian_CM = ( (lphoton_rfg.Vect()).Mag() - fBeta_CM_RF * lphoton_rfg.E() ) / ( fGamma_CM_RF * ( 1.0 - pow(fBeta_CM_RF,2) ) );
+  fJacobian_CM = ( (lphoton_rfg.Vect()).Mag() - fBeta_CM_RF * lphoton_rfg.E() ) / ( fGamma_CM_RF * ( 1.0 - pow(fBeta_CM_RF,2) ) ); // Eqn 22 in paper
  
-  fA = fJacobian_CM * fX_Mom_CM_GeV / fPi;
+  fA = fJacobian_CM * fX_Mom_CM_GeV / fPi; // Eqn 21 in paper
  
   // ----------------------------------------------------
   // Jacobian dOmega* / dOmega dimensionless
   // ----------------------------------------------------
   fJacobian_CM_RF  = ( pow((lX_rf.Vect()).Mag(),2)*fW) / 
     ( fX_Mom_CM * std::abs( ( fProton_Mass + lphoton_rf.E()) * (lX_rf.Vect()).Mag() - 
-			    ( lX_rf.E() * (lphoton_rf.Vect()).Mag() * cos( lX_rf.Theta() ) ) ) );
+			    ( lX_rf.E() * (lphoton_rf.Vect()).Mag() * cos( lX_rf.Theta() ) ) ) ); // Differs from next line in photon vect -> lphoton_rf vs r_lphoton
  
-  fJacobian_CM_Col = ( ( pow((r_lX.Vect()).Mag(),2) * fW ) /
+  fJacobian_CM_Col = ( ( pow((r_lX.Vect()).Mag(),2) * fW ) / // This one is actually used subsequently, so this must be Eqn 20
 		       ( fX_Mom_CM * std::abs( ( fProton_Mass + r_lphoton.E() ) * (r_lX.Vect()).Mag() -
-					       ( r_lX.E() * (r_lphoton.Vect()).Mag() * cos( r_lX.Theta() ) ) ) ) );
+					       ( r_lX.E() * (r_lphoton.Vect()).Mag() * cos( r_lX.Theta() ) ) ) ) ); 
 
 
   //	 cout <<  lX_rf.Vect().Mag() << "  " << << << << << << << << endl;
@@ -502,10 +555,8 @@ void KPlus_Production::Processing_Event() {
   // -----------------------------------------------------------------------------------------------------------
   // CKY sigma L and T starts
   // -----------------------------------------------------------------------------------------------------------
-
   //	 r_fSig_T = 1;
   //	 r_fSig_L = 1;
-  // 
   // -------------------------------------------------------------------------------------------
  
   r_fSig = Get_Total_Cross_Section();
@@ -521,7 +572,6 @@ void KPlus_Production::Processing_Event() {
     return;
   }
      
-  // -----------------------------------------------------------------------------------------------------------
   // -----------------------------------------------------------------------------------------------------------
   //             Lab cross section     Phase Space   Conversion     Luminosity                Total events tried
   // Hz        = ub / ( sr^2 * GeV ) * GeV * sr^2 * ( cm^2 / ub ) * ( # / ( cm^2 * sec ) ) / ( # )
@@ -542,22 +592,23 @@ void KPlus_Production::Processing_Event() {
   //   fNWeightReject ++;
   //   return;
   // }
+
   fNRecorded++;
   fLundRecorded++;
   fRatio = fNRecorded / fNGenerated;
 
   if (gOutputType == "Pythia6"){
-      KPlus_Pythia6_Output();
+    PiPlus_Pythia6_Output();
   }
   else if (gOutputType == "LUND"){
     Lund_Output();
   }
   else if (gOutputType == "HEPMC3"){
-    KPlus_HEPMC3_Output();
-  }	       
+    PiPlus_HEPMC3_Output();
+  }
 }
 
-void KPlus_Production::Progress_Report() {
+void PiPlus_Production::Progress_Report() {
 
   dFractTime = time(0);
 
@@ -572,22 +623,24 @@ void KPlus_Production::Progress_Report() {
   }
 }
 
-TLorentzVector KPlus_Production::GetProtonVector_lab() {
+TLorentzVector PiPlus_Production::GetProtonVector_lab() {
 
-  // Crossing angle
+  ///*--------------------------------------------------*/
+  // // SJDK - 12/01/22
+  // // Crossing angle
+  // // Set crossing angle to 0 for fun4all, also required for ATHENA simulations
   //	 fProton_Theta_Col = 0.050;
   //	 fProton_Theta_Col = 0.025;
-  // Set crossing angle to 0 for fun4all, also required for ATHENA simulations
+
   fProton_Theta_Col = 0.0;
 
-  //     fProton_Phi_Col   = fPi; 
+  ///*--------------------------------------------------*/
   fProton_Phi_Col   = fProton_incidence_phi; 
 
   fProton_Mom_Col   = fPBeam * 1e3; 
   fVertex_X         = 0.; 
   fVertex_Y         = 0.; 
   fVertex_Z         = 0.; 
-
  
   TLorentzVector lproton( fProton_Mom_Col * sin(fProton_Theta_Col) * cos(fProton_Phi_Col),
 			  fProton_Mom_Col * sin(fProton_Theta_Col) * sin(fProton_Phi_Col),
@@ -602,7 +655,7 @@ TLorentzVector KPlus_Production::GetProtonVector_lab() {
 // Proton in collider (lab) frame
 // ----------------------------------------------------
 
-void KPlus_Production::Consider_Proton_Fermi_Momentum() {
+void PiPlus_Production::Consider_Proton_Fermi_Momentum() {
 
   fProton_Mom_Col   = fProton_Mom_Col + rFermiMomentum;
   fProton_Theta_Col = acos( fRandom->Uniform( cos(0.0) , cos(fPi) ) );
@@ -625,7 +678,7 @@ void KPlus_Production::Consider_Proton_Fermi_Momentum() {
 // Electron in collider (lab) frame
 // ----------------------------------------------------
 
-TLorentzVector KPlus_Production::GetElectronVector_lab() {
+TLorentzVector PiPlus_Production::GetElectronVector_lab() {
 
   fElectron_Energy_Col = fElectron_Kin_Col; 
   fElectron_Mom_Col    = sqrt( pow(fElectron_Energy_Col , 2) - pow(fElectron_Mass , 2) );
@@ -643,7 +696,7 @@ TLorentzVector KPlus_Production::GetElectronVector_lab() {
 
 }
 
-Double_t KPlus_Production::Get_Phi_X_LeptonPlane_RF () {
+Double_t PiPlus_Production::Get_Phi_X_LeptonPlane_RF () {
 
   fCos_Phi_X_LeptonPlane_RF = ( ( v3QUnitxL.Dot( v3QUnitxP ) ) / ( v3QUnitxL.Mag() * v3QUnitxP.Mag() ) ); // hep-ph/0410050v2
   fSin_Phi_X_LeptonPlane_RF = ( ( v3LxP.Dot( v3PhotonUnit  ) ) / ( v3QUnitxL.Mag() * v3QUnitxP.Mag() ) ); // hep-ph/0410050v2    
@@ -656,7 +709,7 @@ Double_t KPlus_Production::Get_Phi_X_LeptonPlane_RF () {
 
 }
 
-Double_t KPlus_Production::Get_Phi_TargPol_LeptonPlane_RF () {
+Double_t PiPlus_Production::Get_Phi_TargPol_LeptonPlane_RF () {
 
   fCos_Phi_TargPol_LeptonPlane_RF = ( ( v3QUnitxL.Dot( v3QUnitxS ) ) / ( v3QUnitxL.Mag() * v3QUnitxS.Mag() ) ); // hep-ph/0410050v2
   fSin_Phi_TargPol_LeptonPlane_RF = ( ( v3LxS.Dot( v3PhotonUnit  ) ) / ( v3QUnitxL.Mag() * v3QUnitxS.Mag() ) ); // hep-ph/0410050v2
@@ -669,30 +722,35 @@ Double_t KPlus_Production::Get_Phi_TargPol_LeptonPlane_RF () {
 
 }
 
-Double_t KPlus_Production::Get_Total_Cross_Section() {
+Double_t PiPlus_Production::Get_Total_Cross_Section() {
 
   Double_t total_sig;
 
-  if(rParticle_scat_hadron == "Lambda"){
-    total_sig = GetKPlus_CrossSection();
-    //total_sig = GetKLambda_CrossSection(); -> SJDK 08/02/22 Not implemented yet
-  }
-  else if (rParticle_scat_hadron == "Sigma0"){
-    total_sig = GetKPlus_CrossSection();
-    //total_sig = GetKSigma_CrossSection(); -> SJDK 08/02/22 Not implemented yet
+  Particle_t p = ParticleEnum(rParticle);
+
+  switch (p) {
+
+  case Pi0: 			total_sig = GetPi0_CrossSection();
+  case PiPlus: 		total_sig = GetPiPlus_CrossSection();
   }
 
   return total_sig;
 
 }
 
+Double_t PiPlus_Production::GetPi0_CrossSection() {
+
+  double_t sig_total;	
+  return sig_total;
+
+}
+
 /*--------------------------------------------------*/
-/// Charged Pi+ module: 
+/// Charged Pi+ moduel: 
 /// Author: Z. Ahmed 
 /// Date: 2017
-/// Modified by A. Usman to switch to Kaon production - June/July 2021
 
-Double_t  KPlus_Production::GetKPlus_CrossSection(){
+Double_t  PiPlus_Production::GetPiPlus_CrossSection(){
 
   double_t sig_total;
 
@@ -746,7 +804,9 @@ Double_t  KPlus_Production::GetKPlus_CrossSection(){
   else {
     fSig_L = 0;
   }
-   // SJDK - 02/06/22 - The validity range here was inconsistent, this only went from 0.0 to 0.15, leaving a gap between 0.15 to 0.2
+ 
+  // -------------------------------------------------------------------------------------------
+  // SJDK - 02/06/22 - The validity range here was inconsistent, this only went from 0.0 to 0.15, leaving a gap between 0.15 to 0.2
   // I changed the range to remove this gap. 
   if ( ( fT_GeV > 0.0 ) && ( fT_GeV < 0.2 ) ) {
     eicSigmaT( fW_GeV,  fQsq_GeV, tpar0, tpar1, tpar2 , tpar3 , tpar4 );
@@ -772,57 +832,10 @@ Double_t  KPlus_Production::GetKPlus_CrossSection(){
     delete fitCKYTransexpo;
   }
  
-  // ------------------------------------------------------------------------------------------------
-  // Improving the Kaon Sigma_L following GH's fortran code (pole_ration.f) located in main driectory
-  // Added by AU on July 10, 2021
-  // ------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------
+ 
+  fSig_VR = fSig_T + fEpsilon * fSig_L;
 
-  double mkg = 0, mpig = 0, hbarc = 0, gpoleKL = 0, gpoleKS = 0, gpolepi = 0, gpoleKhyp = 0, r2_dip = 0, r2_mono = 0, Fpi_mono = 0, Fpi_dip = 0, pmono = 0, Fpi_fit = 0, fpisq = 0, Fkk = 0, fksq = 0, lNpi = 0, lNk = 0, gkhypn = 0, gpinn = 0, dl_poleKhyp = 0, dl_polepi = 0, ratio_Khyp_pi = 0, FT_GeV_neg = 0;
-
-  gpoleKL = -13.3;
-  gpoleKS = -3.5; 
-  gpolepi = 13.1;
-
-  r2_dip = 0.411;
-  r2_mono = 0.431;                                                                                                                                                                                                              
-
-  hbarc = 0.197;
-  mkg = fX_Mass_GeV;
-  mpig = 0.13957;
-
-  FT_GeV_neg = -1.0 * fT_GeV;
-
-  if ( recoil_hadron = Lambda ) {
-    gpoleKhyp = gpoleKL;
-  }
-  else if ( recoil_hadron = Sigma0 ) {
-    gpoleKhyp = gpoleKS;
-  }
-
-  Fpi_mono = 1.0 / ( 1.0 + ( r2_mono * fQsq_GeV) / (6 * (hbarc * hbarc)));   
-  Fpi_dip = 1.0 / ( 1.0 + ( r2_dip * fQsq_GeV) / (12 * (hbarc * hbarc))) * ( 1.0 + ( r2_dip * fQsq_GeV) / (12 * (hbarc * hbarc)));
-  pmono = 0.85;
-  
-  Fpi_fit = pmono * Fpi_mono + (1 - pmono) * Fpi_dip;
-  fpisq = Fpi_fit * Fpi_fit;
-
-  Fkk = 0.9 / (1.0 + fQsq_GeV / 0.462 );
-  fksq = Fkk * Fkk;
-
-  lNpi = 0.44;
-  lNk = (0.44+0.80)/2;
-
-  gkhypn = gpoleKhyp * ((lNk * lNk) - (mkg * mkg)) / ((lNk * lNk) - FT_GeV_neg); 
-  gpinn = gpolepi * ((lNpi * lNpi) - (mpig * mpig)) / ((lNpi * lNpi) - FT_GeV_neg);
-
-  dl_poleKhyp = ((gkhypn * gkhypn) * fksq) / ((FT_GeV_neg - (mkg * mkg))*(FT_GeV_neg - (mkg * mkg)));  
-  dl_polepi = ((gpinn * gpinn) * fpisq) / ((FT_GeV_neg - (mpig * mpig))*(FT_GeV_neg - (mpig * mpig)));
-  
-  ratio_Khyp_pi = dl_poleKhyp / dl_polepi; 
-
-  // --------------------------------------------------------------------------------
-
-  fSig_VR = (0.1* fSig_T) + fEpsilon * (ratio_Khyp_pi* fSig_L);
   sig_total = fSig_VR;
 
   return sig_total;
@@ -831,7 +844,7 @@ Double_t  KPlus_Production::GetKPlus_CrossSection(){
 /*--------------------------------------------------*/
 /// Output generator detail
 
-void KPlus_Production::Detail_Output() {
+void PiPlus_Production::Detail_Output() {
 
   ppiDetails << "Total events tried                                           " << setw(20) << fNGenerated   << endl;
   ppiDetails << "Total events recorded                                        " << setw(20) << fNRecorded    << endl;
@@ -839,14 +852,16 @@ void KPlus_Production::Detail_Output() {
   //ppiDetails << "Max weight value                                             " << setw(20) << fEventWeightCeil << endl; 
   ppiDetails << "Number of events with w more than 10.6                       " << setw(20) << w_ev          << endl;
   ppiDetails << "Number of events with wsq negative                           " << setw(20) << w_neg_ev      << endl;
-  ppiDetails << "Number of events with qsq less than 5                        " << setw(20) << qsq_ev        << endl;
+  ppiDetails << "Number of events with qsq less than 3                        " << setw(20) << qsq_ev        << endl;
   ppiDetails << "Number of events with Meson (X) energy NaN                   " << setw(20) << fNaN          << endl;
   ppiDetails << "Number of events failing conservation law check              " << setw(20) << fConserve     << endl;
   ppiDetails << "Total events passing conservation laws                       " << setw(20) << conserve   << endl;
   ppiDetails << "Total events failed energy conservation                      " << setw(20) << ene   << endl; 
-  ppiDetails << "Total events failed momentum conserveation                   " << setw(20) << mom   << endl;
-
+  ppiDetails << "Total events failed momentum conservation                    " << setw(20) << mom   << endl;
   ppiDetails << "Number of events with -t more than threshold                 " << setw(20) << t_ev          << endl;
+  // SJDK 21/06/21 - Commenting out, reverting to old weight determination
+  //ppiDetails << "Number of events with unit weight outside of 0 to 1          " << setw(20) << fNWeightUnphys << endl;
+  //ppiDetails << "Number of events with unit weight less than random number    " << setw(20) << fNWeightReject << endl;
   ppiDetails << "Number of events with w less than threshold                  " << setw(20) << fWSqNeg       << endl;
   ppiDetails << "Number of events with mom not conserve                       " << setw(20) << fNMomConserve << endl;
   ppiDetails << "Number of events with Sigma negative                         " << setw(20) << fNSigmaNeg    << endl;
@@ -856,10 +871,10 @@ void KPlus_Production::Detail_Output() {
 
 }
 
-/*--------------------------------------------------*/
-/// Output format functions follow
+////*--------------------------------------------------
+/// Functions for different output formats follow
 
-void KPlus_Production::Lund_Output() {
+void PiPlus_Production::Lund_Output() {
 
   ppiOut << "3"
 	 << " \t " << fPhi           // var 1
@@ -877,7 +892,6 @@ void KPlus_Production::Lund_Output() {
   ppiOut << setw(10) << "1" 
 	 << setw(10) << "1" 
 	 << setw(10) << "1" 
-    // 	   << setw(10) << "11111111111"
 	 << setw(10) << PDGtype(produced_X)
 	 << setw(10) << "0" 
 	 << setw(10) << "0" 
@@ -908,161 +922,164 @@ void KPlus_Production::Lund_Output() {
 	 << setw(16) << fVertex_Z
 	 << endl;
  	  
-  // Recoiled hadron
+  // Recoiled neutron
   ppiOut << setw(10) << "3" 
 	 << setw(10) << "1" 
 	 << setw(10) << "1" 
-	 << setw(10) << PDGtype(recoil_hadron)
+	 << setw(10) << PDGtype(recoil_nucleon)
 	 << setw(10) << "0" 
 	 << setw(10) << "0" 
-	 << setw(16) << r_l_scat_hadron_g.X() 
-	 << setw(16) << r_l_scat_hadron_g.Y()
-	 << setw(16) << r_l_scat_hadron_g.Z()
-	 << setw(16) << r_l_scat_hadron_g.E()
-	 << setw(16) << f_Scat_hadron_Mass_GeV
+	 << setw(16) << r_l_scat_nucleon_g.X() 
+	 << setw(16) << r_l_scat_nucleon_g.Y()
+	 << setw(16) << r_l_scat_nucleon_g.Z()
+	 << setw(16) << r_l_scat_nucleon_g.E()
+	 << setw(16) << f_Scat_Nucleon_Mass_GeV
 	 << setw(16) << fVertex_X
 	 << setw(16) << fVertex_Y
 	 << setw(16) << fVertex_Z
 	 << endl;
 }
 
-void KPlus_Production::KPlus_Pythia6_Out_Init() {
+void PiPlus_Production::PiPlus_Pythia6_Out_Init() {
 
-	print_itt = 0;
+  print_itt = 0;
 
-	ppiOut << "DEMP Event FILE" << endl;
-	ppiOut << "============================================" << endl;
-	ppiOut << "I, ievent, nParticles, Weight" << endl;
-	ppiOut << "============================================" << endl;
-	ppiOut << "I  K(I,1)  K(I,2)  K(I,3)  K(I,4)  K(I,5)  P(I,1)  P(I,2)  P(I,3)  P(I,4)  P(I,5)  V(I,1)  V(I,2)  V(I,3)" << endl;
-	ppiOut << "============================================" << endl;
+  ppiOut << "DEMP Event FILE" << endl;
+  ppiOut << "============================================" << endl;
+  ppiOut << "I, ievent, nParticles, Weight" << endl;
+  ppiOut << "============================================" << endl;
+  ppiOut << "I  K(I,1)  K(I,2)  K(I,3)  K(I,4)  K(I,5)  P(I,1)  P(I,2)  P(I,3)  P(I,4)  P(I,5)  V(I,1)  V(I,2)  V(I,3)" << endl;
+  ppiOut << "============================================" << endl;
 
 }
 
-void KPlus_Production::KPlus_Pythia6_Output() {
+void PiPlus_Production::PiPlus_Pythia6_Output() {
 
-  ppiOut << "0" << " \t\t\t "  << print_itt << " \t\t\t " << "1" << " \t\t\t " << fEventWeight << endl;           // var 1
+  ppiOut << "0" << " \t\t\t "  << print_itt << " \t\t\t " << "1" << " \t\t\t " << fEventWeight << endl; // var 1
 
-	print_itt++;
+  print_itt++;
 
-	ppiOut << "============================================" << endl;
+  ppiOut << "============================================" << endl;
 
- 	///*--------------------------------------------------*/
-  	// Initial State
+  ///*--------------------------------------------------*/
+  // Initial State
  
-      ppiOut  << "1" 
-  	   << setw(6) << "21" 
-  	   << setw(6) << "11"
-  	   << setw(6) << "0" 
-  	   << setw(6) << "3" 
-  	   << setw(6) << "4" 
+  ppiOut  << "1" 
+	  << setw(6) << "21" 
+	  << setw(6) << "11"
+	  << setw(6) << "0" 
+	  << setw(6) << "3" 
+	  << setw(6) << "4" 
 
-  	   << setw(14) << r_lelectrong.X()
-  	   << setw(14) << r_lelectrong.Y()   
-  	   << setw(14) << r_lelectrong.Z()
-  	   << setw(14) << r_lelectrong.E()
-  	   << setw(14) << fElectron_Mass_GeV
-  	   << setw(6) << fVertex_X
-  	   << setw(6) << fVertex_Y
-  	   << setw(6) << fVertex_Z
-  	   << endl;
+	  << setw(14) << r_lelectrong.X()
+	  << setw(14) << r_lelectrong.Y()   
+	  << setw(14) << r_lelectrong.Z()  
+	  << setw(14) << r_lelectrong.E()
+	  << setw(14) << fElectron_Mass_GeV
+	  << setw(6) << fVertex_X
+	  << setw(6) << fVertex_Y
+	  << setw(6) << fVertex_Z
+	  << endl;
 
-      ppiOut << "2" 
-  	   << setw(6) << "21" 
-  	   << setw(6) << "2212"
-  	   << setw(6) << "0" 
-  	   << setw(6) << "5" 
-  	   << setw(6) << "6" 
+  ppiOut << "2" 
+	 << setw(6) << "21" 
+	 << setw(6) << "2212"
+	 << setw(6) << "0" 
+	 << setw(6) << "5" 
+	 << setw(6) << "6" 
 
-  	   << setw(14) << r_lprotong.X()
-  	   << setw(14) << r_lprotong.Y()   
-  	   << setw(14) << r_lprotong.Z()  
-  	   << setw(14) << r_lprotong.E()
-  	   << setw(14) << fProton_Mass_GeV
-  	   << setw(6) << fVertex_X
-  	   << setw(6) << fVertex_Y
-  	   << setw(6) << fVertex_Z
-  	   << endl;
+	 << setw(14) << r_lprotong.X()
+	 << setw(14) << r_lprotong.Y()   
+	 << setw(14) << r_lprotong.Z()  
+	 << setw(14) << r_lprotong.E()
+	 << setw(14) << fProton_Mass_GeV
+	 << setw(6) << fVertex_X
+	 << setw(6) << fVertex_Y
+	 << setw(6) << fVertex_Z
+	 << endl;
 
-      ppiOut << "3" 
-  	   << setw(6) << "21" 
-  	   << setw(6) << "22"
-  	   << setw(6) << "1" 
-  	   << setw(6) << "0" 
-  	   << setw(6) << "0" 
+  ppiOut << "3" 
+	 << setw(6) << "21" 
+	 << setw(6) << "22"
+	 << setw(6) << "1" 
+	 << setw(6) << "0" 
+	 << setw(6) << "0" 
 
-  	   << setw(14) << r_lphotong.X()
-  	   << setw(14) << r_lphotong.Y()   
-  	   << setw(14) << r_lphotong.Z()  
-  	   << setw(14) << r_lphotong.E()
-  	   << setw(14) << r_lphotong.M()
-  	   << setw(6) << fVertex_X
-  	   << setw(6) << fVertex_Y
-  	   << setw(6) << fVertex_Z
-  	   << endl;
+	 << setw(14) << r_lphotong.X()
+	 << setw(14) << r_lphotong.Y()   
+	 << setw(14) << r_lphotong.Z()  
+	 << setw(14) << r_lphotong.E()
+	 << setw(14) << r_lphotong.M()
+	 << setw(6) << fVertex_X
+	 << setw(6) << fVertex_Y
+	 << setw(6) << fVertex_Z
+	 << endl;
 
- 	///*--------------------------------------------------*/
-  	// Final State
+
+  ///*--------------------------------------------------*/
+  // Final State
       
-      // Scattered electron
-      ppiOut << "4" 
-  	   << setw(6) << "1" 
-  	   << setw(6) << "11" 
-  	   << setw(6) << "1" 
-  	   << setw(6) << "0"
-  	   << setw(6) << "0"
+  // Scattered electron
+  ppiOut << "4" 
+	 << setw(6) << "1" 
+	 << setw(6) << "11" 
+	 << setw(6) << "1" 
+	 << setw(6) << "0"
+	 << setw(6) << "0"
  
-  	   << setw(14) << r_lscatelecg.X() 
-  	   << setw(14) << r_lscatelecg.Y() 
-  	   << setw(14) << r_lscatelecg.Z() 
-  	   << setw(14) << r_lscatelecg.E()
-  	   << setw(14) << fElectron_Mass_GeV
-  	   << setw(6) << fVertex_X
-  	   << setw(6) << fVertex_Y
-  	   << setw(6) << fVertex_Z
-  	   << endl;
+	 << setw(14) << r_lscatelecg.X() 
+	 << setw(14) << r_lscatelecg.Y() 
+	 << setw(14) << r_lscatelecg.Z() 
+	 << setw(14) << r_lscatelecg.E()
+	 << setw(14) << fElectron_Mass_GeV
+	 << setw(6) << fVertex_X
+	 << setw(6) << fVertex_Y
+	 << setw(6) << fVertex_Z
+	 << endl;
   	  
-      // Recoiled hadron
-      ppiOut << "5" 
-  	   << setw(6) << "1" 
-  	   << setw(6) << PDGtype(recoil_hadron)
-  	   << setw(6) << "2" 
-  	   << setw(6) << "0"
-  	   << setw(6) << "0"
+  // Recoiled nucleon
+  ppiOut << "5" 
+	 << setw(6) << "1" 
+	 << setw(6) << PDGtype(recoil_nucleon)
+	 << setw(6) << "2" 
+	 << setw(6) << "0"
+	 << setw(6) << "0"
  
-  	   << setw(14) << r_l_scat_hadron_g.X() 
-  	   << setw(14) << r_l_scat_hadron_g.Y()
-  	   << setw(14) << r_l_scat_hadron_g.Z()
-  	   << setw(14) << r_l_scat_hadron_g.E()
-  	   << setw(14) << f_Scat_hadron_Mass_GeV
-  	   << setw(6) << fVertex_X
-  	   << setw(6) << fVertex_Y
-  	   << setw(6) << fVertex_Z
-  	   << endl;
+	 << setw(14) << r_l_scat_nucleon_g.X() 
+	 << setw(14) << r_l_scat_nucleon_g.Y()
+	 << setw(14) << r_l_scat_nucleon_g.Z()
+	 << setw(14) << r_l_scat_nucleon_g.E()
+	 << setw(14) << f_Scat_Nucleon_Mass_GeV
+	 << setw(6) << fVertex_X
+	 << setw(6) << fVertex_Y
+	 << setw(6) << fVertex_Z
+	 << endl;
  
-      // Produced Particle X
-      ppiOut << "6" 
-  	   << setw(6) << "1" 
-  	   << setw(6) << PDGtype(produced_X)
-  	   << setw(6) << "2" 
-  	   << setw(6) << "0" 
-  	   << setw(6) << "0"
+  // Produced Particle X
+  ppiOut << "6" 
+	 << setw(6) << "1" 
+	 << setw(6) << PDGtype(produced_X)
+	 << setw(6) << "2" 
+	 << setw(6) << "0" 
+	 << setw(6) << "0"
 
-  	   << setw(14) << r_lX_g.X()
-  	   << setw(14) << r_lX_g.Y()   
-  	   << setw(14) << r_lX_g.Z()  
-  	   << setw(14) << r_lX_g.E()
-  	   << setw(14) << fX_Mass_GeV
-  	   << setw(6) << fVertex_X
-  	   << setw(6) << fVertex_Y
-  	   << setw(6) << fVertex_Z
-  	   << endl;
+	 << setw(14) << r_lX_g.X()
+	 << setw(14) << r_lX_g.Y()   
+	 << setw(14) << r_lX_g.Z()  
+	 << setw(14) << r_lX_g.E()
+	 << setw(14) << fX_Mass_GeV
+	 << setw(6) << fVertex_X
+	 << setw(6) << fVertex_Y
+	 << setw(6) << fVertex_Z
+	 << endl;
 
-	ppiOut << "=============== Event finished ===============" << endl;
+  ppiOut << "=============== Event finished ===============" << endl;
 
 }
 
-void KPlus_Production::KPlus_HEPMC3_Out_Init() {
+/*--------------------------------------------------*/
+
+void PiPlus_Production::PiPlus_HEPMC3_Out_Init() {
  
   print_itt = 0;
   ppiOut << "HepMC::Version 3.02.02" << endl;
@@ -1070,9 +1087,11 @@ void KPlus_Production::KPlus_HEPMC3_Out_Init() {
 
 }
 
-void KPlus_Production::KPlus_HEPMC3_Output() {
+/*--------------------------------------------------*/
+
+void PiPlus_Production::PiPlus_HEPMC3_Output() {
   
-  // HEPMC3 output for Athena simulations
+  // HEPMC3 output for Athena/EPIC simulations
 
   // First line - E - Event# - #Vertices - #Particles
   ppiOut << "E" << " "  << print_itt <<  " " << "1" << " " << 5 << endl;
@@ -1092,6 +1111,175 @@ void KPlus_Production::KPlus_HEPMC3_Output() {
   // Produced meson
   ppiOut << "P" << " " << "4" << " " << "-1" << " " << PDGtype(produced_X) << " " << r_lX_g.X() << " "  << r_lX_g.Y() << " "  << r_lX_g.Z() << " " << r_lX_g.E() << " " << fX_Mass_GeV << " " << "1" << endl;
   // Recoil nucleon
-  ppiOut << "P" << " " << "5" << " " << "-1" << " " << PDGtype(recoil_hadron) << " " << r_l_scat_hadron_g.X() << " "  << r_l_scat_hadron_g.Y() << " "  << r_l_scat_hadron_g.Z() << " " << r_l_scat_hadron_g.E() << " " << f_Scat_hadron_Mass_GeV << " " << "1" << endl;
+  ppiOut << "P" << " " << "5" << " " << "-1" << " " << PDGtype(recoil_nucleon) << " " << r_l_scat_nucleon_g.X() << " "  << r_l_scat_nucleon_g.Y() << " "  << r_l_scat_nucleon_g.Z() << " " << r_l_scat_nucleon_g.E() << " " << f_Scat_Nucleon_Mass_GeV << " " << "1" << endl;
   
 }
+
+/*--------------------------------------------------*/ 
+
+bool PiPlus_Production::SolnCheck()
+{
+
+  // Double Checking for solution viability
+  if (TMath::Abs(f_Scat_Nucleon_Mass-r_l_scat_nucleon_solved->M())>1){
+    //cerr << "Mass Missmatch" << endl;
+    //cerr << TMath::Abs(proton_mass_mev-Proton->M()) << endl;
+    return false;
+  }
+  if (TMath::Abs(W_in()-W_out())>1){
+    //cerr << "W Missmatch" << endl;
+    //cerr << TMath::Abs(W_in()-W_out()) << endl;
+    return false;
+  }
+  *Final = *r_l_scat_nucleon_solved + *r_lX_solved;
+
+  if (TMath::Abs(Initial->Px()-Final->Px())>1){
+    //cerr << "Px Missmatch" << endl;
+    //cerr << TMath::Abs(Initial->Px()-Final->Px()) << endl;
+    return false;
+  }
+
+  if (TMath::Abs(Initial->Py()-Final->Py())>1){
+    //cerr << "Py Missmatch" << endl;
+    //cerr << TMath::Abs(Initial->Py()-Final->Py()) << endl;
+    return false;
+  }
+
+  if (TMath::Abs(Initial->Pz()-Final->Pz())>1){
+    //cerr << "Pz Missmatch" << endl;
+    //cerr << TMath::Abs(Initial->Pz()-Final->Pz()) << endl;
+    return false;
+  }
+
+  if (TMath::Abs(Initial->E()-Final->E())>1){
+    return false;
+  }
+  return true;
+}
+
+/*--------------------------------------------------*/ 
+double PiPlus_Production::W_in()
+{
+  return (*Interaction+*Target).Mag2();
+}
+
+/*--------------------------------------------------*/ 
+double PiPlus_Production::W_out()
+{
+  return (*r_l_scat_nucleon_solved+*r_lX_solved).Mag2();
+}
+
+/*--------------------------------------------------*/ 
+
+int PiPlus_Production::Solve()
+{
+//  double theta = AngleGen->Theta();
+//  double phi = AngleGen->Phi();
+//  theta = 0.282478;   
+//  phi = 3.49651;
+//  cout << " Theta Phi: "<< theta << "   " << phi << endl; 
+
+
+  // Setting the initial values for solve function
+  VertBeamElec->SetPxPyPzE(r_lelectron.Px(), r_lelectron.Py(), r_lelectron.Pz(), r_lelectron.E());
+  VertScatElec->SetPxPyPzE(r_lscatelec.Px(), r_lscatelec.Py(), r_lscatelec.Pz(), r_lscatelec.E());
+  Target->SetPxPyPzE(r_lproton.Px(), r_lproton.Py(), r_lproton.Pz(), r_lproton.E());
+
+  *Photon = *VertBeamElec - *VertScatElec;
+  *Interaction = *Photon;
+
+  *Initial = *Interaction+*Target;
+
+  /*--------------------------------------------------*/ 
+
+  theta = fX_Theta_Col;
+  phi = fX_Phi_Col;
+
+  return this->Solve(theta, phi);
+
+}
+
+/*--------------------------------------------------*/ 
+
+int PiPlus_Production::Solve(double theta, double phi)
+{
+
+
+  W_in_val = W_in();
+
+  if (W_in_val<0){
+    return 0;
+  }
+
+  UnitVect->SetTheta(theta);
+  UnitVect->SetPhi(phi);
+  UnitVect->SetMag(1);
+
+  double* pars = new double[9];
+
+  pars[0] = UnitVect->X();
+  pars[1] = UnitVect->Y();
+  pars[2] = UnitVect->Z();
+  pars[3] = Initial->Px();
+  pars[4] = Initial->Py();
+  pars[5] = Initial->Pz();
+  pars[6] = Initial->E();
+  pars[7] = fX_Mass;
+  pars[8] = f_Scat_Nucleon_Mass;
+
+  F->SetParameters(pars);
+
+  P = F->GetX(0, 0, pars[6], 0.0001, 10000);
+
+  Particle * r_lX_temp = new Particle(fX_Mass,
+                                  P*pars[0],
+                                  P*pars[1],
+                                  P*pars[2]);
+  r_lX_solved->SetPxPyPzE(r_lX_temp->Px(), r_lX_temp->Py(), r_lX_temp->Pz(), r_lX_temp->E());
+
+  Particle * r_l_nucleon_temp= new Particle();
+  *r_l_nucleon_temp = *Initial-*r_lX_solved;
+  r_l_scat_nucleon_solved->SetPxPyPzE(r_l_nucleon_temp->Px(), r_l_nucleon_temp->Py(), r_l_nucleon_temp->Pz(), r_l_nucleon_temp->E());
+
+  delete r_lX_temp;
+  delete r_l_nucleon_temp;
+  delete[] pars;
+ 
+  if (TMath::Abs(F->Eval(P)) < 1){
+    if (SolnCheck()){
+      return 1;
+    }
+  }
+
+  ///*--------------------------------------------------*/ 
+  /// Modifier: Ishan Goel
+  /// Date: March 22, 2023
+  /// Commenting out second solution as it is not giving any solution ever
+  /// Check for Second solution:
+  // P2 = F->GetX(0, P+100, pars[6], 0.0001, 10000);
+  ///Try second solution
+  // Particle * Pion2 = new Particle(pion_mass_mev,
+  //                                 P*pars[0],
+  //                                 P*pars[1],
+  //                                 P*pars[2]);
+  // Pion->SetPxPyPzE(Pion2->Px(), Pion2->Py(), Pion2->Pz(), Pion2->E());
+  // Particle * Proton2 = new Particle();
+  // *Proton2 = *Initial - * Pion;
+  // Proton_Particle->SetPxPyPzE(Proton2->Px(), Proton2->Py(), Proton2->Pz(), Proton2->E());
+  // delete Pion2;
+  // delete Proton2;
+  // if (TMath::Abs(F->Eval(P2)) < 1){
+  //   if (SolnCheck()){
+  //     return 1;
+  //   }
+  // }
+  ///*--------------------------------------------------*/ 
+
+  return 0;
+
+}
+
+
+
+
+

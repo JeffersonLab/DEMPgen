@@ -13,7 +13,6 @@
 ///
 /// Comment: March 04, 2020: 
 
-
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
@@ -49,7 +48,6 @@
 #include "FSI.hxx"
 
 #include "eic_evgen/eic.h"
-
 
 using namespace std;
 using namespace constants;
@@ -100,15 +98,14 @@ int main(int argc, char** argv){
 		double HBeam = obj["hbeam"].asDouble();
 		TString hadron = obj["hadron"].asString(); // SJDK 08/02/22 - Add the hadron type as an argument
 //		bool = obj["pi0_particle"].asBool()
-//		eic(nEvents, target_direction, kinematics_type, file_name, gen_seed, particle);
  		eic(obj);
  
    } else if (obj["experiment"].asString() == "solid") {
  
      Gen_seed = gen_seed;
 
-     if (obj["ionization"].asBool())
-       cout << "Ionization Enabled" << endl;
+     if (obj["ionisation"].asBool())
+       cout << "Ionisation Enabled" << endl;
      if (obj["bremsstrahlung"].asBool())
        cout << "Bremsstrahlung Enabled" << endl;
      if (obj["fermi_momentum"].asBool())
@@ -117,7 +114,7 @@ int main(int argc, char** argv){
        cout << "Multiple Scattering Enabled" << endl;
      if (obj["final_state_interaction"].asBool())
        cout << "FSI Enabled" << endl;
-   
+ 
    
      MatterEffects* ME = new MatterEffects();
       
@@ -151,7 +148,7 @@ int main(int argc, char** argv){
    
      Particle* Photon = VertEvent->VirtPhot;
      Photon->SetName("VirtPhot");
-   
+
      Particle* FSIProt = new Particle(proton_mass_mev, "FSIProt", pid_prot);
    
      Particle* InTotal = new Particle();
@@ -179,11 +176,9 @@ int main(int argc, char** argv){
        Particle * Photon = new Particle();
        VertEvent->VirtPhot = Photon;
      */
-   
-   
+
      ProductGen * ProtonPionGen = new ProductGen(Photon,
                                                  VertTargNeut);
-   
    
      int nSuccess = 0;
      int nFail = 0;
@@ -309,7 +304,7 @@ int main(int argc, char** argv){
        // These effects occur before the reaction, so affect the vertex values
        targetthickness = ((*VertEvent->Vertex_z+370.0) * Helium_Density)/
          (ME->X0(Helium_Z, Helium_A));
-       if (obj["ionization"].asBool()){
+       if (obj["ionisation"].asBool()){
          ME->IonLoss(VertBeamElec, Window_A, Window_Z, Window_Density, targwindowthickness);
          ME->IonLoss(VertBeamElec, Helium_A, Helium_Z, Helium_Density, targetthickness);
        }
@@ -331,8 +326,28 @@ int main(int argc, char** argv){
        // Generate target and scattered electron
        *VertTargNeut = *NeutGen->GetParticle();
        *VertScatElec = *ElecGen->GetParticle();
+
+		/*--------------------------------------------------*/ 
+        /// Test only 
+//        VertScatElec->Px() = 15.934; 
+//        VertScatElec->Py() = 1106.06; 
+//        VertScatElec->Pz() = 2281.09; 
+//        VertScatElec->E()  = 2535.16; 
+
+        VertScatElec->SetPxPyPzE(15.934, 1106.06, 2281.09, 2535.16);
+
        *Photon = *VertBeamElec - *VertScatElec;
-   
+
+       cout << "              " << VertBeamElec->Px() << "  " << VertBeamElec->Py() << "  " << VertBeamElec->Pz() << "  " << VertBeamElec->E() << "  " << VertBeamElec->GetMass() << endl;
+ 
+       cout << "              " << VertScatElec->Px() << "  " << VertScatElec->Py() << "  " << VertScatElec->Pz() << "  " << VertScatElec->E() << "  " << VertScatElec->GetMass() << endl;
+
+       cout << "asdasdabbbbb  " << Photon->Px() << "  " << Photon->Py() << "  " 
+       << Photon->Pz() << "  " << Photon->E() << "  " << Photon->GetMass() << endl; 
+
+
+
+  
        // Solve for remaining particles
        event_status = ProtonPionGen->Solve();
        if (event_status == 0)
@@ -474,8 +489,7 @@ int main(int argc, char** argv){
          cout << "Px Violation" << endl;
    
        //Matter Effects~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   
-   
+      
        targetthickness = ((-330.0 - *VertEvent->Vertex_z) * Helium_Density)/
          (ME->X0(Helium_Z, Helium_A));
        // Assuming path along z only inside the target.
@@ -489,7 +503,7 @@ int main(int argc, char** argv){
    
        //cout << targetthickness << endl;
    
-       if (obj["ionization"].asBool()){
+       if (obj["ionisation"].asBool()){
    
          //Scattered Electron
          ME->IonLoss(LCorEvent->ScatElec, Window_A, Window_Z,
@@ -742,7 +756,6 @@ int main(int argc, char** argv){
        t1->SetBranchAddress("Flux_Factor_RF",&Flux_Factor_RF);
        t1->SetBranchAddress("Flux_Factor_Col",&Flux_Factor_Col);
    
-   
        bool ALERT = false;
        for (int i=0; i<tests; i++){
    
@@ -753,11 +766,15 @@ int main(int argc, char** argv){
                                     ScatElec_Energy_Col_GeV * 1000);
          *VertTargNeut = *NeutGen->GetParticle();
    
+         /// Setting Photon
          *Photon = *VertBeamElec - *VertScatElec;
    
          ProtonPionGen->Solve(Pion_Theta_Col/DEG,Pion_Phi_Col/DEG);
    
+
+         /// Setting Pion
          *VertProdPion = *ProtonPionGen->ProdPion();
+         /// Setting Proton
          *VertProdProt = *ProtonPionGen->ProdProton();
    
          VertEvent->Update();

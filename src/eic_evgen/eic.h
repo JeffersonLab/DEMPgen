@@ -28,18 +28,24 @@
 
 #include "eic_pim.h"
 
-#include "tssa_sig_Para.h"
+#include "PiPlus_sig.h"
+#include "PiPlus_sig_Param.h"
+#include "KPlus_sig.h"
+#include "KPlus_sig_Scaling.h"
+//#include "Pi0_sig_Param.h"
 
 #include "reaction_routine.h"
-#include "legacy.h"
 
 #include "json/json.h"
 #include "json/json-forwards.h"
 
+using std::vector;
+
 void eic();
 //void eic(int, int, int, TString, int, TString);
 
-void eic(int, int, int, TString, int, TString, TString, TString, TString, double, double);
+// 18/01/23 - SJDK- This function is never used since eic() is only called with a json object as the argument. Commented out for now, delete later?
+//void eic(int, int, int, TString, int, TString, TString, TString, TString, double, double);
 void eic(Json::Value);
 
 extern int fSeed;
@@ -47,7 +53,11 @@ extern int fSeed;
 void SetEICSeed(int);
 
 TString ExtractParticle(TString);
-TString ExtractCharge(TString) ;
+TString ExtractCharge(TString);
+
+vector<vector<vector<vector<double>>>> ReadCrossSectionPar(TString particle, TString hadron);
 
 #endif
+
+
 

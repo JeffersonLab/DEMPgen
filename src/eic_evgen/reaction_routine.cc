@@ -22,7 +22,7 @@ using namespace std;
 
 Reaction::Reaction(TString particle_str) { 
 
- 	rParticle = particle_str;
+ 	rEjectile = particle_str;
 	cout << "Produced particle is: " << GetParticle() << endl; 
 	cout << "Generated process: e + p -> e' + p' + " << GetParticle() << endl; 
     	tTime.Start(); 
@@ -39,8 +39,8 @@ Reaction::Reaction(TString particle_str) {
 // SJDK 09/02/22 - New reaction where the particle and hadron are specified
 Reaction::Reaction(TString particle_str, TString hadron_str) { 
 
- 	rParticle = particle_str;
-	rHadron = hadron_str;
+ 	rEjectile = particle_str;
+	rRecoil = hadron_str;
 	cout << "Produced particle is: " << GetParticle() << endl; 
 	cout << "Produced hadron is: " << GetHadron() << endl;
 	cout << "Generated process: e + p -> e'+ " << GetHadron() << " + " << GetParticle() << endl; 
@@ -78,22 +78,17 @@ Reaction::~Reaction() {
 ///
 
 void Reaction::process_reaction() {
-  if (rParticle == "Pi+") {
-    PiPlus_Production* rr1 = new PiPlus_Production(rParticle);
-    rr1->process_reaction();
-    delete rr1;
-  }
-  else if (rParticle == "Pi0") {
+  if (rEjectile == "Pi0") {
     //		Pi0_Production* r1 = new Pi0_Production("Eta");
-    Pi0_Production* rr1 = new Pi0_Production(rParticle);
+    Pi0_Production* rr1 = new Pi0_Production(rEjectile);
     rr1->process_reaction();
     delete rr1;
   }
-  // 09/02/22 - SJDK - K+ production, initialises with particle and hadron specified
-  else if (rParticle == "K+") {
-    KPlus_Production* rr1 = new KPlus_Production(rParticle, rHadron);
+  // SJDK - 19/12/22 - New generic DEMP reaction class, the intention is that this should be able to handle any case
+  else{
+    DEMP_Reaction* rr1 = new DEMP_Reaction(rEjectile, rRecoil);
     rr1->process_reaction();
     delete rr1;
   }
-  // SJDK - 08/02/22 - Deleted large block of commented code that was below, was only there as reference?
+
 }

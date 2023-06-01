@@ -12,13 +12,12 @@
 ///          are properly decleared in header file tssa_sig_Para.h
 ///
 
+/// SJDK 21/12/22 - Renamed this to make it more obvious what this is
+/// This function returns the parameters for a corresponding value of w/Qsq, not the cross section itself
 
+#include "PiPlus_sig_Param.h"
 
-
-#include "tssa_sig_Para.h"
-
-
-void eicSigmaL( double fw, double fqsq, double& par0, double& par1, double& par2, double& par3, double& par4, double& par5, double& par6 ) { 
+void PiPlus_sigmaL_Param( double fw, double fqsq, double& par0, double& par1, double& par2, double& par3, double& par4, double& par5, double& par6 ) { 
 
  if ( ( fw >=    2 ) && ( fw <  2.2 ) ) {  if ( ( fqsq >=    3 ) && ( fqsq <    4 ) ) {  par0 =          0; par1 =          0; par2 =          0; par3 =          0; par4 =          0; par5 =   0.627856; par6 =   -3.63632; } }
  if ( ( fw >=    2 ) && ( fw <  2.2 ) ) {  if ( ( fqsq >=    4 ) && ( fqsq <    5 ) ) {  par0 =          0; par1 =          0; par2 =          0; par3 =          0; par4 =          0; par5 = -0.0552142; par6 =    -3.0659; } }
@@ -1336,17 +1335,10 @@ void eicSigmaL( double fw, double fqsq, double& par0, double& par1, double& par2
  }
 
 
-
-
 /////*--------------------------------------------------*/
 
 
-
-
-
-
-
-void eicSigmaT( double fw, double fqsq, double& par0, double& par1, double& par2 , double& par3 , double& par4 ) { 
+void PiPlus_sigmaT_Param( double fw, double fqsq, double& par0, double& par1, double& par2 , double& par3 , double& par4 ) { 
 
  if ( ( fw >=    2 ) && ( fw <  2.2 ) ) {  if ( ( fqsq >=  3.5 ) && ( fqsq <  4.5 ) ) {  par0 =          0; par1 =          0; par2 =          0; par3 =   0.257887; par4 =   -1.96317; } }
  if ( ( fw >=    2 ) && ( fw <  2.2 ) ) {  if ( ( fqsq >=  4.5 ) && ( fqsq <  5.5 ) ) {  par0 =          0; par1 =          0; par2 =          0; par3 =  -0.311282; par4 =    -1.7445; } }
@@ -2662,5 +2654,3 @@ void eicSigmaT( double fw, double fqsq, double& par0, double& par1, double& par2
  if ( ( fw >=   10 ) && ( fw < 10.2 ) ) {  if ( ( fqsq >= 34.5 ) && ( fqsq < 35.5 ) ) {  par0 = 6.4485e-07; par1 = 6.81933e-05; par2 = -0.000221823; par3 =   -10.8987; par4 =   -5.08495; } }
 
  }
-
-

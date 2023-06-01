@@ -13,18 +13,20 @@
 
 #include "eic_pim.h"
 
+using std::vector;
 using namespace std;
 
 //TRandom2 *fRandom;                    
 TRandom3 *fRandom;                    
 
 TFile *f;                    
-TTree *t1;                    
+TTree *t1;
 
 int gKinematics_type;
 bool gPi0_decay;
 string gDet_location;
 string gOutputType; // SJDK 12/01/22 - Added output type as a variable you can specify in the .json file
+string gBeamPart; // SJDK 12/01/22 - Added output type as a variable you can specify in the .json file
 float fProton_incidence_phi;
 
 TString gfile_name;
@@ -38,7 +40,8 @@ int fWLessShell, fWLess1P9, fSDiff;
 
 unsigned long long int fNEvents, fNRecorded, fNGenerated, fWSqNeg, fNMomConserve, fNSigmaNeg, fNaN, fConserve, fNWeightUnphys, fNWeightReject, fLundRecorded, fNFile;
 
-double fK, fm, fElectron_Kin_Col_GeV, fElectron_Kin_Col, fRand, fLumi, fuBcm2, fPI, fDEG2RAD, fRAD2DEG, fEBeam, fPBeam, fScatElec_Theta_I, fScatElec_Theta_F, fPion_Theta_I, fPion_Theta_F, fScatElec_E_Hi, fScatElec_E_Lo, fPSF; 
+// SJDK 03/04/23 - Added in Qsq Min/Max and W Min/Max
+double fK, fm, fElectron_Kin_Col_GeV, fElectron_Kin_Col, fRand, fLumi, fuBcm2, fPI, fDEG2RAD, fRAD2DEG, fEBeam, fPBeam, fScatElec_Theta_I, fScatElec_Theta_F, fPion_Theta_I, fPion_Theta_F, fEjectileX_Theta_I, fEjectileX_Theta_F, fScatElec_E_Hi, fScatElec_E_Lo, fPSF, fQsq_Min, fQsq_Max, fW_Min, fW_Max; 
 
 double fOmega_Theta_I, fOmega_Theta_F, fOmega_Theta_Col, fOmega_Phi_Col;
 
@@ -120,7 +123,6 @@ double fBeta_CM_RF, fGamma_CM_RF;
 
 double fPhoton_MomZ_RF, fPhoton_MomX_RF, fPhoton_MomY_RF, fPhoton_Theta_RF, fPhoton_Phi_RF, fPion_Energy_RF, fPion_Energy_RF_GeV, fPiqVec_Theta_RF, fPion_Mom_RF, fPion_Mom_RF_GeV, fPion_MomX_RF, fPion_MomY_RF, fPion_MomZ_RF, fPion_Theta_RF, fPion_Phi_RF, fPion_MomX_RF_GeV, fPion_MomY_RF_GeV, fPion_MomZ_RF_GeV;
 
-
 double fT_Para, fT_Para_GeV, fT, fEpsilon, fx, fy, fz, fNeutron_Energy_RF, fNeutron_Energy_RF_GeV, fNeutron_Mom_RF, fNeutron_Mom_RF_GeV, fNeutron_qVec_Theta_RF, fNeutron_MomX_RF, fNeutron_MomY_RF, fNeutron_MomZ_RF, fNeutron_Theta_RF, fNeutron_Phi_RF, fPhoton_MomX_RF_GeV, fPhoton_MomY_RF_GeV, fPhoton_MomZ_RF_GeV, fNeutron_MomX_RF_GeV, fNeutron_MomY_RF_GeV, fNeutron_MomZ_RF_GeV;
 
 double fPhoton_Theta_Col, fPhoton_Phi_Col, fPhoton_Energy_Col, fPhoton_Mom_Col, fPhoton_MomX_Col, fPhoton_MomZ_Col, fPhoton_MomY_Col, fPhoton_Energy_Col_GeV, fPhoton_Mom_Col_GeV, fPhoton_MomX_Col_GeV, fPhoton_MomZ_Col_GeV, fPhoton_MomY_Col_GeV;
@@ -158,6 +160,8 @@ double fepi1, fepi2, fradical;
 double fOmega_Energy_CM, fOmega_Mom_CM, fOmega_Energy_CM_GeV, fOmega_Mom_CM_GeV;   
 
 double fMomentum[300];
+
+vector<vector<vector<vector<double>>>> SigPar;
 
 double fProb[300] = {    
 6.03456,    6.02429,    6.01155,    5.99636,    5.97873,    5.95869,    5.93626,    5.91147,    5.88435,    5.85493,
@@ -203,8 +207,6 @@ pim::pim(int aaa) {
 
 }
 
-
-
 /*--------------------------------------------------*/
 /*--------------------------------------------------*/
 
@@ -234,19 +236,31 @@ void pim::Initilize() {
     kFSI                                        = false;
     kMSele                                      = false;
     kMS                                         = false;
-//    fLumi                                     = 0.374e33; // Jlab design
-    fLumi                                       = 1e34; // https://eic.jlab.org/wiki/index.php/EIC_luminosity
+    // 18/01/23 - The luminosity below is some default assumtpion, more up to date values are set in DEMP prod and depend upon beam energy combinations if they are specified
+    // See slide 11 in https://indico.cern.ch/event/1072579/contributions/4796856/attachments/2456676/4210776/CAP-EIC-June-7-2022-Seryi-r2.pdf for more info
+    // fLumi                                     = 0.374e33; // Jlab design
+    //fLumi                                       = 1e34; // https://eic.jlab.org/wiki/index.php/EIC_luminosity - OUTDATED
+    fLumi                                       = 1e33; // 18/01/23, this seems a better default based upon more up to date info, see link above
     fuBcm2                                      = 1.0e-30;
     fPI                                         = 3.1415926;
     fDEG2RAD                                    = fPI/180.0;
     fRAD2DEG                                   = 180.0/fPI;
-
-    fScatElec_Theta_I                           = 60.0 * fDEG2RAD;
-    fScatElec_Theta_F                           = 175.0 * fDEG2RAD;
-    fScatElec_E_Lo                              = 0.5;  // % of beam energy
-    fScatElec_E_Hi                              = 2.5;  // % of beam energy
+    
+    // SJDK 21/12/22 - Set by .json read in
+    //fScatElec_Theta_I                           = 60.0 * fDEG2RAD;
+    //fScatElec_Theta_F                           = 175.0 * fDEG2RAD;
+    // SJDK 29/11/22 - Updated comment on two variables below
+    // Two parameters below are NOT a percentage of the beam energy as previously clamed. This parameter along with _Hi represent the RANGE of enegries over which the scattered electron is generated
+    // The range is from 0.5*EBeam to 2.5*EBeam -> Therefore for the phase space calculation, the spread of 2* the incoming beam energy is used in the calculation
+    // SJDK 21/12/22 - Set by .json read in
+    //fScatElec_E_Lo                              = 0.5;  // NOT a percentage of beam energy
+    //fScatElec_E_Hi                              = 2.5;  // NOT a percentage of beam energy
+    // Should remove specific pion/omega values here and JUST use EjectileX, should then actually read this in as a parameter, use 0 to 50 as default
     fPion_Theta_I                               = 0.0 * fDEG2RAD;
     fPion_Theta_F                               = 50.0 * fDEG2RAD;
+    // SJDK 21/12/22 - Set by .json read in
+    //fEjectileX_Theta_I                          = 0.0 * fDEG2RAD;
+    //fEjectileX_Theta_F                          = 50.0 * fDEG2RAD;
     fOmega_Theta_I                              = 0.0 * fDEG2RAD; 
     fOmega_Theta_F                              = 360.0 * fDEG2RAD; 
     // 02/06/21 - SJDK
@@ -254,15 +268,15 @@ void pim::Initilize() {
     fPSF                                     = 0;
     fK                                          = 1000.0;
     fm                                          = 1.0/1000.0;
-    fElectron_Mass                              = 0.511;
+    fElectron_Mass                              = 0.51099895000;
     fElectron_Mass_GeV                          = fElectron_Mass/1000.0;
-    fProton_Mass                                = 938.27; // Its is the mass of Proton which in SoLID DVMP is outgoing reocil Proton
+    fProton_Mass                                = 938.27208816; // Its is the mass of Proton which in SoLID DVMP is outgoing reocil Proton
     fProton_Mass_GeV                            = fProton_Mass/1000.0;
-    fNeutron_Mass                               = 939.57; // It is the mass of Neutron. The target is Neutron in SoLID DVMP.
+    fNeutron_Mass                               = 939.5654205; // It is the mass of Neutron. The target is Neutron in SoLID DVMP.
     fNeutron_Mass_GeV                           = fNeutron_Mass/1000.0;
-    fRecoilProton_Mass                          = 938.27;
+    fRecoilProton_Mass                          = 938.27208816;
     fRecoilProton_Mass_GeV                      = fRecoilProton_Mass/1000.0;
-    fPion_Mass                                  = 139.57018;
+    fPion_Mass                                  = 139.57039 ;
     fPion_Mass_GeV                              = fPion_Mass/1000.0;
 
     fKaon_Mass                                  = 493.677;
@@ -272,10 +286,10 @@ void pim::Initilize() {
     fSigma_Mass                                 = 1192.642;
     fSigma_Mass_GeV                             = fSigma_Mass/1000.0;
 
-    fOmega_Mass                                 = 782.65;
+    fOmega_Mass                                 = 782.66;
     fOmega_Mass_GeV                             = fOmega_Mass/1000.0;
 
-    fDiff                                       = 0.5;
+    fDiff                                       = 0.00001; // 10/05/23 - Love Preet - Changed from 0.5
     // 02/06/21 - SJDK
     // Set to 0, now set in PiPlusProd.cc
     fElectron_Kin_Col_GeV                       = 0;
@@ -948,71 +962,56 @@ double pim::fermiMomentum() {
     return fMom;
 }
 
-// SJDK - 08/02/22 - Original version where there is no separate energy difference
+///*--------------------------------------------------*/ 
+//-> 10/05/23 - Love added a slimmed down, simpler to read version of the CheckLaws fn
+// 
+// To check the conservation of the energy and momentum, there two methods avalaible:
+// Method 1: Give the four-vectors of the initial and final states partciles, 
+//           tolerance factor will be defaulted 1e-6 MeV
+// Method 2: Give the four-vectors of the initial and final states partciles, 
+//           and the prefered tolerance factor.
+//
+                                                      
 int pim::CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, TLorentzVector P_pim, TLorentzVector P_pro) {
 
-    double energy_check = (P_t.E() + P_E0.E()) - (P_e.E()+P_pim.E()+P_pro.E());
-    double px_check =(P_t.Px() + P_E0.Px()) - (P_e.Px()+P_pim.Px()+P_pro.Px()); 
-    double py_check =(P_t.Py() + P_E0.Py()) - (P_e.Py()+P_pim.Py()+P_pro.Py()); 
-    double pz_check =(P_t.Pz() + P_E0.Pz()) - (P_e.Pz()+P_pim.Pz()+P_pro.Pz()); 
-    
-    Int_t err = -1;
-    if( fabs( energy_check ) < fDiff &&
-        fabs( px_check )     < fDiff &&
-        fabs( py_check )     < fDiff &&
-        fabs( pz_check )     < fDiff )
-      {
-        conserve++;
-        err = 1;
-      }
-    else if (fabs( energy_check ) >= fDiff_E)
-         { 
-	   ene++;
-         } 
-    
-    else (fabs( px_check )     >= fDiff ||
-          fabs( py_check )     >= fDiff ||
-          fabs( pz_check )     >= fDiff );
-      {
-	mom++;
-      }
-    return err;
+  double energy_check = (P_t.E() + P_E0.E()) - (P_e.E()+P_pim.E()+P_pro.E());
+  double px_check =(P_t.Px() + P_E0.Px()) - (P_e.Px()+P_pim.Px()+P_pro.Px()); 
+  double py_check =(P_t.Py() + P_E0.Py()) - (P_e.Py()+P_pim.Py()+P_pro.Py()); 
+  double pz_check =(P_t.Pz() + P_E0.Pz()) - (P_e.Pz()+P_pim.Pz()+P_pro.Pz()); 
+                                                                                                 
+  Int_t err = -1;
+  if( fabs( energy_check ) < fDiff &&
+      fabs( px_check )     < fDiff &&
+      fabs( py_check )     < fDiff &&
+      fabs( pz_check )     < fDiff){
+    conserve++;
+    err = 1;
+  }
+
+  return err;
+  }
+
+int pim::CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, TLorentzVector P_pim, TLorentzVector P_pro, double fdiff_E) {
+
+  double energy_check = (P_t.E() + P_E0.E()) - (P_e.E()+P_pim.E()+P_pro.E());
+  double px_check =(P_t.Px() + P_E0.Px()) - (P_e.Px()+P_pim.Px()+P_pro.Px()); 
+  double py_check =(P_t.Py() + P_E0.Py()) - (P_e.Py()+P_pim.Py()+P_pro.Py()); 
+  double pz_check =(P_t.Pz() + P_E0.Pz()) - (P_e.Pz()+P_pim.Pz()+P_pro.Pz()); 
+                                                                                                 
+  Int_t err = -1;
+  if( fabs( energy_check ) < fdiff_E &&
+      fabs( px_check )     < fdiff_E &&
+      fabs( py_check )     < fdiff_E &&
+      fabs( pz_check )     < fdiff_E ) {
+    conserve++;
+    err = 1;
+  }
+
+  return err;
 }
 
-// SJDK - 08/02/22 - Set the energy tolerance is a parameter that is fed in
-int pim::CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, TLorentzVector P_pim, TLorentzVector P_pro, double fDiff_E) {
 
-    double energy_check = (P_t.E() + P_E0.E()) - (P_e.E()+P_pim.E()+P_pro.E());
-    double px_check =(P_t.Px() + P_E0.Px()) - (P_e.Px()+P_pim.Px()+P_pro.Px()); 
-    double py_check =(P_t.Py() + P_E0.Py()) - (P_e.Py()+P_pim.Py()+P_pro.Py()); 
-    double pz_check =(P_t.Pz() + P_E0.Pz()) - (P_e.Pz()+P_pim.Pz()+P_pro.Pz()); 
-    
-    Int_t err = -1;
-    if( fabs( energy_check ) < fDiff_E &&
-        fabs( px_check )     < fDiff &&
-        fabs( py_check )     < fDiff &&
-        fabs( pz_check )     < fDiff )
-      {
-        conserve++;
-        err = 1;
-      }
-    else if (fabs( energy_check ) >= fDiff_E)
-         { 
-	   ene++;
-         } 
-    
-    else (fabs( px_check )     >= fDiff ||
-          fabs( py_check )     >= fDiff ||
-          fabs( pz_check )     >= fDiff );
-      {
-	mom++;
-      }
-    return err;
-}
-
-///*--------------------------------------------------*/
-
-
+///****************************************
 
 void pim::setrootfile( string rootFile ){ 
 

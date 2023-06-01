@@ -36,6 +36,8 @@ Asymmetry::Asymmetry(char * in_AsyName, char * in_Func,
 
 int Asymmetry::Parameterize(vector<double> in_Qsq)
 {
+
+
   //Go to default work file if not extern not available
   if (WorkFile->IsZombie()){
     WorkFile = new TFile("../output/test.root");
@@ -78,7 +80,6 @@ int Asymmetry::Parameterize(vector<double> in_Qsq)
     sprintf(tempname3, cutstr, Qsq_Vec[i]);
 
     n = GK_Raw->Draw(tempname2, tempname3, "goff");
-
 
     // The previous version of this parameterization used
     // only one TF1. As a result, the parameters were
@@ -203,6 +204,7 @@ int Asymmetry::SetPars(vector<double> in_Qsq)
     WorkFile = new TFile("../output/test.root");
     // cout << "File Opened" << endl;
   }
+
 
   nQsq = in_Qsq.size();
   if (nQsq == 0) {

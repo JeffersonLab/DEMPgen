@@ -21,6 +21,7 @@ Event generator for Deep Exclusive Meson Production
 
   - cd data/
   - ./../build/DEMPgen ../Config.json
+  - Data will be saved under data/OutputFiles/ , the default format is in HEMPC3 Ascii format.
 
 ### Building on the iFarm
 
@@ -154,9 +155,6 @@ The jobs the script creates and submits all execute the Process_EIC.csh script d
 
 - This version should be used to submit jobs to the Farm batch queueing system (swif2)
 - It uses the same arguments as Batch_Submission_EIC.sh
-- Before running, ensure you have a folder or sym link for LundFiles
-    - data/LundFiles 
-	- This must exist for output!
 - You should also check the paths set throughout the script look ok (for example, in the COMMAND: ... line)
     - By default, /eic/users/${USER}/DEMPGen is assumed
 
@@ -165,4 +163,4 @@ The jobs the script creates and submits all execute the Process_EIC.csh script d
 - There were several .json files clogging up the main directory, many of these were very outdated. As such, I've moved them all to a subfolder -
   - json_examples
 - This folder has .json config files for a variety of different conditions.
-  - Due to several of them being quite outdated, the Config_EIC.json file in the main (the directory of this README) directory should be consulted to see the options that are actually availble.
+  - Due to several of them being quite outdated, the Config_EIC.json file in the main (the directory of this README) directory should be consulted to see the options that are actually available.
