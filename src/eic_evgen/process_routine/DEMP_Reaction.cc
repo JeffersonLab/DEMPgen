@@ -1,6 +1,8 @@
 #include "reaction_routine.h"
 #include "eic.h"
 
+#include <sys/stat.h>
+
 using namespace std;
 
 DEMP_Reaction::DEMP_Reaction() { 
@@ -58,9 +60,23 @@ void DEMP_Reaction::Init() {
 	
   rEjectile_charge = ExtractCharge(rEjectile);
 
-  sTFile = Form("./LundFiles/eic_%s.txt", gfile_name.Data());
-  sLFile= Form("./LundFiles/eic_input_%s.dat", gfile_name.Data());
+  const char* dir_name = "OutputFiles";
+  struct stat sb;
+
+  if (stat(dir_name, &sb) == 0) {
+     cout << "The path is valid!";
+  }
+  else {
+     cout << "The Path is invalid!";
+     mkdir(dir_name,0777);
+  } 
+
+  sTFile = Form("./%s/eic_%s.txt", dir_name, gfile_name.Data());
+  sLFile= Form("./%s/eic_input_%s.dat", dir_name, gfile_name.Data());
    
+ 
+  
+
   DEMPOut.open( sLFile.c_str() );
   DEMPDetails.open( sTFile.c_str() );
 	
