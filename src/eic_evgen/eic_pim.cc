@@ -268,15 +268,15 @@ void pim::Initilize() {
     fPSF                                     = 0;
     fK                                          = 1000.0;
     fm                                          = 1.0/1000.0;
-    fElectron_Mass                              = 0.511;
+    fElectron_Mass                              = 0.51099895000;
     fElectron_Mass_GeV                          = fElectron_Mass/1000.0;
-    fProton_Mass                                = 938.27; // Its is the mass of Proton which in SoLID DVMP is outgoing reocil Proton
+    fProton_Mass                                = 938.27208816; // Its is the mass of Proton which in SoLID DVMP is outgoing reocil Proton
     fProton_Mass_GeV                            = fProton_Mass/1000.0;
-    fNeutron_Mass                               = 939.57; // It is the mass of Neutron. The target is Neutron in SoLID DVMP.
+    fNeutron_Mass                               = 939.5654205; // It is the mass of Neutron. The target is Neutron in SoLID DVMP.
     fNeutron_Mass_GeV                           = fNeutron_Mass/1000.0;
-    fRecoilProton_Mass                          = 938.27;
+    fRecoilProton_Mass                          = 938.27208816;
     fRecoilProton_Mass_GeV                      = fRecoilProton_Mass/1000.0;
-    fPion_Mass                                  = 139.57018;
+    fPion_Mass                                  = 139.57039 ;
     fPion_Mass_GeV                              = fPion_Mass/1000.0;
 
     fKaon_Mass                                  = 493.677;
@@ -286,7 +286,7 @@ void pim::Initilize() {
     fSigma_Mass                                 = 1192.642;
     fSigma_Mass_GeV                             = fSigma_Mass/1000.0;
 
-    fOmega_Mass                                 = 782.65;
+    fOmega_Mass                                 = 782.66;
     fOmega_Mass_GeV                             = fOmega_Mass/1000.0;
 
     fDiff                                       = 0.00001; // 10/05/23 - Love Preet - Changed from 0.5

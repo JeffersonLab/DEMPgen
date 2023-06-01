@@ -733,7 +733,7 @@ void DEMP_Reaction::Detail_Output() {
   DEMPDetails << "Number of events failing conservation law check              " << setw(20) << fConserve     << endl;
   DEMPDetails << "Total events passing conservation laws                       " << setw(20) << conserve   << endl;
   DEMPDetails << "Total events failed energy conservation                      " << setw(20) << ene   << endl; 
-  DEMPDetails << "Total events failed momentum conserveation                   " << setw(20) << mom   << endl;
+  DEMPDetails << "Total events failed momentum conservation                   " << setw(20) << mom   << endl;
   DEMPDetails << "Number of events with -t > 2 (K+) or -t > 1.3 (Pi+) GeV      " << setw(20) << t_ev          << endl;
   DEMPDetails << "Number of events with w less than threshold                  " << setw(20) << fWSqNeg       << endl;
   DEMPDetails << "Number of events with mom not conserve                       " << setw(20) << fNMomConserve << endl;
@@ -967,7 +967,7 @@ void DEMP_Reaction::DEMPReact_HEPMC3_Output() {
   // HEPMC3 output for Athena/EPIC simulations
 
   // First line - E - Event# - #Vertices - #Particles
-  DEMPOut << "E" << " "  << print_itt <<  " " << "1" << " " << 5 << endl;
+  DEMPOut << std::scientific << std::setprecision(15) << "E" << " "  << print_itt <<  " " << "1" << " " << 5 << endl;
   print_itt++;
   // Second line, Units - U - ENERGY UNIT - DISTANCE UNIT
   DEMPOut << "U" << " " << "GEV" << " " << "MM" << endl;
