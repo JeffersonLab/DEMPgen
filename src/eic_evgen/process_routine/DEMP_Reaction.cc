@@ -713,7 +713,7 @@ Double_t DEMP_Reaction::Get_Total_Cross_Section() {
     total_sig = GetPiPlus_CrossSection(fT_GeV, fW_GeV, fQsq_GeV, fEpsilon);
   }
   else if (rEjectile == "Pi0"){
-    total_sig = GetPi0_CrossSection();
+    total_sig = GetKPlus_CrossSection(fT_GeV, fW_GeV, fQsq_GeV, fEpsilon, rRecoil);
   }
   else if (rEjectile == "K+"){
     total_sig = GetKPlus_CrossSection(fT_GeV, fW_GeV, fQsq_GeV, fEpsilon, rRecoil);
@@ -727,13 +727,13 @@ Double_t DEMP_Reaction::Get_Total_Cross_Section() {
 
 }
 
-// SJDK 21/12/22 - This function needs updating!
-Double_t DEMP_Reaction::GetPi0_CrossSection() {
-
-  double_t sig_total;
-  return sig_total;
-
-}
+//// SJDK 21/12/22 - This function needs updating!
+//Double_t DEMP_Reaction::GetPi0_CrossSection() {
+//
+//  double_t sig_total;
+//  return sig_total;
+//
+//}
 
 /*--------------------------------------------------*/
 /// Output generator detail

@@ -32,6 +32,9 @@
 #include "PiPlus_sig_Param.h"
 #include "KPlus_sig.h"
 #include "KPlus_sig_Scaling.h"
+
+#include "Pi0_sig.h"
+
 //#include "Pi0_sig_Param.h"
 
 #include "reaction_routine.h"
