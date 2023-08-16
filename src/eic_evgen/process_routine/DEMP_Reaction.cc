@@ -23,8 +23,18 @@ DEMP_Reaction::DEMP_Reaction(TString particle_str, TString hadron_str) {
 
 DEMP_Reaction::~DEMP_Reaction() {
 
+  // Text output data file and generation information 
+
   DEMPOut.close();
   DEMPDetails.close();
+
+  // Diagnostic root file with plots
+
+  dRootTree->Write();
+  dRootFile->Close();
+
+  delete dRootFile;
+  delete dRootTree;
 
 }
 
@@ -72,13 +82,19 @@ void DEMP_Reaction::Init() {
   } 
 
   sTFile = Form("./%s/eic_%s.txt", dir_name, gfile_name.Data());
-  sLFile= Form("./%s/eic_input_%s.dat", dir_name, gfile_name.Data());
-   
- 
-  
+  sLFile = Form("./%s/eic_input_%s.dat", dir_name, gfile_name.Data());
+  sDFile = Form("./%s/eic_input_%s.root", dir_name, gfile_name.Data());
 
   DEMPOut.open( sLFile.c_str() );
   DEMPDetails.open( sTFile.c_str() );
+ 
+  dRootFile = new TFile(sDFile.c_str(),"RECREATE"); 
+  dRootTree = new TTree();
+ 
+  dRootTree->Branch("EventWeight", &fEventWeight, "fEventWeight/D");
+
+
+  /*--------------------------------------------------*/ 
 	
   qsq_ev = 0, t_ev = 0, w_neg_ev = 0, w_ev = 0;
   rNEvents = fNEvents;
@@ -589,6 +605,9 @@ void DEMP_Reaction::Processing_Event() {
   else if (gOutputType == "HEPMC3"){
     DEMPReact_HEPMC3_Output();
   }
+
+  dRootTree->Fill();
+
 }
 
 void DEMP_Reaction::Progress_Report() {

@@ -87,9 +87,13 @@ class DEMP_Reaction {
 
   std::string sTFile;   /// Generator output files. For documentation and monitoring purposes 
   std::string sLFile;   /// Lund input file into the EIC simulation
+  std::string sDFile;   /// Root dianostic plot in root file format
 
   std::ofstream DEMPOut;     
   std::ofstream DEMPDetails;
+
+  TFile* dRootFile;
+  TTree* dRootTree;
 		
   long long int qsq_ev, t_ev, w_neg_ev, w_ev;
 		
