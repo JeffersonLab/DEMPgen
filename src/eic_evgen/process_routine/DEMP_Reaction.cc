@@ -153,7 +153,6 @@ void DEMP_Reaction::Init() {
     f_Recoil_Mass_GeV = f_Recoil_Mass/1000;
     cout<<"Particle = "<<rEjectile_scat_hadron<<" with mass = "<< f_Recoil_Mass << endl;
   }
-
   rDEG2RAD   = fPI/180.0;
 
   f_Ejectile_Theta_I = fEjectileX_Theta_I ;
@@ -557,7 +556,9 @@ void DEMP_Reaction::Processing_Event() {
   //	 r_fSig_L = 1;
   // -------------------------------------------------------------------------------------------
   r_fSig = Get_Total_Cross_Section();
-  
+   
+    
+   
   // -----------------------------------------------------------------------------------------------------------
   // CKY sigma L and T ends
   // -----------------------------------------------------------------------------------------------------------

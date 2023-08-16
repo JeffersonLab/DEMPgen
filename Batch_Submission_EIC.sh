@@ -55,7 +55,8 @@ while [[ $i -le $NumFiles ]]; do
     echo "#PBS -o  /home/${USER}/trq_output/${EBeamE}on${HBeamE}_${Particle}${Hadron}_${InteractionPoint}_${NumEvents}_${i}.out" >> ${batch} # Output directory and file name, set to what you like
     echo "#PBS -e  /home/${USER}/trq_output/${EBeamE}on${HBeamE}_${Particle}${Hadron}_${InteractionPoint}_${NumEvents}_${i}.err" >> ${batch} # Error output directory and file name
     echo "date" >> ${batch} 
-    echo "cd /home/apps/DEMPgen/" >> ${batch} # Tell your job to go to the directory with the script you want to run
+   # echo "cd /home/apps/DEMPgen/" >> ${batch} # Tell your job to go to the directory with the script you want to run
+    echo "cd /home/preet/analytic_function_DEMPGen/DEMPgen" >> ${batch} # Tell your job to go to the directory with the script you want to run
     echo "./Process_EIC.csh ${i} ${NumEvents} ${EBeamE} ${HBeamE} ${RandomSeed} ${OutputType} ${InteractionPoint} ${Particle} ${Hadron}" >> ${batch} # Run your script, change this to what you like
     echo "date">>${batch}
     echo "exit">>${batch} # End of your job script
