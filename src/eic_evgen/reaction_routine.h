@@ -74,7 +74,7 @@ class DEMP_Reaction {
 
   Double_t Get_Total_Cross_Section(); 
 
-  Double_t GetPi0_CrossSection();
+//  Double_t GetPi0_CrossSection();
 
   /*--------------------------------------------------*/
   // Parameters
@@ -87,9 +87,13 @@ class DEMP_Reaction {
 
   std::string sTFile;   /// Generator output files. For documentation and monitoring purposes 
   std::string sLFile;   /// Lund input file into the EIC simulation
+  std::string sDFile;   /// Root dianostic plot in root file format
 
   std::ofstream DEMPOut;     
   std::ofstream DEMPDetails;
+
+  TFile* dRootFile;
+  TTree* dRootTree;
 		
   long long int qsq_ev, t_ev, w_neg_ev, w_ev;
 		
@@ -268,62 +272,62 @@ class DEMP_Reaction {
 
 };
 
-class Pi0_Production:DEMP_Reaction{
- 
- public:
-  Pi0_Production();
-  Pi0_Production(TString);
-  ~Pi0_Production();
-
-  void process_reaction();
-  void Detail_Output();
-  void Processing_Event();
-  Double_t Get_CrossSection();
-
-  void Pi0_decay(TLorentzVector);
-
-  bool if_pi0_decay;
-
-  void Pi0_Decay_Pythia6_Out_Init();
-  void Pi0_Decay_Pythia6_Output();
-  
-  ///----------------------------------------------------*/
-  /// Output algorithm into HEPMC3 format
-
-  void Pi0_HEPMC3_Out_Init();
-  void Pi0_HEPMC3_Output();
-
-  unsigned long long int print_itt;
-
- private:
-
-  Double_t theta_X_rf;
-
-  Double_t ft_min;
-  Double_t fu_min;
-
-  Double_t ft;
-  Double_t fu;
-
-  std::ofstream polar_out;     
-
-  TLorentzVector l_photon_1;
-  TLorentzVector l_photon_2;
-
-  void Pi0_Lund_Output();
-  void Pi0_Decay_Lund_Output();
-
-  //  		template <class T> 
-  //  		inline int 
-  //  		sgn(T val) {
-  //      		return (T(0) < val) - (val < T(0));
-  //  		}
-
-  template <class T>
-    T Sign (T a, T b) {
-    return (a < b) - (b < a);
-  }
-
-};
+//class Pi0_Production:DEMP_Reaction{
+// 
+// public:
+//  Pi0_Production();
+//  Pi0_Production(TString);
+//  ~Pi0_Production();
+//
+//  void process_reaction();
+//  void Detail_Output();
+//  void Processing_Event();
+//  Double_t Get_CrossSection();
+//
+//  void Pi0_decay(TLorentzVector);
+//
+//  bool if_pi0_decay;
+//
+//  void Pi0_Decay_Pythia6_Out_Init();
+//  void Pi0_Decay_Pythia6_Output();
+//  
+//  ///----------------------------------------------------*/
+//  /// Output algorithm into HEPMC3 format
+//
+//  void Pi0_HEPMC3_Out_Init();
+//  void Pi0_HEPMC3_Output();
+//
+//  unsigned long long int print_itt;
+//
+// private:
+//
+//  Double_t theta_X_rf;
+//
+//  Double_t ft_min;
+//  Double_t fu_min;
+//
+//  Double_t ft;
+//  Double_t fu;
+//
+//  std::ofstream polar_out;     
+//
+//  TLorentzVector l_photon_1;
+//  TLorentzVector l_photon_2;
+//
+//  void Pi0_Lund_Output();
+//  void Pi0_Decay_Lund_Output();
+//
+//  //  		template <class T> 
+//  //  		inline int 
+//  //  		sgn(T val) {
+//  //      		return (T(0) < val) - (val < T(0));
+//  //  		}
+//
+//  template <class T>
+//    T Sign (T a, T b) {
+//    return (a < b) - (b < a);
+//  }
+//
+//};
 
 # endif
