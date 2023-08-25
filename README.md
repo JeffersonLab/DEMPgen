@@ -114,7 +114,7 @@ This script copies Config_EIC.json and formats a new file based upon this, DO NO
   - Arg 3 - EBeamE -> The electron beam energy, set this to whatever you want, typically, we use 5, 10 or 18 (the nominal max for the EIC)  
   - Arg 4 - HBeamE -> The hadron beam energy, again, set this to whatevr you want. Typically we use 41, 100 or 275 (41 and 275 being the nominal min/max)  
   - Arg 5 - RandomSeed -> The random seed, self explanatory. Set this however you like, the batch submission job randomly generates a random seed to feed in here  
-  - Arg 6 - OutputType -> The format of the output file, select from LUND, Pythia6 (for Fun4All) or HEPMC3 (for ATHENA), the default is Pythia6 if your choice is invalid  
+  - Arg 6 - OutputType -> The format of the output file, select from LUND, Pythia6 (for ECCE/Fun4All) or HEPMC3 (for ePIC), the default is HEPMC3 if your choice is invalid  
   - Arg 7 - InteractionPoint -> The interaction point, choose from ip6 or ip8. The default is ip6 if your choice is invalid  
   - Arg 8 - Particle -> The produced particle (meson) in the reaction, choose from omega, pi+, pi0 or K+  
   - Arg 9 - Hadron -> OPTIONAL - This only matters if you select K+ as the particle, in this case, choose from Lambda or Sigma0 here. If your choice is invalid (or you don't specify arg9), the default is Lambda  
@@ -134,7 +134,7 @@ The jobs the script creates and submits all execute the Process_EIC.csh script d
   - Arg 2 - NumEvents -> The number of events thrown for this file, set this to whatever you want to run. For reference, with the Pi+/K+ generator, 1B files takes ~1 hour  
   - Arg 3 - EBeamE -> The electron beam energy, set this to whatever you want, typically, we use 5, 10 or 18 (the nominal max for the EIC)  
   - Arg 4 - HBeamE -> The hadron beam energy, again, set this to whatevr you want. Typically we use 41, 100 or 275 (41 and 275 being the nominal min/max)  
-  - Arg 5 - OutputType -> The format of the output file, select from LUND, Pythia6 (for Fun4All) or HEPMC3 (for ATHENA), the default is Pythia6 if your choice is invalid  
+  - Arg 5 - OutputType -> The format of the output file, select from LUND, Pythia6 (for ECCE/Fun4All) or HEPMC3 (for ePIC), the default is HEPMC3 if your choice is invalid  
   - Arg 6 - InteractionPoint -> The interaction point, choose from ip6 or ip8. The default is ip6 if your choice is invalid  
   - Arg 7 - Particle -> The produced particle (meson) in the reaction, choose from omega, pi+, pi0 or K+  
   - Arg 8 - Hadron -> OPTIONAL - This only matters if you select K+ as the particle, in this case, choose from Lambda or Sigma0 here. If your choice is invalid (or you don't specify arg9), the default is Lambda  

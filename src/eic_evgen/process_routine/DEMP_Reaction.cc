@@ -203,7 +203,6 @@ void DEMP_Reaction::Init() {
     cout << "!!! Notice !!! The beam energy combination simulated does not match an expected case, a default luminosity value of - " << fLumi << " cm^2s^-1 has been assumed. !!! Notice !!!" << endl;
   }
  
-
 }
 
 void DEMP_Reaction::Processing_Event() {
@@ -593,11 +592,10 @@ void DEMP_Reaction::Processing_Event() {
   fEventWeight = abs(fSigma_Col * fPSF * fuBcm2 * fLumi / fNEvents);   // in Hz
 
   fNRecorded++;
-  fLundRecorded++;
   fRatio = fNRecorded / fNGenerated;
 
   if (gOutputType == "Pythia6"){
-      DEMPReact_Pythia6_Output();
+    DEMPReact_Pythia6_Output();
   }
   else if (gOutputType == "LUND"){
     Lund_Output();
@@ -762,20 +760,24 @@ void DEMP_Reaction::Detail_Output() {
   DEMPDetails << "Total events tried                                           " << setw(20) << fNGenerated   << endl;
   DEMPDetails << "Total events recorded                                        " << setw(20) << fNRecorded    << endl;
   DEMPDetails << "Number of events with wsq negative                           " << setw(20) << w_neg_ev      << endl;
-  DEMPDetails << "Number of events with " << fW_Min << " < w < " << fW_Max       << "                             " << setw(20) << w_ev << endl;
+  DEMPDetails << "Number of events with " << fW_Min << " < w < " << fW_Max       << "                           " << setw(20) << w_ev << endl;
   DEMPDetails << "Number of events with " << fQsq_Min << " < qsq < " << fQsq_Max << "                           " << setw(20) << qsq_ev << endl;
   DEMPDetails << "Number of events with Meson (X) energy NaN                   " << setw(20) << fNaN          << endl;
-  DEMPDetails << "Number of events failing conservation law check              " << setw(20) << fConserve     << endl;
   DEMPDetails << "Total events passing conservation law check with tolerance " << fDiff << setw(17) << conserve   << endl;
+  DEMPDetails << "Total events failing conservation law checks                 " << setw(20) << fConserve     << endl;
   DEMPDetails << "Total events failing energy conservation check ONLY          " << setw(20) << ene   << endl; 
   DEMPDetails << "Total events failing momentum conservation check ONLY        " << setw(20) << mom   << endl;
-  DEMPDetails << "Total events failing momentum and energy conservation checks " << setw(20) << ene_mom   << endl;
+  DEMPDetails << "Total events failing energy AND momentum conservation checks " << setw(20) << ene_mom   << endl;
+  DEMPDetails << "Total events failing px conservation law check               " << setw(20) << mom_px   << endl;
+  DEMPDetails << "Total events failing py conservation law check               " << setw(20) << mom_py   << endl;
+  DEMPDetails << "Total events failing pz conservation law check               " << setw(20) << mom_pz   << endl;
+  DEMPDetails << "Total events failing px and py conservation law checks       " << setw(20) << mom_pxpy   << endl;
+  DEMPDetails << "Total events failing px and pz conservation law checks       " << setw(20) << mom_pxpz   << endl;
+  DEMPDetails << "Total events failing py and pz conservation law checks       " << setw(20) << mom_pypz   << endl;
+  DEMPDetails << "Total events failing px, py and pz conservation law checks   " << setw(20) << mom_pxpypz   << endl;
   DEMPDetails << "Number of events with -t > 2 (K+) or -t > 1.3 (Pi+) GeV      " << setw(20) << t_ev          << endl;
   DEMPDetails << "Number of events with w less than threshold                  " << setw(20) << fWSqNeg       << endl;
-  DEMPDetails << "Number of events with mom not conserve                       " << setw(20) << fNMomConserve << endl;
   DEMPDetails << "Number of events with Sigma negative                         " << setw(20) << fNSigmaNeg    << endl;
-  DEMPDetails << "Number of lund events                                        " << setw(20) << fLundRecorded << endl;
-
   DEMPDetails << "Seed used for the Random Number Generator                    " << setw(20) << fSeed         << endl;
 
 }
