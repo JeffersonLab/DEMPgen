@@ -400,7 +400,7 @@ vector<vector<vector<vector<double>>>> ReadCrossSectionPar(TString particle, TSt
     sigL_ParamFile = "../src/eic_evgen/CrossSection_Params/KPlusLambda_Param_sigL";
     sigT_ParamFile = "../src/eic_evgen/CrossSection_Params/KPlusLambda_Param_sigT"; // Shouldn't really have a relative path, should look at setting a DEMPGen variable and doing this in a better way later
   }
-  else if (particle == "K+" && hadron == "Sigma"){
+  else if (particle == "K+" && hadron == "Sigma0"){
     cout << "Add K+/Sigma case here" << endl;
     sigL_ParamFile = "../src/eic_evgen/CrossSection_Params/KPlusSigma_Param_sigL";
     sigT_ParamFile = "../src/eic_evgen/CrossSection_Params/KPlusSigma_Param_sigT";
