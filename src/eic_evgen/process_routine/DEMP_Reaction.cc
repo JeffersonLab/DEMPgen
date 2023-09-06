@@ -461,16 +461,9 @@ void DEMP_Reaction::Processing_Event() {
   }
   */ 
 
-  // 31/01/23 SJDK - New limit on t, remove only events outside the parameterisation range, limits depend upon particle typ
-  if (rEjectile == "Pi+" && fT_GeV > 1.3 ) {
-    t_ev++;
-    return;
-  }
-  else if (rEjectile == "K+" && fT_GeV > 2.0) {
-    t_ev++;
-    return;
-  }
-  else if (rEjectile == "Pi0+" && fT_GeV > 0.5){ // 03/02/23 - SJDK - Not sure what range is used for pi0, assume < 0.5 for now, would be u in this case anyway?
+  // 31/01/23 SJDK - New limit on t, remove only events outside the parameterisation range
+  // 06/09/23 SJDK - fT_Max set in eic.cc depending upon ejectile type
+  if (fT_GeV > fT_Max ) {
     t_ev++;
     return;
   }
@@ -775,7 +768,7 @@ void DEMP_Reaction::Detail_Output() {
   DEMPDetails << "Total events failing px and pz conservation law checks       " << setw(20) << mom_pxpz   << endl;
   DEMPDetails << "Total events failing py and pz conservation law checks       " << setw(20) << mom_pypz   << endl;
   DEMPDetails << "Total events failing px, py and pz conservation law checks   " << setw(20) << mom_pxpypz   << endl;
-  DEMPDetails << "Number of events with -t > 2 (K+) or -t > 1.3 (Pi+) GeV      " << setw(20) << t_ev          << endl;
+  DEMPDetails << "Number of events with -t > " << fT_Max << "GeV               " << setw(30) << t_ev          << endl;
   DEMPDetails << "Number of events with w less than threshold                  " << setw(20) << fWSqNeg       << endl;
   DEMPDetails << "Number of events with Sigma negative                         " << setw(20) << fNSigmaNeg    << endl;
   DEMPDetails << "Seed used for the Random Number Generator                    " << setw(20) << fSeed         << endl;

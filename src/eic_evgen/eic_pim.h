@@ -143,6 +143,7 @@ extern double fQsq_Min;
 extern double fQsq_Max;
 extern double fW_Min;
 extern double fW_Max;
+extern double fT_Max;
 
 extern double fMandSConserve;
 extern double fTop_Pion_Mom;

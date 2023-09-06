@@ -179,18 +179,22 @@ void eic(Json::Value obj) {
 	if (particle == "pi+" || particle == "Pion+" || particle == "Pi+"){
 	  fQsq_Min = 3.0; fQsq_Max = 35.0;
 	  fW_Min = 2.0; fW_Max = 10.2;
+	  fT_Max = 1.3;
 	}
 	else if (particle == "pi0" || particle == "Pion0" || particle == "Pi0"){
 	  fQsq_Min = 5.0; fQsq_Max = 1000.0;
 	  fW_Min = 2.0; fW_Max = 10.0;
+	  fT_Max = 0.5;
 	}
 	else if (particle == "K+"){
 	  fQsq_Min = 1.0; fQsq_Max = 35.0;
 	  fW_Min = 2.0; fW_Max = 10.0;
+	  fT_Max = 2.0;
 	}
 	else{
 	  fQsq_Min = 5.0; fQsq_Max = 35.0;
 	  fW_Min = 2.0; fW_Max = 10.0;
+	  fT_Max = 1.3;
 	}
 
 	// SJDK - 01/06/21
