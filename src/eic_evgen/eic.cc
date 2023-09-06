@@ -390,26 +390,26 @@ vector<vector<vector<vector<double>>>> ReadCrossSectionPar(TString particle, TSt
   string sigL_ParamFile, sigT_ParamFile;
  
   if (particle == "Pi+" && hadron == "Neutron"){
-    cout << "Add Pi+/Neutron case here" << endl;
+    //cout << "Add Pi+/Neutron case here" << endl;
   }
   else if (particle == "Pi-" && hadron == "Proton"){
-    cout << "Add Pi-/Proton case here" << endl;
+    //cout << "Add Pi-/Proton case here" << endl;
   }
   else if (particle == "K+" && hadron == "Lambda"){
-    cout << "Add K+/Lambda case here" << endl;
+    //cout << "Add K+/Lambda case here" << endl;
     sigL_ParamFile = "../src/eic_evgen/CrossSection_Params/KPlusLambda_Param_sigL";
     sigT_ParamFile = "../src/eic_evgen/CrossSection_Params/KPlusLambda_Param_sigT"; // Shouldn't really have a relative path, should look at setting a DEMPGen variable and doing this in a better way later
   }
   else if (particle == "K+" && hadron == "Sigma0"){
-    cout << "Add K+/Sigma case here" << endl;
+    //cout << "Add K+/Sigma case here" << endl;
     sigL_ParamFile = "../src/eic_evgen/CrossSection_Params/KPlusSigma_Param_sigL";
     sigT_ParamFile = "../src/eic_evgen/CrossSection_Params/KPlusSigma_Param_sigT";
   }
   else if (particle == "Pi0"){
-    cout << "Add Pi0 case here" << endl;
+    //cout << "Add Pi0 case here" << endl;
   }
   else{
-    cout << "Throw some error" << endl;
+    cerr << " !!!!! " << endl << "Warning! Combination of specified ejectile and recoil particles not found!" << " !!!!! " << endl;
   }
  
   //....................................................................................................
