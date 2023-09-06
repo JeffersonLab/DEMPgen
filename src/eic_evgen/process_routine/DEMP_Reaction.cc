@@ -351,13 +351,6 @@ void DEMP_Reaction::Processing_Event() {
   r_lw = r_lproton + r_lphoton;
   fW = r_lw.Mag();
 
-  // ----------------------------------------------------------------------------------------------
-  // Calculate w prime w' = (proton + photon - pion)^2                                             
-  // ----------------------------------------------------------------------------------------------
- 
-  lwp = r_lprotong + r_lphotong - r_l_Ejectile_g;
-  fW_Prime_GeV = lwp.Mag();    
-
   fsini = r_lelectron + r_lproton;
   fsfin = r_lscatelec + r_l_Ejectile + l_Recoil;
      
@@ -747,6 +740,7 @@ Double_t DEMP_Reaction::Get_Total_Cross_Section() {
 
 /*--------------------------------------------------*/
 /// Output generator detail
+// 06/06/23 SJDK - Formatting of these is all messed up annoyingly, would be nice to get the final numbers to align. They don't currently
 
 void DEMP_Reaction::Detail_Output() {
 
