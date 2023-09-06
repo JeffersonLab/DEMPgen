@@ -351,14 +351,6 @@ void DEMP_Reaction::Processing_Event() {
   r_lw = r_lproton + r_lphoton;
   fW = r_lw.Mag();
 
-  fsini = r_lelectron + r_lproton;
-  fsfin = r_lscatelec + r_l_Ejectile + l_Recoil;
-     
-  fsinig = fsini * fm;
-  fsfing = fsfin * fm; 
-  // SJDK 15/06/21 - Mandlestam S conservation check - doesn't actually seem to be utilised?
-  fMandSConserve = std::abs( fsinig.Mag() - fsfing.Mag() );
-
   // SJDK 15/06/21 - Added integer counters for conservation law check and for NaN check
   if (r_l_Ejectile.E() != r_l_Ejectile.E()){ // SJDK 15/06/21 - If the energy of the produced meson is not a number, return and add to counter
     fNaN++;
