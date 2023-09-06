@@ -93,13 +93,12 @@ void DEMP_Reaction::Init() {
  
   dRootTree->Branch("EventWeight", &fEventWeight, "fEventWeight/D");
 
-
   /*--------------------------------------------------*/ 
 	
   qsq_ev = 0, t_ev = 0, w_neg_ev = 0, w_ev = 0;
   rNEvents = fNEvents;
   rNEvent_itt = 0;
-
+  
   // 02/06/21 SJDK 
   // Set these values once the beam energies are read in
   fPSF = ( fEBeam * ( fScatElec_E_Hi - fScatElec_E_Lo ) *( sin( fScatElec_Theta_F ) - sin( fScatElec_Theta_I ) ) * 2 * fPI *( sin( fEjectileX_Theta_F ) - sin( fEjectileX_Theta_I ) ) * 2 * fPI );
@@ -108,7 +107,7 @@ void DEMP_Reaction::Init() {
 
   // cout << rNEvents << "    " << fNEvents << endl;
 	
-  rFermiMomentum = pd->fermiMomentum();
+  //rFermiMomentum = pd->fermiMomentum();
 
   // ----------------------------------------------------
   // Proton in collider (lab) frame
@@ -128,7 +127,8 @@ void DEMP_Reaction::Init() {
   // ----------------------------------------------------
   // Electron in collider (lab) frame
 
-  cout << "Fermi momentum: " << rFermiMomentum << endl;
+  // 06/09/23 - SJDK - Commenting out for now, should be disabled for e/p collisions
+  //cout << "Fermi momentum: " << rFermiMomentum << endl;
 
   r_lelectron	 = GetElectronVector_lab();
   r_lelectrong = r_lelectron * fm;
@@ -177,7 +177,12 @@ void DEMP_Reaction::Init() {
 
   cout << "Produced particle in exclusive production: " << rEjectile << ";  with mass: " << f_Ejectile_Mass << " MeV "<< endl;
   cout << fEBeam << " GeV electrons on " << fPBeam << " GeV ions" << endl;
-  
+  if(UseSolve == true){
+    cout << rEjectile << " and " << rEjectile_scat_hadron << " 4-vectors calculated using Solve function" << endl;
+  }
+  else if(UseSolve == false){
+    cout << rEjectile << " and " << rEjectile_scat_hadron << " 4-vectors calculated using analytical solution" << endl;
+  }
   // Set luminosity value based upon beam energy combination, note that if no case matches, a default of 1e33 is assumed. Cases are a set of nominal planned beam energy combinations for the EIC (and EICC)
   // See slide 11 in https://indico.cern.ch/event/1072579/contributions/4796856/attachments/2456676/4210776/CAP-EIC-June-7-2022-Seryi-r2.pdf
   // If available in the future, this could be replaced by some fixed function
@@ -202,7 +207,48 @@ void DEMP_Reaction::Init() {
   else{
     cout << "!!! Notice !!! The beam energy combination simulated does not match an expected case, a default luminosity value of - " << fLumi << " cm^2s^-1 has been assumed. !!! Notice !!!" << endl;
   }
- 
+
+  // /*--------------------------------------------------*/ 
+  // // SJDK 03/04/22 -  New set of initialisation stuff for the solve function from Ishan and Bill
+
+  // CoinToss = new TRandom3();
+
+  // //  F = new TF1("F",
+  // //              "[6]-sqrt([7]**2+x**2)-sqrt([8]**2+([3]-[0]*x)**2+([4]-[1]*x)**2+([5]-[2]*x)**2)",
+  // //              0, 12000);
+
+  // F = new TF1("F",
+  //             "[6]-sqrt([7]**2+x**2)-sqrt([8]**2+([3]-[0]*x)**2+([4]-[1]*x)**2+([5]-[2]*x)**2)",
+  //             0, r_lproton.E());
+
+  // char AngleGenName[100] = "AngleGen";
+  // double dummy[2] = {0,1};
+  // // Changed the theta range here to match the one actually provided in the input .json file, these are already converted to radians in eic.cc (see ~ line 293)
+  // //  double ThetaRange[2] = {fX_Theta_I, fX_Theta_F};
+
+  // f_Ejectile_Theta_I = fEjectileX_Theta_I;
+  // f_Ejectile_Theta_F = fEjectileX_Theta_F;
+
+  // double ThetaRange[2] = {f_Ejectile_Theta_I, f_Ejectile_Theta_F};
+  // double PhiRange[2] = {0, 360*TMath::DegToRad()};
+
+  // AngleGen = new CustomRand(AngleGenName, dummy,
+  //                           ThetaRange, PhiRange);
+
+  // UnitVect = new TVector3(0,0,1);
+
+  // ///*--------------------------------------------------*/ 
+  // // Produced hadron and recoilded hadron from the solve function 
+
+  // VertBeamElec = new TLorentzVector();
+  // VertScatElec = new TLorentzVector();
+
+  // Initial      = new TLorentzVector();
+  // Target       = new TLorentzVector();
+  // Photon       = new TLorentzVector();
+  // Interaction  = new TLorentzVector();
+  // Final        = new TLorentzVector();
+  
 }
 
 void DEMP_Reaction::Processing_Event() {
@@ -210,10 +256,10 @@ void DEMP_Reaction::Processing_Event() {
   // ----------------------------------------------------
   // Considering Fermi momentum for the proton
   // ----------------------------------------------------
-  // SJDK - 31/01/23 - This doesn't seem to do anything?
-  if( kCalcFermi ) {
-    Consider_Proton_Fermi_Momentum(); 
-  }
+  // SJDK - 06/06/23 - Commenting out for now, this increases the number of recorded events - Should have no fermi momentum for e/p collisions
+  // if( kCalcFermi ) {
+  //   Consider_Proton_Fermi_Momentum(); 
+  // }
 
   // ----------------------------------------------------
   // Boost vector from collider (lab) frame to protons rest frame (Fix target)
@@ -283,62 +329,68 @@ void DEMP_Reaction::Processing_Event() {
     return;
   }
 
-  // ---------------------------------------------------------
-  // Pion momentum in collider frame, analytic solution starts
-  // ---------------------------------------------------------
+  // SJDK - 06/09/23 - Check UseSolved boolean, process through relevant loop
+  if (UseSolve == false){
+    // ---------------------------------------------------------
+    // Pion momentum in collider frame, analytic solution starts
+    // ---------------------------------------------------------
  
-  double fupx = sin( f_Ejectile_Theta_Col ) * cos( f_Ejectile_Phi_Col );
-  double fupy = sin( f_Ejectile_Theta_Col ) * sin( f_Ejectile_Phi_Col );
-  double fupz = cos( f_Ejectile_Theta_Col );
+    double fupx = sin( f_Ejectile_Theta_Col ) * cos( f_Ejectile_Phi_Col );
+    double fupy = sin( f_Ejectile_Theta_Col ) * sin( f_Ejectile_Phi_Col );
+    double fupz = cos( f_Ejectile_Theta_Col );
  
-  double fuqx = sin( r_lphoton.Theta() ) * cos( r_lphoton.Phi() );
-  double fuqy = sin( r_lphoton.Theta() ) * sin( r_lphoton.Phi() );
-  double fuqz = cos( r_lphoton.Theta() );
+    double fuqx = sin( r_lphoton.Theta() ) * cos( r_lphoton.Phi() );
+    double fuqy = sin( r_lphoton.Theta() ) * sin( r_lphoton.Phi() );
+    double fuqz = cos( r_lphoton.Theta() );
  
-  double fa = -(r_lphoton.Vect()).Mag() * ( fupx * fuqx +  fupy * fuqy +  fupz * fuqz );
-  double fb = pow ( (r_lphoton.Vect()).Mag() , 2 );
-  double fc = r_lphoton.E() + fProton_Mass;
+    double fa = -(r_lphoton.Vect()).Mag() * ( fupx * fuqx +  fupy * fuqy +  fupz * fuqz );
+    double fb = pow ( (r_lphoton.Vect()).Mag() , 2 );
+    double fc = r_lphoton.E() + fProton_Mass;
  
-  fa = ( fa - std::abs( (r_lproton.Vect()).Mag() ) * ( ( ( r_lproton.X() / (r_lproton.Vect()).Mag() ) * fupx ) + 
-  						       ( ( r_lproton.Y() / (r_lproton.Vect()).Mag() ) * fupy ) + 
-  						       ( ( r_lproton.Z() / (r_lproton.Vect()).Mag() ) * fupz ) ) );
+    fa = ( fa - std::abs( (r_lproton.Vect()).Mag() ) * ( ( ( r_lproton.X() / (r_lproton.Vect()).Mag() ) * fupx ) + 
+							 ( ( r_lproton.Y() / (r_lproton.Vect()).Mag() ) * fupy ) + 
+							 ( ( r_lproton.Z() / (r_lproton.Vect()).Mag() ) * fupz ) ) );
      
-  double factor = ( pow( (r_lproton.Vect()).Mag() , 2 ) + 2.0 * (r_lphoton.Vect()).Mag() * (r_lproton.Vect()).Mag() *  
-  		    ( ( ( r_lproton.X() / (r_lproton.Vect()).Mag() ) * fuqx ) + 
-  		      ( ( r_lproton.Y() / (r_lproton.Vect()).Mag() ) * fuqy ) + 
-  		      ( ( r_lproton.Z() / (r_lproton.Vect()).Mag() ) * fuqz ) ) );
+    double factor = ( pow( (r_lproton.Vect()).Mag() , 2 ) + 2.0 * (r_lphoton.Vect()).Mag() * (r_lproton.Vect()).Mag() *  
+		      ( ( ( r_lproton.X() / (r_lproton.Vect()).Mag() ) * fuqx ) + 
+			( ( r_lproton.Y() / (r_lproton.Vect()).Mag() ) * fuqy ) + 
+			( ( r_lproton.Z() / (r_lproton.Vect()).Mag() ) * fuqz ) ) );
      
-  fb =  fb + factor;  
-  fc = r_lphoton.E() + r_lproton.E();
+    fb =  fb + factor;  
+    fc = r_lphoton.E() + r_lproton.E();
      
-  double ft = fc * fc - fb + f_Ejectile_Mass * f_Ejectile_Mass - f_Recoil_Mass * f_Recoil_Mass;
+    double ft = fc * fc - fb + f_Ejectile_Mass * f_Ejectile_Mass - f_Recoil_Mass * f_Recoil_Mass;
      
-  double fQA = 4.0 * ( fa * fa - fc * fc );
-  double fQB = 4.0 * fc * ft;
+    double fQA = 4.0 * ( fa * fa - fc * fc );
+    double fQB = 4.0 * fc * ft;
 
-  double fQC = -4.0 * fa * fa * f_Ejectile_Mass * f_Ejectile_Mass - ft * ft;    
+    double fQC = -4.0 * fa * fa * f_Ejectile_Mass * f_Ejectile_Mass - ft * ft;    
  
-  fradical = fQB * fQB - 4.0 * fQA * fQC;
+    fradical = fQB * fQB - 4.0 * fQA * fQC;
  
-  fepi1 = ( -fQB - sqrt( fradical ) ) / ( 2.0 * fQA );
-  fepi2 = ( -fQB + sqrt( fradical ) ) / ( 2.0 * fQA );
+    fepi1 = ( -fQB - sqrt( fradical ) ) / ( 2.0 * fQA );
+    fepi2 = ( -fQB + sqrt( fradical ) ) / ( 2.0 * fQA );
 
-  ///---------------------------------------------------------
-  /// Particle X momentum in collider frame, analytic solution
-  /// And obtain recoiled proton in collider (lab) frame
-  ///---------------------------------------------------------
+    ///---------------------------------------------------------
+    /// Particle X momentum in collider frame, analytic solution
+    /// And obtain recoiled proton in collider (lab) frame
+    ///---------------------------------------------------------
 
-   r_l_Ejectile.SetPxPyPzE( (sqrt( pow( fepi1 , 2) - pow(f_Ejectile_Mass , 2) ) ) * sin(f_Ejectile_Theta_Col) * cos(f_Ejectile_Phi_Col),
-  		   ( sqrt( pow( fepi1 , 2) - pow(f_Ejectile_Mass , 2) ) ) * sin(f_Ejectile_Theta_Col) * sin(f_Ejectile_Phi_Col),
-  		   ( sqrt( pow( fepi1 , 2) - pow(f_Ejectile_Mass , 2) ) ) * cos(f_Ejectile_Theta_Col),
-  		   fepi1 );
+    r_l_Ejectile.SetPxPyPzE( (sqrt( pow( fepi1 , 2) - pow(f_Ejectile_Mass , 2) ) ) * sin(f_Ejectile_Theta_Col) * cos(f_Ejectile_Phi_Col),
+			     ( sqrt( pow( fepi1 , 2) - pow(f_Ejectile_Mass , 2) ) ) * sin(f_Ejectile_Theta_Col) * sin(f_Ejectile_Phi_Col),
+			     ( sqrt( pow( fepi1 , 2) - pow(f_Ejectile_Mass , 2) ) ) * cos(f_Ejectile_Theta_Col),
+			     fepi1 );
   
-   l_Recoil.SetPxPyPzE( ( r_lproton + r_lelectron - r_lscatelec - r_l_Ejectile).X(),
-  			       ( r_lproton + r_lelectron - r_lscatelec - r_l_Ejectile ).Y(),
-  			       ( r_lproton + r_lelectron - r_lscatelec - r_l_Ejectile ).Z(),
-  			       sqrt( pow( ( ( ( r_lproton + r_lelectron - r_lscatelec - r_l_Ejectile ).Vect() ).Mag()),2) +
-  				     pow( f_Recoil_Mass , 2) ) );
-
+    l_Recoil.SetPxPyPzE( ( r_lproton + r_lelectron - r_lscatelec - r_l_Ejectile).X(),
+			 ( r_lproton + r_lelectron - r_lscatelec - r_l_Ejectile ).Y(),
+			 ( r_lproton + r_lelectron - r_lscatelec - r_l_Ejectile ).Z(),
+			 sqrt( pow( ( ( ( r_lproton + r_lelectron - r_lscatelec - r_l_Ejectile ).Vect() ).Mag()),2) +
+			       pow( f_Recoil_Mass , 2) ) );
+  }
+   else if (UseSolve == true){
+     r_l_Ejectile.SetPxPyPzE(0,0,0,0);
+     l_Recoil_g.SetPxPyPzE(0,0,0,0);
+   }
   ///--------------------------------------------------
   
   r_l_Ejectile_g = r_l_Ejectile * fm;

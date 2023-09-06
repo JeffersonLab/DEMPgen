@@ -30,6 +30,7 @@
     "hbeam_part":"Proton",           // Hadron beam particle, proton, deut or helium3, work in progress, will need to be added to shell script later on as an argument
     "OutputType": "HEPMC3",		   // choices: LUND (Docker), Pythia6 (ECCE Fun4All) or HEPMC3 (ePIC)   
     "det_location": "ip6",		   // choices: ip6 for STAR, ip8 for PHENIX
+    "calc_method": "Analytical",            // choices: Analytical or Solve, affects how the ejectile/recoil hadron 4-vectors are calculated. Default is analytical
     "Ee_Low": 0.5, // The minimum scattered electron energy that will be generated as a fraction of the electron beam energy
     "Ee_High": 2.5, // The maximum scattered electron energy that will be generated as a fraction of the electron beam energy
     "e_Theta_Low": 60.0, // The minimum scattered electron angle (theta) that will be generated in degrees

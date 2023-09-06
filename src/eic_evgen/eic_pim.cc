@@ -24,6 +24,7 @@ TTree *t1;
 
 int gKinematics_type;
 bool gPi0_decay;
+bool UseSolve;
 string gDet_location;
 string gOutputType; // SJDK 12/01/22 - Added output type as a variable you can specify in the .json file
 string gBeamPart; // SJDK 12/01/22 - Added output type as a variable you can specify in the .json file

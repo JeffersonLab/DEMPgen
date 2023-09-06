@@ -316,9 +316,22 @@ void eic(Json::Value obj) {
 	  fEjectileX_Theta_F = 60.0 * fDEG2RAD;
 	  cout << "Max ejectile X theta not specified in .json file, defaulting to 60 degrees." << endl;
 	}
-        
-	SigPar = ReadCrossSectionPar(particle, hadron);
 
+	// 06/09/23 - SJDK - Added string to check method chosen
+	TString CalcMethod = obj["calc_method"].asString(); 
+	if(CalcMethod == "Analytical"){
+	  UseSolve = false;
+	}
+	else if (CalcMethod == "Solve"){
+	  UseSolve = true;
+	}
+	else{
+	  cout << "! WARNING !" << endl  << "! WARNING !- Calculation method not specified or not recognised, defaulting to Analytical - ! WARNING!" << endl << "! WARNING !" << endl;
+	  UseSolve = false;
+	}
+	
+	SigPar = ReadCrossSectionPar(particle, hadron);
+	
         if(particle != "pi0"){ // Default case now
 	  Reaction* r1 = new Reaction(particle, hadron);
 	  r1->process_reaction();

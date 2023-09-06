@@ -50,6 +50,7 @@ extern TString gfile_name;
 extern TString gParticle;
 extern TString gHadron;
 extern bool gPi0_decay;
+extern bool UseSolve;
 extern std::string gDet_location;
 extern std::string gOutputType;
 extern std::string gBeamPart;
