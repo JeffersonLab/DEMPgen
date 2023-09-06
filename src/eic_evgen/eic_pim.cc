@@ -1038,7 +1038,6 @@ int pim::CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, 
     return err;
 }
 
-// SJDK - 01/06/23 - This should actually be even more flexible, add an fDiff_mom too - Set momentum and energy differences separately
 int pim::CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, TLorentzVector P_pim, TLorentzVector P_pro, double fDiff_E) {
 
   double energy_check = (P_t.E() + P_E0.E()) - (P_e.E()+P_pim.E()+P_pro.E());
