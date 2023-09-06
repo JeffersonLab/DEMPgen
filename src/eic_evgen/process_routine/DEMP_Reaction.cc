@@ -108,7 +108,7 @@ void DEMP_Reaction::Init() {
 
   // cout << rNEvents << "    " << fNEvents << endl;
 	
-  //rFermiMomentum = pd->fermiMomentum();
+  rFermiMomentum = pd->fermiMomentum();
 
   // ----------------------------------------------------
   // Proton in collider (lab) frame
@@ -128,7 +128,7 @@ void DEMP_Reaction::Init() {
   // ----------------------------------------------------
   // Electron in collider (lab) frame
 
-  //cout << "Fermi momentum: " << rFermiMomentum << endl;
+  cout << "Fermi momentum: " << rFermiMomentum << endl;
 
   r_lelectron	 = GetElectronVector_lab();
   r_lelectrong = r_lelectron * fm;
@@ -211,9 +211,9 @@ void DEMP_Reaction::Processing_Event() {
   // Considering Fermi momentum for the proton
   // ----------------------------------------------------
   // SJDK - 31/01/23 - This doesn't seem to do anything?
-  // if( kCalcFermi ) {
-  //   Consider_Proton_Fermi_Momentum(); 
-  // }
+  if( kCalcFermi ) {
+    Consider_Proton_Fermi_Momentum(); 
+  }
 
   // ----------------------------------------------------
   // Boost vector from collider (lab) frame to protons rest frame (Fix target)
@@ -629,24 +629,24 @@ TLorentzVector DEMP_Reaction::GetProtonVector_lab() {
 // Proton in collider (lab) frame
 // ----------------------------------------------------
 
-// void DEMP_Reaction::Consider_Proton_Fermi_Momentum() {
+void DEMP_Reaction::Consider_Proton_Fermi_Momentum() {
 
-//   fProton_Mom_Col   = fProton_Mom_Col + rFermiMomentum;
-//   fProton_Theta_Col = acos( fRandom->Uniform( cos(0.0) , cos(fPi) ) );
-//   fProton_Phi_Col   = fRandom->Uniform( 0 , 360 );
+  fProton_Mom_Col   = fProton_Mom_Col + rFermiMomentum;
+  fProton_Theta_Col = acos( fRandom->Uniform( cos(0.0) , cos(fPi) ) );
+  fProton_Phi_Col   = fRandom->Uniform( 0 , 360 );
 
-//   double px, py, pz, e;
+  double px, py, pz, e;
 
-//   px = fProton_Mom_Col * sin(fProton_Theta_Col) * cos(fProton_Phi_Col);
-//   py = fProton_Mom_Col * sin(fProton_Theta_Col) * sin(fProton_Phi_Col);
-//   pz = fProton_Mom_Col * cos(fProton_Theta_Col);
-//   e  = sqrt( pow( fProton_Mom_Col , 2 ) + pow( fProton_Mass , 2 ) );
+  px = fProton_Mom_Col * sin(fProton_Theta_Col) * cos(fProton_Phi_Col);
+  py = fProton_Mom_Col * sin(fProton_Theta_Col) * sin(fProton_Phi_Col);
+  pz = fProton_Mom_Col * cos(fProton_Theta_Col);
+  e  = sqrt( pow( fProton_Mom_Col , 2 ) + pow( fProton_Mass , 2 ) );
 
-//   r_lproton.SetPxPyPzE(px,py,pz,e);
+  r_lproton.SetPxPyPzE(px,py,pz,e);
 
-//   r_lprotong = r_lproton*fm;
+  r_lprotong = r_lproton*fm;
 
-// }
+}
 
 // ----------------------------------------------------
 // Electron in collider (lab) frame
@@ -728,33 +728,45 @@ Double_t DEMP_Reaction::Get_Total_Cross_Section() {
 
 /*--------------------------------------------------*/
 /// Output generator detail
-// 06/06/23 SJDK - Formatting of these is all messed up annoyingly, would be nice to get the final numbers to align. They don't currently
-
+// 06/09/23 SJDK - Formatting of these is all messed up annoyingly, would be nice to get the final numbers to align. They don't currently.
+// Cuts are now ordered as they are applied in the generator
 void DEMP_Reaction::Detail_Output() {
 
-  DEMPDetails << "Total events tried                                           " << setw(20) << fNGenerated   << endl;
-  DEMPDetails << "Total events recorded                                        " << setw(20) << fNRecorded    << endl;
-  DEMPDetails << "Number of events with wsq negative                           " << setw(20) << w_neg_ev      << endl;
-  DEMPDetails << "Number of events with " << fW_Min << " < w < " << fW_Max       << "                           " << setw(20) << w_ev << endl;
-  DEMPDetails << "Number of events with " << fQsq_Min << " < qsq < " << fQsq_Max << "                           " << setw(20) << qsq_ev << endl;
-  DEMPDetails << "Number of events with Meson (X) energy NaN                   " << setw(20) << fNaN          << endl;
-  DEMPDetails << "Total events passing conservation law check with tolerance " << fDiff << setw(17) << conserve   << endl;
-  DEMPDetails << "Total events failing conservation law checks                 " << setw(20) << fConserve     << endl;
-  DEMPDetails << "Total events failing energy conservation check ONLY          " << setw(20) << ene   << endl; 
-  DEMPDetails << "Total events failing momentum conservation check ONLY        " << setw(20) << mom   << endl;
-  DEMPDetails << "Total events failing energy AND momentum conservation checks " << setw(20) << ene_mom   << endl;
-  DEMPDetails << "Total events failing px conservation law check               " << setw(20) << mom_px   << endl;
-  DEMPDetails << "Total events failing py conservation law check               " << setw(20) << mom_py   << endl;
-  DEMPDetails << "Total events failing pz conservation law check               " << setw(20) << mom_pz   << endl;
-  DEMPDetails << "Total events failing px and py conservation law checks       " << setw(20) << mom_pxpy   << endl;
-  DEMPDetails << "Total events failing px and pz conservation law checks       " << setw(20) << mom_pxpz   << endl;
-  DEMPDetails << "Total events failing py and pz conservation law checks       " << setw(20) << mom_pypz   << endl;
-  DEMPDetails << "Total events failing px, py and pz conservation law checks   " << setw(20) << mom_pxpypz   << endl;
-  DEMPDetails << "Number of events with -t > " << fT_Max << "GeV               " << setw(30) << t_ev          << endl;
-  DEMPDetails << "Number of events with w less than threshold                  " << setw(20) << fWSqNeg       << endl;
-  DEMPDetails << "Number of events with Sigma negative                         " << setw(20) << fNSigmaNeg    << endl;
   DEMPDetails << "Seed used for the Random Number Generator                    " << setw(20) << fSeed         << endl;
+  DEMPDetails << endl;
+  DEMPDetails << "Total events tried                                           " << setw(20) << fNGenerated   << endl;
+  DEMPDetails << "Total events cut                                             " << setw(20) << (qsq_ev + w_ev + w_neg_ev + fNaN + fConserve + t_ev + fNSigmaNeg) << endl;
+  DEMPDetails << "Total events recorded                                        " << setw(20) << fNRecorded    << endl;
+  if (fNGenerated != (qsq_ev + w_ev + w_neg_ev + fNaN + fConserve + t_ev + fNSigmaNeg + fNRecorded)){
+    DEMPDetails << "Total events cut + recorded = events tried?                " << setw(20) << "NO! ERROR!" << endl;
+  }
+  else{
+    DEMPDetails << "Total events cut + recorded = events tried?                " << setw(22) << "Yes! :)" << endl;
+  }
+  
+  DEMPDetails << endl << "Cut details -" << endl;
+  DEMPDetails << "Events cut due to qsq < " << fQsq_Min << " or qsq > "<< fQsq_Max << "                        " << setw(20) << qsq_ev << endl;
+  DEMPDetails << "Events cut due to negative Wsq value                         " << setw(20) << w_neg_ev      << endl;  
+  DEMPDetails << "Events cut due to W < " << fW_Min << " or W > " << fW_Max << "                          " << setw(20) << w_ev << endl;
+  DEMPDetails << "Events cut due to ejectile (X) energy NaN                    " << setw(20) << fNaN          << endl;
+  DEMPDetails << "Events cut due to conservation law check failure             " << setw(20) << fConserve     << endl;
+  DEMPDetails << "Events cut due to -t > " << fT_Max << "GeV                      " << setw(30) << t_ev          << endl;
+  DEMPDetails << "Events cut due to -ve cross section value                    " << setw(20) << fNSigmaNeg    << endl;
 
+  DEMPDetails << endl << "Conservation law checks details -" << endl;
+  DEMPDetails << "Total events PASSING conservation law check with tolerance " << fDiff << setw(17) << conserve   << endl;
+  DEMPDetails << "Events cut due to energy conservation check ONLY             " << setw(20) << ene   << endl; 
+  DEMPDetails << "Events cut due to momentum conservation check ONLY           " << setw(20) << mom   << endl;
+  DEMPDetails << "Events cut due to energy AND momentum conservation checks    " << setw(20) << ene_mom   << endl;
+  DEMPDetails << "Events cut due to px conservation law check                  " << setw(20) << mom_px   << endl;
+  DEMPDetails << "Events cut due to py conservation law check                  " << setw(20) << mom_py   << endl;
+  DEMPDetails << "Events cut due to pz conservation law check                  " << setw(20) << mom_pz   << endl;
+  DEMPDetails << "Events cut due to px and py conservation law checks          " << setw(20) << mom_pxpy   << endl;
+  DEMPDetails << "Events cut due to px and pz conservation law checks          " << setw(20) << mom_pxpz   << endl;
+  DEMPDetails << "Events cut due to py and pz conservation law checks          " << setw(20) << mom_pypz   << endl;
+  DEMPDetails << "Events cut due to px, py and pz conservation law checks      " << setw(20) << mom_pxpypz   << endl;
+
+  
 }
 
 ////*--------------------------------------------------
