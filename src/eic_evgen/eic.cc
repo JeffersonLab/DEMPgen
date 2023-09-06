@@ -409,7 +409,8 @@ vector<vector<vector<vector<double>>>> ReadCrossSectionPar(TString particle, TSt
     //cout << "Add Pi0 case here" << endl;
   }
   else{
-    cerr << " !!!!!! " << endl << "Warning! Combination of specified ejectile and recoil particles not found!" << " !!!!!! " << endl;
+    cerr << " !!!!! " << endl << "Warning!" << endl << "Combination of specified ejectile and recoil particles not found!" << "Cross section parameters cannot be read, check inputs!" << endl << "Warning!" << endl << " !!!!! " << endl;
+    exit(-1);
   }
  
   //....................................................................................................
