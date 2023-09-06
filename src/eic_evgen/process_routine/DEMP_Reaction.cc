@@ -356,10 +356,6 @@ void DEMP_Reaction::Processing_Event() {
     fNaN++;
     return;
   }
-  kSConserve = false;
-  if( std::abs( fsinig.Mag() - fsfing.Mag() ) < fDiff ) {
-    kSConserve = true;
-  }
 
 ///*--------------------------------------------------*/ 
 //-> 10/05/23 - Love added a slimmed down, simpler to read version of the CheckLaws fn
