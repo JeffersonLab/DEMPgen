@@ -36,16 +36,16 @@ int fSeed;
 bool allset, print, kCalcFermi, kCalcBremss, kCalcIon, kCalcBremssEle, kCalcIonEle, kSConserve, kFSI, kMSele, kMS;
 int fWLessShell, fWLess1P9, fSDiff;
 
-//long int fNEvents, fNRecorded, fNGenerated, fWSqNeg, fNMomConserve, fNSigmaNeg, fNWeightUnphys, fNWeightReject, fLundRecorded, fNFile; 
+//long int fNEvents, fNRecorded, fNGenerated, fWSqNeg, fNSigmaNeg, fNWeightUnphys, fNWeightReject, fLundRecorded, fNFile; 
 
-unsigned long long int fNEvents, fNRecorded, fNGenerated, fWSqNeg, fNMomConserve, fNSigmaNeg, fNaN, fConserve, fNWeightUnphys, fNWeightReject, fLundRecorded, fNFile;
+unsigned long long int fNEvents, fNRecorded, fNGenerated, fWSqNeg, fNSigmaNeg, fNaN, fConserve, fNWeightUnphys, fNWeightReject, fLundRecorded, fNFile;
 
 // SJDK 03/04/23 - Added in Qsq Min/Max and W Min/Max
 double fK, fm, fElectron_Kin_Col_GeV, fElectron_Kin_Col, fRand, fLumi, fuBcm2, fPI, fDEG2RAD, fRAD2DEG, fEBeam, fPBeam, fScatElec_Theta_I, fScatElec_Theta_F, fPion_Theta_I, fPion_Theta_F, fEjectileX_Theta_I, fEjectileX_Theta_F, fScatElec_E_Hi, fScatElec_E_Lo, fPSF, fQsq_Min, fQsq_Max, fW_Min, fW_Max; 
 
 double fOmega_Theta_I, fOmega_Theta_F, fOmega_Theta_Col, fOmega_Phi_Col;
 
-double fDiff_E, conserve, ene, mom, ene_mom;     // 18/06/21 AU -> New variables to count envents passing/not passing conservation laws
+double fDiff_E, conserve, ene, mom, ene_mom, mom_px, mom_py, mom_pz, mom_pxpy, mom_pxpz, mom_pypz, mom_pxpypz;     // 18/06/21 AU -> New variables to count envents passing/not passing conservation laws
 
 double fMandSConserve, fTop_Pion_Mom, fBot_Pion_Mom, fPion_Mom_Same, fEnergyConserve, fXMomConserve, fYMomConserve, fZMomConserve, fXMomConserve_RF, fYMomConserve_RF, fZMomConserve_RF, fEnergyConserve_RF; 
 
@@ -321,14 +321,12 @@ void pim::Initilize() {
     fPion_Alpha                                 = 0;
     fPion_Beta                                  = 0;
     fNRecorded                                  = 0;
-    fLundRecorded                               = 0;
     fNGenerated                                 = 0;
     fRatio                                      = 0;
     fWLessShell                                 = 0;
     fWLess1P9                                   = 0;
     fWSqNeg                                     = 0;
     fNSigmaNeg                                  = 0;
-    fNMomConserve                               = 0;
     // SJDK 15/06/21 - Integer counters to check number returning NaN and failing conservation laws added
     fNaN                                        = 0;
     fConserve                                   = 0;
@@ -938,6 +936,13 @@ void pim::Initilize() {
     ene                                         = 0; // The number that FAIL due to failing energy conservation check ONLY
     mom                                         = 0; // The number that FAIL due to failing the momentum conservation check ONLY
     ene_mom                                     = 0; // The number that FAIL BOTH energy and momentum check
+    mom_px                                      = 0; // Fail due to px only
+    mom_py                                      = 0; // Fail due to py only
+    mom_pz                                      = 0; // Fail due to pz only
+    mom_pxpy                                    = 0; // Fail due to px and py
+    mom_pxpz                                    = 0; // Fail due to px and pz
+    mom_pypz                                    = 0; // Fail due to py and pz
+    mom_pxpypz                                  = 0; // Fail due to px, py and pz
 
 }
 
@@ -978,30 +983,61 @@ int pim::CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, 
   double px_check =(P_t.Px() + P_E0.Px()) - (P_e.Px()+P_pim.Px()+P_pro.Px());
   double py_check =(P_t.Py() + P_E0.Py()) - (P_e.Py()+P_pim.Py()+P_pro.Py());
   double pz_check =(P_t.Pz() + P_E0.Pz()) - (P_e.Pz()+P_pim.Pz()+P_pro.Pz());
-                                                                                                 
+  
   Int_t err = -1;
   if( fabs( energy_check ) < fDiff  && fabs( px_check ) < fDiff  &&  fabs( py_check ) < fDiff && fabs( pz_check ) < fDiff){  // if both momentum components and energy pass the conservation check (simultaneously)
     conserve++;
     err = 1;
   }
-
+  
   else{
-    if((fabs( px_check ) < fDiff  &&  fabs( py_check ) < fDiff && fabs( pz_check ) < fDiff) == false ){ // If momentum check fails, check if energy also failed, add counters accordingly
-      if ( (fabs( energy_check ) < fDiff) == false ){
+    if( (fabs( px_check ) > fDiff) || (fabs( py_check ) > fDiff) || (fabs( pz_check ) > fDiff) ){ // If momentum check fails, check if energy also failed, add counters accordingly  	
+
+      // Check components
+      if( fabs( px_check ) > fDiff){
+	// px failed, check py
+	if( fabs( py_check ) > fDiff){
+	  // py failed, check pz
+	  if( fabs( pz_check ) > fDiff){
+	    // pz failed, all 3 failed
+	    mom_pxpypz++; // All failed
+	  }
+	  else mom_pxpy++; // px and py failed
+	}
+	else if( fabs( py_check ) < fDiff){
+	  // py passed, check pz
+	  if( fabs( pz_check ) > fDiff){
+	    mom_pxpz++; // px and pz failed
+	  }
+	  else mom_px++; // px failed, py and pz passd
+	}
+      }
+     
+      else if ( abs( px_check ) < fDiff){
+	// px passed, check py
+	if( fabs( py_check ) > fDiff){
+	  // py failed, check pz
+	  if( fabs( pz_check ) > fDiff){
+	    mom_pypz++; // py and pz failed
+	  }
+	  else mom_py++; // Just py failed
+	}
+	else mom_pz++; // Only option left (since we know one of them failed) is that pz failed
+      }
+      
+      if( fabs( energy_check ) > fDiff){
 	ene_mom++; // Both failed
       }
-      else{
+      else if( abs( energy_check ) < fDiff){
 	mom++; // Only momentum failed
       }
-    }
-    else{ // If check did not pass, but it wasn't momentum, must have been energy
-      ene++; // Energy failed, add to counter
-    }
+    }    
+    else ene++; // If check did not pass, but it wasn't momentum, must have been energy, add to counter
   }
-
-  return err;
+  
+    return err;
 }
-// SJDK - 01/06/23 - This should actually be even more flexible, add an fDiff_mom too - Set momentum and energy differences separately
+
 int pim::CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, TLorentzVector P_pim, TLorentzVector P_pro, double fDiff_E) {
 
   double energy_check = (P_t.E() + P_E0.E()) - (P_e.E()+P_pim.E()+P_pro.E());
@@ -1016,19 +1052,50 @@ int pim::CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, 
   }
 
   else{
-    if((fabs( px_check ) < fDiff_E  &&  fabs( py_check ) < fDiff_E && fabs( pz_check ) < fDiff_E) == false ){ // If momentum check fails, check if energy also failed, add counters accordingly
-      if ( (fabs( energy_check ) < fDiff_E) == false ){
+    if( (fabs( px_check ) > fDiff_E) || (fabs( py_check ) > fDiff_E) || (fabs( pz_check ) > fDiff_E) ){ // If momentum check fails, check if energy also failed, add counters accordingly  	
+
+      // Check components
+      if( fabs( px_check ) > fDiff_E){
+	// px failed, check py
+	if( fabs( py_check ) > fDiff_E){
+	  // py failed, check pz
+	  if( fabs( pz_check ) > fDiff_E){
+	    // pz failed, all 3 failed
+	    mom_pxpypz++; // All failed
+	  }
+	  else mom_pxpy++; // px and py failed
+	}
+	else if( fabs( py_check ) < fDiff_E){
+	  // py passed, check pz
+	  if( fabs( pz_check ) > fDiff_E){
+	    mom_pxpz++; // px and pz failed
+	  }
+	  else mom_px++; // px failed, py and pz passd
+	}
+      }
+     
+      else if ( abs( px_check ) < fDiff_E){
+	// px passed, check py
+	if( fabs( py_check ) > fDiff_E){
+	  // py failed, check pz
+	  if( fabs( pz_check ) > fDiff_E){
+	    mom_pypz++; // py and pz failed
+	  }
+	  else mom_py++; // Just py failed
+	}
+	else mom_pz++; // Only option left (since we know one of them failed) is that pz failed
+      }
+      
+      if( fabs( energy_check ) > fDiff_E){
 	ene_mom++; // Both failed
       }
-      else{
+      else if( abs( energy_check ) < fDiff_E){
 	mom++; // Only momentum failed
       }
-    }
-    else{ // If check did not pass, but it wasn't momentum, must have been energy
-      ene++; // Energy failed, add to counter
-    }
+    }    
+    else ene++; // If check did not pass, but it wasn't momentum, must have been energy, add to counter
   }
-
+  
   return err;
 }
 

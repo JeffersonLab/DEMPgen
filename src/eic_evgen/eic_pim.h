@@ -115,7 +115,6 @@ extern unsigned long long int fConserve;
 extern unsigned long long int fNWeightUnphys;
 extern unsigned long long int fNWeightReject;
 
-extern unsigned long long int fLundRecorded;
 extern unsigned long long int fNFile;
 
 extern double fK;
@@ -840,6 +839,14 @@ extern double conserve;      // 16/06/21 AU -> New Variables for conservation la
 extern double ene; // The number that FAIL due to failing energy conservation check ONLY
 extern double mom; // The number that FAIL due to failing the momentum conservation check ONLY
 extern double ene_mom; // The number that FAIL BOTH energy and momentum check
+
+extern double mom_px; // Number that fail due to px only
+extern double mom_py; // Number that fail due to py only
+extern double mom_pz; // Number that fail due to pz only
+extern double mom_pxpy; // Number that fail due to px and py
+extern double mom_pxpz; // Number that fail due to px and pz
+extern double mom_pypz; // Number that fail due to py and pz
+extern double mom_pxpypz; // Number that fail due to px, py and pz
 
 // 27/01/22 - Love Preet - Adding in vector of cross section parameters
 extern vector<vector<vector<vector<double>>>> SigPar;

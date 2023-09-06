@@ -233,8 +233,8 @@ void eic(Json::Value obj) {
 	  }
 	  else{
 	    cout << "Output type not recognised!" << endl;
-	    cout << "Setting output type to Pythia6 by default!" << endl;
-	    gOutputType = "Pythia6";
+	    cout << "Setting output type to HEPMC3 by default!" << endl;
+	    gOutputType = "HEPMC3";
 	  }
 	}
 	else{
