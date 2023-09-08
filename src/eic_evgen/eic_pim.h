@@ -116,6 +116,10 @@ extern unsigned long long int fConserve;
 extern unsigned long long int fNWeightUnphys;
 extern unsigned long long int fNWeightReject;
 
+extern unsigned long long int fSolveEvents_0Sol;
+extern unsigned long long int fSolveEvents_1Sol;
+extern unsigned long long int fSolveEvents_2Sol;
+
 extern unsigned long long int fNFile;
 
 extern double fK;

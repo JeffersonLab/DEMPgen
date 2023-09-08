@@ -39,14 +39,14 @@ int fWLessShell, fWLess1P9, fSDiff;
 
 //long int fNEvents, fNRecorded, fNGenerated, fWSqNeg, fNSigmaNeg, fNWeightUnphys, fNWeightReject, fLundRecorded, fNFile; 
 
-unsigned long long int fNEvents, fNRecorded, fNGenerated, fWSqNeg, fNSigmaNeg, fNaN, fConserve, fNWeightUnphys, fNWeightReject, fLundRecorded, fNFile;
+unsigned long long int fNEvents, fNRecorded, fNGenerated, fWSqNeg, fNSigmaNeg, fNaN, fConserve, fNWeightUnphys, fNWeightReject, fLundRecorded, fNFile, fSolveEvents_0Sol, fSolveEvents_1Sol, fSolveEvents_2Sol;
 
 // SJDK 03/04/23 - Added in Qsq Min/Max, W Min/Max and t max (06/09/23)
 double fK, fm, fElectron_Kin_Col_GeV, fElectron_Kin_Col, fRand, fLumi, fuBcm2, fPI, fDEG2RAD, fRAD2DEG, fEBeam, fPBeam, fScatElec_Theta_I, fScatElec_Theta_F, fPion_Theta_I, fPion_Theta_F, fEjectileX_Theta_I, fEjectileX_Theta_F, fScatElec_E_Hi, fScatElec_E_Lo, fPSF, fQsq_Min, fQsq_Max, fW_Min, fW_Max, fT_Max; 
 
 double fOmega_Theta_I, fOmega_Theta_F, fOmega_Theta_Col, fOmega_Phi_Col;
 
-double fDiff_E, conserve, ene, mom, ene_mom, mom_px, mom_py, mom_pz, mom_pxpy, mom_pxpz, mom_pypz, mom_pxpypz;     // 18/06/21 AU -> New variables to count envents passing/not passing conservation laws
+double fDiff_E, conserve, ene, mom, ene_mom, mom_px, mom_py, mom_pz, mom_pxpy, mom_pxpz, mom_pypz, mom_pxpypz; // 18/06/21 AU -> New variables to count envents passing/not passing conservation laws
 
 double fMandSConserve, fTop_Pion_Mom, fBot_Pion_Mom, fPion_Mom_Same, fEnergyConserve, fXMomConserve, fYMomConserve, fZMomConserve, fXMomConserve_RF, fYMomConserve_RF, fZMomConserve_RF, fEnergyConserve_RF; 
 
@@ -240,7 +240,6 @@ void pim::Initilize() {
     // 18/01/23 - The luminosity below is some default assumtpion, more up to date values are set in DEMP prod and depend upon beam energy combinations if they are specified
     // See slide 11 in https://indico.cern.ch/event/1072579/contributions/4796856/attachments/2456676/4210776/CAP-EIC-June-7-2022-Seryi-r2.pdf for more info
     // fLumi                                     = 0.374e33; // Jlab design
-    //fLumi                                       = 1e34; // https://eic.jlab.org/wiki/index.php/EIC_luminosity - OUTDATED
     fLumi                                       = 1e33; // 18/01/23, this seems a better default based upon more up to date info, see link above
     fuBcm2                                      = 1.0e-30;
     fPI                                         = 3.1415926;
@@ -279,14 +278,12 @@ void pim::Initilize() {
     fRecoilProton_Mass_GeV                      = fRecoilProton_Mass/1000.0;
     fPion_Mass                                  = 139.57039 ;
     fPion_Mass_GeV                              = fPion_Mass/1000.0;
-
     fKaon_Mass                                  = 493.677;
     fKaon_Mass_GeV                              = fKaon_Mass/1000.0;
     fLambda_Mass                                = 1115.683;
     fLambda_Mass_GeV                            = fLambda_Mass/1000.0;
     fSigma_Mass                                 = 1192.642;
     fSigma_Mass_GeV                             = fSigma_Mass/1000.0;
-
     fOmega_Mass                                 = 782.66;
     fOmega_Mass_GeV                             = fOmega_Mass/1000.0;
 
@@ -333,6 +330,9 @@ void pim::Initilize() {
     fConserve                                   = 0;
     fNWeightUnphys                              = 0;
     fNWeightReject                              = 0;
+    fSolveEvents_0Sol                           = 0;
+    fSolveEvents_1Sol                           = 0;
+    fSolveEvents_2Sol                           = 0;
     fSDiff                                      = 0;
     fScatElecEnergyLess                         = 0;
     fScatElecThetaLess                          = 0;

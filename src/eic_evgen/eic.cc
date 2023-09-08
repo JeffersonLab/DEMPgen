@@ -233,17 +233,17 @@ void eic(Json::Value obj) {
 	    cout << "Using LUND output format" << endl;
 	  }
 	  else if (gOutputType == "HEPMC3"){
-	    cout << "Using HEPMC3 output format for EPIC" << endl;
+	    cout << "Using HEPMC3 output format for ePIC" << endl;
 	  }
 	  else{
 	    cout << "Output type not recognised!" << endl;
-	    cout << "Setting output type to HEPMC3 by default!" << endl;
+	    cout << "Setting output type to HEPMC3 (ePIC) by default!" << endl;
 	    gOutputType = "HEPMC3";
 	  }
 	}
 	else{
 	  cout << "Output type not specified in .json file!" << endl;
-	  cout << "Setting output type to HEPMC3 by default!" << endl;
+	  cout << "Setting output type to HEPMC3 (ePIC) by default!" << endl;
 	  gOutputType = "HEPMC3";
 	}
 	///*--------------------------------------------------*/
@@ -407,23 +407,21 @@ vector<vector<vector<vector<double>>>> ReadCrossSectionPar(TString particle, TSt
   string sigL_ParamFile, sigT_ParamFile;
  
   if (particle == "Pi+" && hadron == "Neutron"){
-    //cout << "Add Pi+/Neutron case here" << endl;
+    // When pion model parameterised in some way, add Pi+/Neutron case here - 
   }
   else if (particle == "Pi-" && hadron == "Proton"){
-    //cout << "Add Pi-/Proton case here" << endl;
+    // When pion model parameterised in some way, add Pi-/Proton case here - 
   }
   else if (particle == "K+" && hadron == "Lambda"){
-    //cout << "Add K+/Lambda case here" << endl;
     sigL_ParamFile = "../src/eic_evgen/CrossSection_Params/KPlusLambda_Param_sigL";
     sigT_ParamFile = "../src/eic_evgen/CrossSection_Params/KPlusLambda_Param_sigT"; // Shouldn't really have a relative path, should look at setting a DEMPGen variable and doing this in a better way later
   }
   else if (particle == "K+" && hadron == "Sigma0"){
-    //cout << "Add K+/Sigma case here" << endl;
     sigL_ParamFile = "../src/eic_evgen/CrossSection_Params/KPlusSigma_Param_sigL";
     sigT_ParamFile = "../src/eic_evgen/CrossSection_Params/KPlusSigma_Param_sigT";
   }
   else if (particle == "Pi0"){
-    //cout << "Add Pi0 case here" << endl;
+    // When pi0 model paramterised, add it here
   }
   else{
     cerr << " !!!!! " << endl << "Warning!" << endl << "Combination of specified ejectile and recoil particles not found!" << "Cross section parameters cannot be read, check inputs!" << endl << "Warning!" << endl << " !!!!! " << endl;

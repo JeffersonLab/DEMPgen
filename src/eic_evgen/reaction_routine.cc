@@ -78,17 +78,10 @@ Reaction::~Reaction() {
 ///
 
 void Reaction::process_reaction() {
-//  if (rEjectile == "Pi0") {
-//    //		Pi0_Production* r1 = new Pi0_Production("Eta");
-//    Pi0_Production* rr1 = new Pi0_Production(rEjectile);
-//    rr1->process_reaction();
-//    delete rr1;
-//  }
-//  else{
+
   // SJDK - 19/12/22 - New generic DEMP reaction class, the intention is that this should be able to handle any case
     DEMP_Reaction* rr1 = new DEMP_Reaction(rEjectile, rRecoil);
     rr1->process_reaction();
     delete rr1;
-//  }
 
 }

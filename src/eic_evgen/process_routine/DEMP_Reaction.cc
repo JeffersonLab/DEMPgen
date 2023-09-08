@@ -54,7 +54,7 @@ void DEMP_Reaction::process_reaction() {
     rNEvent_itt = i;
     fNGenerated ++;
  
-    Progress_Report();  // This is happens at each 10% of the total event is processed
+    Progress_Report();  // This happens at each 10% of the total event is processed
     Processing_Event();
   }
  
@@ -106,12 +106,14 @@ void DEMP_Reaction::Init() {
   fElectron_Kin_Col = fElectron_Kin_Col_GeV * 1000.0;
 
   // cout << rNEvents << "    " << fNEvents << endl;
-	
+
+  // 08/09/23 - SJDK - Fermi momentum commented out for now, this is not fully implemented yet
+  // In future, this will be enabled/disabled automatically depending upon the specified hadron beam
   //rFermiMomentum = pd->fermiMomentum();
 
   // ----------------------------------------------------
   // Proton in collider (lab) frame
-
+  // 08/09/23 - SJDK - The naming needs to be adjusted to be the incoming hadron beam, not the proton. Make this generic.
   r_lproton = GetProtonVector_lab();
   r_lprotong = GetProtonVector_lab() * fm;
 
@@ -134,7 +136,7 @@ void DEMP_Reaction::Init() {
   r_lelectrong = r_lelectron * fm;
 
   ///*--------------------------------------------------*/
-  /// Getting the particle mass from the data base
+  /// Getting the ejectile (produced meson) particle mass from the data base
  
   produced_X = ParticleEnum(rEjectile);
   f_Ejectile_Mass = ParticleMass(produced_X)*1000; //MeV
@@ -208,46 +210,42 @@ void DEMP_Reaction::Init() {
     cout << "!!! Notice !!! The beam energy combination simulated does not match an expected case, a default luminosity value of - " << fLumi << " cm^2s^-1 has been assumed. !!! Notice !!!" << endl;
   }
 
-  // /*--------------------------------------------------*/ 
-  // // SJDK 03/04/22 -  New set of initialisation stuff for the solve function from Ishan and Bill
+  if(UseSolve == true){
+    /*--------------------------------------------------*/ 
+    // SJDK 03/04/22 -  New set of initialisation stuff for the solve function from Ishan and Bill
+    
+    CoinToss = new TRandom3();
 
-  // CoinToss = new TRandom3();
+    F = new TF1("F",
+		"[6]-sqrt([7]**2+x**2)-sqrt([8]**2+([3]-[0]*x)**2+([4]-[1]*x)**2+([5]-[2]*x)**2)",
+		0, r_lproton.E());
 
-  // //  F = new TF1("F",
-  // //              "[6]-sqrt([7]**2+x**2)-sqrt([8]**2+([3]-[0]*x)**2+([4]-[1]*x)**2+([5]-[2]*x)**2)",
-  // //              0, 12000);
+    char AngleGenName[100] = "AngleGen";
+    double dummy[2] = {0,1};
 
-  // F = new TF1("F",
-  //             "[6]-sqrt([7]**2+x**2)-sqrt([8]**2+([3]-[0]*x)**2+([4]-[1]*x)**2+([5]-[2]*x)**2)",
-  //             0, r_lproton.E());
+    f_Ejectile_Theta_I = fEjectileX_Theta_I;
+    f_Ejectile_Theta_F = fEjectileX_Theta_F;
 
-  // char AngleGenName[100] = "AngleGen";
-  // double dummy[2] = {0,1};
-  // // Changed the theta range here to match the one actually provided in the input .json file, these are already converted to radians in eic.cc (see ~ line 293)
-  // //  double ThetaRange[2] = {fX_Theta_I, fX_Theta_F};
+    double ThetaRange[2] = {f_Ejectile_Theta_I, f_Ejectile_Theta_F};
+    double PhiRange[2] = {0, 360*TMath::DegToRad()};
 
-  // f_Ejectile_Theta_I = fEjectileX_Theta_I;
-  // f_Ejectile_Theta_F = fEjectileX_Theta_F;
+    AngleGen = new CustomRand(AngleGenName, dummy,
+			      ThetaRange, PhiRange);
 
-  // double ThetaRange[2] = {f_Ejectile_Theta_I, f_Ejectile_Theta_F};
-  // double PhiRange[2] = {0, 360*TMath::DegToRad()};
+    UnitVect = new TVector3(0,0,1);
 
-  // AngleGen = new CustomRand(AngleGenName, dummy,
-  //                           ThetaRange, PhiRange);
+    //  ///*--------------------------------------------------*/ 
+    //  // Produced hadron and recoilded hadron from the solve function 
 
-  // UnitVect = new TVector3(0,0,1);
+    VertBeamElec = new TLorentzVector();
+    VertScatElec = new TLorentzVector();
 
-  // ///*--------------------------------------------------*/ 
-  // // Produced hadron and recoilded hadron from the solve function 
-
-  // VertBeamElec = new TLorentzVector();
-  // VertScatElec = new TLorentzVector();
-
-  // Initial      = new TLorentzVector();
-  // Target       = new TLorentzVector();
-  // Photon       = new TLorentzVector();
-  // Interaction  = new TLorentzVector();
-  // Final        = new TLorentzVector();
+    Initial      = new TLorentzVector();
+    Target       = new TLorentzVector();
+    Photon       = new TLorentzVector();
+    Interaction  = new TLorentzVector();
+    Final        = new TLorentzVector();
+  }
   
 }
 
@@ -276,10 +274,9 @@ void DEMP_Reaction::Processing_Event() {
   fScatElec_Energy_Col = fRandom->Uniform( fScatElec_E_Lo * fElectron_Energy_Col , fScatElec_E_Hi * fElectron_Energy_Col );
 
   // ----------------------------------------------------
-  // Produced Particle X in Collider frame
+  // Produced ejectile in Collider frame
   // ----------------------------------------------------  
 
-  /// The generic produced particle in the exclusive reaction is labelled as X 
   f_Ejectile_Theta_Col      = acos( fRandom->Uniform( cos(f_Ejectile_Theta_I), cos(f_Ejectile_Theta_F ) ) ); 
   f_Ejectile_Phi_Col        = fRandom->Uniform( 0 , 2.0 * fPi );
     	
@@ -388,9 +385,13 @@ void DEMP_Reaction::Processing_Event() {
 			       pow( f_Recoil_Mass , 2) ) );
   }
    else if (UseSolve == true){
-     r_l_Ejectile.SetPxPyPzE(0,0,0,0);
-     l_Recoil_g.SetPxPyPzE(0,0,0,0);
+     if(!Solve()){
+       return;
+     }  
+     r_l_Ejectile = r_l_Ejectile_solved;
+     l_Recoil = r_l_Recoil_solved;
    }
+  
   ///--------------------------------------------------
   
   r_l_Ejectile_g = r_l_Ejectile * fm;
@@ -409,16 +410,18 @@ void DEMP_Reaction::Processing_Event() {
     return;
   }
 
-///*--------------------------------------------------*/ 
-//-> 10/05/23 - Love added a slimmed down, simpler to read version of the CheckLaws fn
-// 
-// To check the conservation of the energy and momentum, there two methods avalaible:
-// Method 1: Give the four-vectors of the initial and final states partciles, 
-//           tolerance factor will be defaulted 1e-6 MeV
-// Method 2: Give the four-vectors of the initial and final states partciles, 
-//           and the prefered tolerance factor.
-//
-
+  ///*--------------------------------------------------*/ 
+  //-> 10/05/23 - Love added a slimmed down, simpler to read version of the CheckLaws fn
+  // 
+  // To check the conservation of the energy and momentum, there two methods avalaible:
+  // Method 1: Give the four-vectors of the initial and final states partciles, 
+  //           tolerance factor will be defaulted 1e-6 MeV
+  //           CheckLaws(e_beam, h_beam, scatt_e, ejectile, recoil) <- input 4 vectors
+  // Method 2: Give the four-vectors of the initial and final states partciles, 
+  //           and the prefered tolerance factor.
+  //           CheckLaws(e_beam, h_beam, scatt_e, ejectile, recoil, tolerance) <- input 4 vectors and tolerance value in GeV
+  // Both functions return 1 if conservations laws are satisified
+  
    if( pd->CheckLaws(r_lelectron, r_lproton, r_lscatelec, r_l_Ejectile, l_Recoil) !=1 ){
      fConserve++;
      return;
@@ -787,19 +790,35 @@ void DEMP_Reaction::Detail_Output() {
   DEMPDetails << "Seed used for the Random Number Generator                    " << setw(20) << fSeed         << endl;
   DEMPDetails << endl;
   DEMPDetails << "Total events tried                                           " << setw(20) << fNGenerated   << endl;
-  DEMPDetails << "Total events cut                                             " << setw(20) << (qsq_ev + w_ev + w_neg_ev + fNaN + fConserve + t_ev + fNSigmaNeg) << endl;
-  DEMPDetails << "Total events recorded                                        " << setw(20) << fNRecorded    << endl;
-  if (fNGenerated != (qsq_ev + w_ev + w_neg_ev + fNaN + fConserve + t_ev + fNSigmaNeg + fNRecorded)){
-    DEMPDetails << "Total events cut + recorded = events tried?                " << setw(20) << "NO! ERROR!" << endl;
+  if(UseSolve == true){
+    DEMPDetails << "Total events cut                                             " << setw(20) << (qsq_ev + w_ev + w_neg_ev + fNaN + fConserve + t_ev + fNSigmaNeg + fSolveEvents_0Sol) << endl;
+    DEMPDetails << "Total events recorded                                        " << setw(20) << fNRecorded    << endl;
+    if (fNGenerated != (qsq_ev + w_ev + w_neg_ev + fNaN + fConserve + t_ev + fNSigmaNeg + fNRecorded + fSolveEvents_0Sol)){
+      DEMPDetails << "Total events cut + recorded = events tried?                " << setw(20) << "NO! ERROR!" << endl;
+    }
+    else{
+      DEMPDetails << "Total events cut + recorded = events tried?                " << setw(22) << "Yes! :)" << endl;
+    }
+
   }
   else{
-    DEMPDetails << "Total events cut + recorded = events tried?                " << setw(22) << "Yes! :)" << endl;
+    DEMPDetails << "Total events cut                                             " << setw(20) << (qsq_ev + w_ev + w_neg_ev + fNaN + fConserve + t_ev + fNSigmaNeg) << endl;
+    DEMPDetails << "Total events recorded                                        " << setw(20) << fNRecorded    << endl;
+    if (fNGenerated != (qsq_ev + w_ev + w_neg_ev + fNaN + fConserve + t_ev + fNSigmaNeg + fNRecorded)){
+      DEMPDetails << "Total events cut + recorded = events tried?                " << setw(20) << "NO! ERROR!" << endl;
+    }
+    else{
+      DEMPDetails << "Total events cut + recorded = events tried?                " << setw(22) << "Yes! :)" << endl;
+    }
   }
   
   DEMPDetails << endl << "Cut details -" << endl;
   DEMPDetails << "Events cut due to qsq < " << fQsq_Min << " or qsq > "<< fQsq_Max << "                        " << setw(20) << qsq_ev << endl;
   DEMPDetails << "Events cut due to negative Wsq value                         " << setw(20) << w_neg_ev      << endl;  
   DEMPDetails << "Events cut due to W < " << fW_Min << " or W > " << fW_Max << "                          " << setw(20) << w_ev << endl;
+  if(UseSolve == true){
+    DEMPDetails << "Events cut due to solve function finding 0 solutions         " << setw(20) << fSolveEvents_0Sol << endl;
+  }
   DEMPDetails << "Events cut due to ejectile (X) energy NaN                    " << setw(20) << fNaN          << endl;
   DEMPDetails << "Events cut due to conservation law check failure             " << setw(20) << fConserve     << endl;
   DEMPDetails << "Events cut due to -t > " << fT_Max << "GeV                      " << setw(30) << t_ev          << endl;
@@ -818,6 +837,12 @@ void DEMP_Reaction::Detail_Output() {
   DEMPDetails << "Events cut due to py and pz conservation law checks          " << setw(20) << mom_pypz   << endl;
   DEMPDetails << "Events cut due to px, py and pz conservation law checks      " << setw(20) << mom_pxpypz   << endl;
 
+  if(UseSolve == true){
+    DEMPDetails << endl << "Solve function, addtional info -" << endl;
+    DEMPDetails << "Number of events with 0 Solution                             " << setw(20) << fSolveEvents_0Sol << endl;
+    DEMPDetails << "Number of events with 1 Solution                             " << setw(20) << fSolveEvents_1Sol << endl;
+    DEMPDetails << "Number of events with 2 Solution                             " << setw(20) << fSolveEvents_2Sol << endl;
+  }
   
 }
 
@@ -1041,7 +1066,7 @@ void DEMP_Reaction::DEMPReact_HEPMC3_Out_Init() {
 
 void DEMP_Reaction::DEMPReact_HEPMC3_Output() {
   
-  // HEPMC3 output for Athena/EPIC simulations
+  // HEPMC3 output for Athena/ePIC simulations
 
   // First line - E - Event# - #Vertices - #Particles
   DEMPOut << std::scientific << std::setprecision(15) << "E" << " "  << print_itt <<  " " << "1" << " " << 5 << endl;
@@ -1062,5 +1087,169 @@ void DEMP_Reaction::DEMPReact_HEPMC3_Output() {
   DEMPOut << "P" << " " << "4" << " " << "-1" << " " << PDGtype(produced_X) << " " << r_l_Ejectile_g.X() << " "  << r_l_Ejectile_g.Y() << " "  << r_l_Ejectile_g.Z() << " " << r_l_Ejectile_g.E() << " " << r_l_Ejectile_g.M() << " " << "1" << endl;
   // Recoil hadron
   DEMPOut << "P" << " " << "5" << " " << "-1" << " " << PDGtype(recoil_hadron) << " " << l_Recoil_g.X() << " "  << l_Recoil_g.Y() << " "  << l_Recoil_g.Z() << " " << l_Recoil_g.E() << " " <<  l_Recoil_g.M() << " " << "1" << endl;
+
+}
+
+/*--------------------------------------------------*/ 
+
+bool DEMP_Reaction::SolnCheck()
+{
+  //
+  //  // Double Checking for solution viability
+  //  if (TMath::Abs(f_Scat_hadron_Mass-r_l_scat_hadron_solved->M())>1){
+  //    //cerr << "Mass Missmatch" << endl;
+  //    //cerr << TMath::Abs(proton_mass_mev-Proton->M()) << endl;
+  //    return false;
+  //  }
+  //  if (TMath::Abs(W_in()-W_out())>1){
+  //    //cerr << "W Missmatch" << endl;
+  //    //cerr << TMath::Abs(W_in()-W_out()) << endl;
+  //    return false;
+  //  }
+  //  *Final = *r_l_scat_hadron_solved + *r_lX_solved;
+  //
+  //  if (TMath::Abs(Initial->Px()-Final->Px())>1){
+  //    //cerr << "Px Missmatch" << endl;
+  //    //cerr << TMath::Abs(Initial->Px()-Final->Px()) << endl;
+  //    return false;
+  //  }
+  //
+  //  if (TMath::Abs(Initial->Py()-Final->Py())>1){
+  //    //cerr << "Py Missmatch" << endl;
+  //    //cerr << TMath::Abs(Initial->Py()-Final->Py()) << endl;
+  //    return false;
+  //  }
+  //
+  //  if (TMath::Abs(Initial->Pz()-Final->Pz())>1){
+  //    //cerr << "Pz Missmatch" << endl;
+  //    //cerr << TMath::Abs(Initial->Pz()-Final->Pz()) << endl;
+  //    return false;
+  //  }
+  //
+  //  if (TMath::Abs(Initial->E()-Final->E())>1){
+  //    return false;
+  //  }
+  return true;
+}
+
+/*--------------------------------------------------*/ 
+double DEMP_Reaction::W_in()
+{
+  return 0;
+}
+
+/*--------------------------------------------------*/ 
+double DEMP_Reaction::W_out()
+{
+  return 0;
+}
+
+/*--------------------------------------------------*/ 
+
+int DEMP_Reaction::Solve()
+{
+
+
+  VertBeamElec->SetPxPyPzE(r_lelectron.Px(), r_lelectron.Py(), r_lelectron.Pz(), r_lelectron.E());
+  VertScatElec->SetPxPyPzE(r_lscatelec.Px(), r_lscatelec.Py(), r_lscatelec.Pz(), r_lscatelec.E());
+  Target->SetPxPyPzE(r_lproton.Px(), r_lproton.Py(), r_lproton.Pz(), r_lproton.E());
+  *Photon = *VertBeamElec - *VertScatElec;
+  *Interaction = *Photon;
+
+  *Initial = *Interaction+*Target;
+
+  theta =  f_Ejectile_Theta_Col;
+  phi   =  f_Ejectile_Phi_Col;  
+
+  return this->Solve(theta, phi);
+}
+
+
+int DEMP_Reaction::Solve(double theta, double phi)
+{
+
+  W_in_val = W_in();
+
+  if (W_in_val<0){
+    return 0;
+  }
+
+  UnitVect->SetTheta(theta);
+  UnitVect->SetPhi(phi);
+  UnitVect->SetMag(1);
+
+  double* pars = new double[9];
+
+  pars[0] = UnitVect->X();
+  pars[1] = UnitVect->Y();
+  pars[2] = UnitVect->Z();
+  pars[3] = Initial->Px();
+  pars[4] = Initial->Py();
+  pars[5] = Initial->Pz();
+  pars[6] = Initial->E();
+  pars[7] = f_Ejectile_Mass;
+  pars[8] = f_Recoil_Mass;
+
+  F->SetParameters(pars);
+
+
+  ///*--------------------------------------------------*/ 
+  // Looking for the 1st Solution:
+  //    If a solution found, then this will be the fist solution. Then we proceed to look for the 2nd solution. 
+  //    If no soluion found, then exit solve function
+
+  P = F->GetX(0, 0, pars[6], 0.0001, 10000);
+
+  if (TMath::Abs(F->Eval(P)) < 1){
+    fSolveEvents_1Sol++;
+  } else {
+    fSolveEvents_0Sol++; 
+    return 0;
+  }
+
+  TLorentzVector * r_l_Ejectile_solved_1_temp = new TLorentzVector();
+  TLorentzVector * r_l_Ejectile_solved_2_temp = new TLorentzVector();
+
+  Float_t r_l_Ejectile_E = sqrt( pow(P*pars[0],2) + pow(P*pars[1],2) + pow(P*pars[2],2) + pow(f_Ejectile_Mass,2) );
+  r_l_Ejectile_solved_1_temp->SetPxPyPzE(P*pars[0], P*pars[1],  P*pars[2], r_l_Ejectile_E);
+
+  ///*--------------------------------------------------*/ 
+  // Looking for the 2nd Solution 
+
+  P2 = F->GetX(0, P+100, pars[6], 0.0001, 10000);
+  Float_t r_l_Ejectile_E_2 = sqrt( pow(P2 * pars[0],2) + pow(P2 * pars[1],2) + pow(P2 * pars[2],2) + pow(f_Ejectile_Mass,2) );
+  r_l_Ejectile_solved_2_temp->SetPxPyPzE(P2 * pars[0], P2 * pars[1],  P2 * pars[2], r_l_Ejectile_E_2);
+
+  ///*--------------------------------------------------*/ 
+  // If a valid 2nd solution is found, then we are certian that there are two solutions.
+  //   - We then increament the counter for 2nd solution scenario
+  //   - We then decreament the counter for the 1st solution scenario 
+
+  if (TMath::Abs(F->Eval(P2)) < 1){
+    fSolveEvents_2Sol++;
+    fSolveEvents_1Sol--;
+    if ( Int_t(CoinToss->Uniform(0,100)) < 50) {
+      r_l_Ejectile_solved.SetPxPyPzE(r_l_Ejectile_solved_1_temp->X(), r_l_Ejectile_solved_1_temp->Y(), r_l_Ejectile_solved_1_temp->Z(), r_l_Ejectile_solved_1_temp->E());
+    } else {
+      r_l_Ejectile_solved.SetPxPyPzE(r_l_Ejectile_solved_2_temp->X(), r_l_Ejectile_solved_2_temp->Y(), r_l_Ejectile_solved_2_temp->Z(), r_l_Ejectile_solved_2_temp->E());
+    }
+  }
+  else {
+    r_l_Ejectile_solved.SetPxPyPzE(r_l_Ejectile_solved_1_temp->X(), r_l_Ejectile_solved_1_temp->Y(), r_l_Ejectile_solved_1_temp->Z(), r_l_Ejectile_solved_1_temp->E());
+  }
+
+  ///*--------------------------------------------------*/ 
+  /// Solve for the recoil information with the "solved" Ejectile informaiton
+  TLorentzVector * r_l_hadron_temp= new TLorentzVector();
+  *r_l_hadron_temp = *Initial- r_l_Ejectile_solved;
+  r_l_Recoil_solved.SetPxPyPzE(r_l_hadron_temp->Px(), r_l_hadron_temp->Py(), r_l_hadron_temp->Pz(), r_l_hadron_temp->E());
+
+  delete r_l_Ejectile_solved_1_temp;
+  delete r_l_Ejectile_solved_2_temp;
+
+  delete r_l_hadron_temp;
+  delete[] pars;
+ 
+  return 1;
 
 }
