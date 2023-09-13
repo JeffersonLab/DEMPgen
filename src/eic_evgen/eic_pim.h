@@ -134,6 +134,8 @@ extern double fDEG2RAD;
 extern double fRAD2DEG;
 extern double fEBeam;
 extern double fPBeam;
+// 13/09/23 - SJDK - New generic HBeam value (rather than proton beam)
+extern double fHBeam;
 extern double fScatElec_Theta_I;
 extern double fScatElec_Theta_F;
 extern double fPion_Theta_I; // SJDK 19/12/22 - These should be removed in future, specific to pion reaction cases. Should be generic MesonX

@@ -178,7 +178,7 @@ void DEMP_Reaction::Init() {
   f_Ejectile_Theta_F = fEjectileX_Theta_F;
 
   cout << "Produced particle in exclusive production: " << rEjectile << ";  with mass: " << f_Ejectile_Mass << " MeV "<< endl;
-  cout << fEBeam << " GeV electrons on " << fPBeam << " GeV ions" << endl;
+  cout << fEBeam << " GeV electrons on " << fHBeam << " GeV ions" << endl;
   if(UseSolve == true){
     cout << rEjectile << " and " << rEjectile_scat_hadron << " 4-vectors calculated using Solve function" << endl;
   }
@@ -188,22 +188,22 @@ void DEMP_Reaction::Init() {
   // Set luminosity value based upon beam energy combination, note that if no case matches, a default of 1e33 is assumed. Cases are a set of nominal planned beam energy combinations for the EIC (and EICC)
   // See slide 11 in https://indico.cern.ch/event/1072579/contributions/4796856/attachments/2456676/4210776/CAP-EIC-June-7-2022-Seryi-r2.pdf
   // If available in the future, this could be replaced by some fixed function
-  if ((fEBeam == 5.0 ) && (fPBeam == 41.0) ){
+  if ((fEBeam == 5.0 ) && (fHBeam == 41.0) ){
     fLumi = 0.44e33;
   }
-  else if ((fEBeam == 5.0 ) && (fPBeam == 100.0) ){
+  else if ((fEBeam == 5.0 ) && (fHBeam == 100.0) ){
     fLumi = 3.68e33;
   }
-  else if ((fEBeam == 10.0 ) && (fPBeam == 100.0) ){
+  else if ((fEBeam == 10.0 ) && (fHBeam == 100.0) ){
     fLumi = 4.48e33;
   }
-  else if ((fEBeam == 18.0 ) && (fPBeam == 275.0) ){
+  else if ((fEBeam == 18.0 ) && (fHBeam == 275.0) ){
     fLumi = 1.54e33;
   }
-  else if ((fEBeam == 3.5 ) && (fPBeam == 20) ){ // EICC optimal beam energy combination
+  else if ((fEBeam == 3.5 ) && (fHBeam == 20) ){ // EICC optimal beam energy combination
     fLumi = 2e33;
   }
-  else if ((fEBeam == 2.8 ) && (fPBeam == 13) ){ // EICC lowest beam energy combination
+  else if ((fEBeam == 2.8 ) && (fHBeam == 13) ){ // EICC lowest beam energy combination
     fLumi = 0.7e33;
   }
   else{
@@ -666,7 +666,7 @@ TLorentzVector DEMP_Reaction::GetProtonVector_lab() {
   //     fProton_Phi_Col   = fPi; 
   fProton_Phi_Col   = fProton_incidence_phi; 
 
-  fProton_Mom_Col   = fPBeam * 1e3; 
+  fProton_Mom_Col   = fHBeam * 1e3; 
   fVertex_X         = 0.; 
   fVertex_Y         = 0.; 
   fVertex_Z         = 0.; 

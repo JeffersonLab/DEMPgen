@@ -42,7 +42,8 @@ int fWLessShell, fWLess1P9, fSDiff;
 unsigned long long int fNEvents, fNRecorded, fNGenerated, fWSqNeg, fNSigmaNeg, fNaN, fConserve, fNWeightUnphys, fNWeightReject, fLundRecorded, fNFile, fSolveEvents_0Sol, fSolveEvents_1Sol, fSolveEvents_2Sol;
 
 // SJDK 03/04/23 - Added in Qsq Min/Max, W Min/Max and t max (06/09/23)
-double fK, fm, fElectron_Kin_Col_GeV, fElectron_Kin_Col, fRand, fLumi, fuBcm2, fPI, fDEG2RAD, fRAD2DEG, fEBeam, fPBeam, fScatElec_Theta_I, fScatElec_Theta_F, fPion_Theta_I, fPion_Theta_F, fEjectileX_Theta_I, fEjectileX_Theta_F, fScatElec_E_Hi, fScatElec_E_Lo, fPSF, fQsq_Min, fQsq_Max, fW_Min, fW_Max, fT_Max; 
+// 13/09/23 - SJDK - New generic HBeam value (rather than proton beam)
+double fK, fm, fElectron_Kin_Col_GeV, fElectron_Kin_Col, fRand, fLumi, fuBcm2, fPI, fDEG2RAD, fRAD2DEG, fEBeam, fPBeam, fHBeam, fScatElec_Theta_I, fScatElec_Theta_F, fPion_Theta_I, fPion_Theta_F, fEjectileX_Theta_I, fEjectileX_Theta_F, fScatElec_E_Hi, fScatElec_E_Lo, fPSF, fQsq_Min, fQsq_Max, fW_Min, fW_Max, fT_Max; 
 
 double fOmega_Theta_I, fOmega_Theta_F, fOmega_Theta_Col, fOmega_Phi_Col;
 
