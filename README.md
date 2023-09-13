@@ -42,11 +42,11 @@ The file Config.json contains all the configuration options. Use this as a templ
 
 - The EIC module of DEMPgen has two different calculation methods that may be used to calculate the ejectile properties.
 - These are referred to as the "Analytical" and "Solve" methods. Either can be used in a simulation run, just change the config file to switch between them.
-- In your config .json file, select between the two versions using the
-  - "calc_method" argument, this can be set to Analytical or Solve, e.g.
-  		 - "calc_method": "Analytical",
-		 - OR
-		 - "calc_method": "Solve",
+- In your config .json file, select between the two versions using the "calc_method" argument, this can be set to Analytical or Solve, e.g.
+  - "calc_method": "Analytical"
+  - OR
+  - "calc_method": "Solve"
+  - If the method is not entered exactly as above, it will not be recognised and the generator will default to the analytical method.
 
 - If you are using the shell scripts provided to run a lot of simulations, modify Config_EIC.json BEFORE running the shell scripts.
 
