@@ -421,7 +421,7 @@ vector<vector<vector<vector<double>>>> ReadCrossSectionPar(TString particle, TSt
     sigT_ParamFile = "../src/eic_evgen/CrossSection_Params/KPlusSigma_Param_sigT";
   }
   else if (particle == "Pi0"){
-    // When pi0 model paramterised, add it here
+    // When pi0 model parameterised, add it here
   }
   else{
     cerr << " !!!!! " << endl << "Warning!" << endl << "Combination of specified ejectile and recoil particles not found!" << "Cross section parameters cannot be read, check inputs!" << endl << "Warning!" << endl << " !!!!! " << endl;
