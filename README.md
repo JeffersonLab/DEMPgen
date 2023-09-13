@@ -36,7 +36,10 @@ Event generator for Deep Exclusive Meson Production.
 
 ## Configuration
 
-The file Config.json contains all the configuration options. Use this as a template for other configuration files, which may be given as an argument to the event generator.
+The file Config_EIC.json and Config_SoLID.json contain all the configuration options for EIC and SoLID event generation respectively. Use these as a template for other configuration files, which may be given as an argument to the event generator.
+- Note that Config_EIC.json is used in shell scripts (see below) that run large numbers of jobs on batch queueing systems. *Do not* modify this file unless you know what you're doing with it or you really need to edit something.
+  - Copying the template to a new file and editing that is strongly recommended in all cases.
+
 
 ### Ejectile calculation methods
 
