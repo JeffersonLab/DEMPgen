@@ -9,7 +9,7 @@ Event generator for Deep Exclusive Meson Production.
 
 - After downloading the source create a build directory and cd to it. Take note of the location of the source directory (where CMakeLists.txt should be stored) and run the commands:
 
-  - mdkir build.
+  - mdkir build
   - cd build
   - cmake ..
   - make -j8
