@@ -132,8 +132,8 @@ This script copies Config_EIC.json and formats a new file based upon this, DO NO
   - Arg 5 - RandomSeed -> The random seed, self explanatory. Set this however you like, the batch submission job randomly generates a random seed to feed in here.
   - Arg 6 - OutputType -> The format of the output file, select from LUND, Pythia6 (for ECCE/Fun4All) or HEPMC3 (for ePIC), the default is HEPMC3 if your choice is invalid.
   - Arg 7 - InteractionPoint -> The interaction point, choose from ip6 or ip8. The default is ip6 if your choice is invalid.
-  - Arg 8 - Particle -> The produced particle (meson) in the reaction, choose from omega, pi+, pi0 or K+.
-  - Arg 9 - Hadron -> OPTIONAL - This only matters if you select K+ as the particle, in this case, choose from Lambda or Sigma0 here. If your choice is invalid (or you don't specify arg9), the default is Lambda.
+  - Arg 8 - Ejectile -> The produced ejectile (meson) in the reaction, choose from omega, pi+, pi0 or K+.
+  - Arg 9 - RecoilHadron -> OPTIONAL - This only matters if you select K+ as the ejectile, in this case, choose from Lambda or Sigma0 here. If your choice is invalid (or you don't specify arg9), the default is Lambda.
   
 - So as an example if you executed the following -  
   
@@ -152,8 +152,8 @@ The jobs the script creates and submits all execute the Process_EIC.csh script d
   - Arg 4 - HBeamE -> The hadron beam energy, again, set this to whatevr you want. Typically we use 41, 100 or 275 (41 and 275 being the nominal min/max).
   - Arg 5 - OutputType -> The format of the output file, select from LUND, Pythia6 (for ECCE/Fun4All) or HEPMC3 (for ePIC), the default is HEPMC3 if your choice is invalid. 
   - Arg 6 - InteractionPoint -> The interaction point, choose from ip6 or ip8. The default is ip6 if your choice is invalif.
-  - Arg 7 - Particle -> The produced particle (meson) in the reaction, choose from omega, pi+, pi0 or K+.
-  - Arg 8 - Hadron -> OPTIONAL - This only matters if you select K+ as the particle, in this case, choose from Lambda or Sigma0 here. If your choice is invalid (or you don't specify arg9), the default is Lambda.
+  - Arg 7 - Ejectile -> The produced ejectile (meson) in the reaction, choose from omega, pi+, pi0 or K+.
+  - Arg 8 - RecoilHadron -> OPTIONAL - This only matters if you select K+ as the ejectile, in this case, choose from Lambda or Sigma0 here. If your choice is invalid (or you don't specify arg9), the default is Lambda.
 
 - The script automatically generates a random seed itself using the /dev/urandom function.
 

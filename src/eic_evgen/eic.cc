@@ -49,7 +49,7 @@ void eic() {
 
 /*--------------------------------------------------*/
 // 18/01/23 - SJDK- This function is never used since eic() is only called with a json object as the argument. Commented out for now, delete later?
-/* void eic(int event_number, int target_direction, int kinematics_type, TString file_name, int fEIC_seed, TString particle, TString hadron, TString det_location, TString OutputType, double EBeam, double HBeam) {
+/* void eic(int event_number, int target_direction, int kinematics_type, TString file_name, int fEIC_seed, TString Ejectile, TString RecoilHadron, TString det_location, TString OutputType, double EBeam, double HBeam) {
 
    	TString targetname;
 	TString charge;
@@ -65,45 +65,45 @@ void eic() {
 	fNEvents = event_number;
 
 	fSeed = fEIC_seed;
-	cout << EBeam << " elec " << HBeam << " hadrons" << endl; 
+	cout << EBeam << " elec " << HBeam << " RecoilHadrons" << endl; 
 	fEBeam = EBeam;
 	fPBeam = HBeam;
 
 	pim* myPim = new pim(fSeed);
   	myPim->Initilize();
-	// 09/02/22 - SJDK - Special case for the kaon, if hadron not specified, default to Lambda
-	if (particle == "K+"){
-	  if (hadron != "Lambda" && hadron != "Sigma0"){
-	    hadron = "Lambda";
+	// 09/02/22 - SJDK - Special case for the kaon, if RecoilHadron not specified, default to Lambda
+	if (Ejectile == "K+"){
+	  if (RecoilHadron != "Lambda" && RecoilHadron != "Sigma0"){
+	    RecoilHadron = "Lambda";
 	  }
 	  else{
-	    hadron = ExtractParticle(hadron);
+	    RecoilHadron = ExtractParticle(RecoilHadron);
 	  }
-	  Reaction* r1 = new Reaction(particle, hadron);
+	  Reaction* r1 = new Reaction(Ejectile, RecoilHadron);
 	  r1->process_reaction();
 	  delete r1;
 	}
-	else if (particle == "pi+" || particle == "Pion+" ||  particle == "Pi+"){
-	  hadron = "Neutron";
-	  particle = ExtractParticle(particle);
-	  charge = ExtractCharge(particle);
-	  Reaction* r1 = new Reaction(particle, hadron);
+	else if (Ejectile == "pi+" || Ejectile == "Pion+" ||  Ejectile == "Pi+"){
+	  RecoilHadron = "Neutron";
+	  Ejectile = ExtractParticle(particle);
+	  charge = ExtractCharge(Ejectile);
+	  Reaction* r1 = new Reaction(Ejectile, RecoilHadron);
 	  r1->process_reaction();
 	  delete r1;
 	}
-	else if (particle == "pi0" || particle == "Pion0" || particle == "Pi0"){
-	  hadron = "Proton";
-	  particle = ExtractParticle(particle);
-	  charge = ExtractCharge(particle);
-	  //Reaction* r1 = new Reaction(particle);
-	  Reaction* r1 = new Reaction(particle, hadron);
+	else if (Ejectile == "pi0" || Ejectile == "Pion0" || Ejectile == "Pi0"){
+	  RecoilHadron = "Proton";
+	  Ejectile = ExtractParticle(Ejectile);
+	  charge = ExtractCharge(Ejectile);
+	  //Reaction* r1 = new Reaction(Ejectile);
+	  Reaction* r1 = new Reaction(Ejectile, RecoilHadron);
 	  r1->process_reaction();
 	  delete r1;
 	}
 	else{
-	  particle = ExtractParticle(particle);
-	  charge = ExtractCharge(particle);
-	  Reaction* r1 = new Reaction(particle);
+	  Ejectile = ExtractParticle(Ejectile);
+	  charge = ExtractCharge(Ejectile);
+	  Reaction* r1 = new Reaction(Ejectile);
 	  r1->process_reaction();
 	  delete r1;
 	}
@@ -139,54 +139,54 @@ void eic(Json::Value obj) {
 //  	TDatime dsTime;
 //  	cout << "Start Time:   " << dsTime.GetHour() << ":" << dsTime.GetMinute() << endl;
 	// 21/12/22 - SJDK - Should do a check if these are defined or not, should crash if not defined or set defaults, see other quantities below
-	TString particle = obj["particle"].asString();
-	TString hadron = obj["hadron"].asString(); // 09/02/22 - SJDK - Added in hadron type argument for K+
-	// SJDK - 08/02/22 - This is terrible, need to change this, particle should just be K+
-	// Add a new flag which, hadron - where this is specified too, then add conditionals elsewhere based on this
+	TString Ejectile = obj["ejectile"].asString();
+	TString RecoilHadron = obj["recoil_hadron"].asString(); // 09/02/22 - SJDK - Added in RecoilHadron type argument for K+
+	// SJDK - 08/02/22 - This is terrible, need to change this, Ejectile should just be K+
+	// Add a new flag which, RecoilHadron - where this is specified too, then add conditionals elsewhere based on this
 	// New conditional, special case for Kaon	
-	particle = ExtractParticle(particle);
-	charge = ExtractCharge(particle);
-	if(hadron == "Sigma" || hadron == "sigma"){ // SJDK - 31/01/23 - If hadron specified as Sigma, interpret this as Sigma0. Also correct for lower case
-	  hadron = "Sigma0";
+	Ejectile = ExtractParticle(Ejectile);
+	charge = ExtractCharge(Ejectile);
+	if(RecoilHadron == "Sigma" || RecoilHadron == "sigma"){ // SJDK - 31/01/23 - If RecoilHadron specified as Sigma, interpret this as Sigma0. Also correct for lower case
+	  RecoilHadron = "Sigma0";
 	}
-	if (hadron == "lambda"){ // SJDK - 31/01/23 - Make Lambda selection case insensitive
-	  hadron = "Lambda"; 
+	if (RecoilHadron == "lambda"){ // SJDK - 31/01/23 - Make Lambda selection case insensitive
+	  RecoilHadron = "Lambda"; 
 	}
-	if (particle == "K+"){
-	  if (hadron != "Lambda" && hadron != "Sigma0"){
-	    hadron = "Lambda";
+	if (Ejectile == "K+"){
+	  if (RecoilHadron != "Lambda" && RecoilHadron != "Sigma0"){
+	    RecoilHadron = "Lambda";
 	    cout << "! WARNING !" << endl;
-	    cout << "! WARNING !- K+ production specified but hadron not recognised, deaulting to Lambda - ! WARNING!" << endl;
+	    cout << "! WARNING !- K+ production specified but RecoilHadron not recognised, deaulting to Lambda - ! WARNING!" << endl;
 	    cout << "! WARNING !" << endl;
 	  }
 	  else{
-	    hadron = ExtractParticle(hadron);
+	    RecoilHadron = ExtractParticle(RecoilHadron);
 	  }
 	}
-	// SJDK - 19/12/22 - Specify hadron to neutron/proton for pi+/pi0 production, for pi0 production, may want to adjust? 
-	else if (particle == "pi+" || particle == "Pion+" || particle == "Pi+"){
-	  hadron = "Neutron";
+	// SJDK - 19/12/22 - Specify RecoilHadron to neutron/proton for pi+/pi0 production, for pi0 production, may want to adjust? 
+	else if (Ejectile == "pi+" || Ejectile == "Pion+" || Ejectile == "Pi+"){
+	  RecoilHadron = "Neutron";
 	}
-	else if (particle == "pi0" || particle == "Pion0" || particle == "Pi0"){
-	  hadron = "Proton";
+	else if (Ejectile == "pi0" || Ejectile == "Pion0" || Ejectile == "Pi0"){
+	  RecoilHadron = "Proton";
 	}
-	else { // SJDK -09/02/22 - Note that in future this could be changed to get different hadrons in other reactions if desired
-	  hadron = "";
+	else { // SJDK -09/02/22 - Note that in future this could be changed to get different RecoilHadrons in other reactions if desired
+	  RecoilHadron = "";
 	}
 
 	// SJDK 03/04/23 - Change to how Qsq range is set/chosen, could add as an override variable later too
-	// Set min/max Qsq values depending upon particle type
-	if (particle == "pi+" || particle == "Pion+" || particle == "Pi+"){
+	// Set min/max Qsq values depending upon Ejectile type
+	if (Ejectile == "pi+" || Ejectile == "Pion+" || Ejectile == "Pi+"){
 	  fQsq_Min = 3.0; fQsq_Max = 35.0;
 	  fW_Min = 2.0; fW_Max = 10.2;
 	  fT_Max = 1.3;
 	}
-	else if (particle == "pi0" || particle == "Pion0" || particle == "Pi0"){
+	else if (Ejectile == "pi0" || Ejectile == "Pion0" || Ejectile == "Pi0"){
 	  fQsq_Min = 5.0; fQsq_Max = 1000.0;
 	  fW_Min = 2.0; fW_Max = 10.0;
 	  fT_Max = 0.5;
 	}
-	else if (particle == "K+"){
+	else if (Ejectile == "K+"){
 	  fQsq_Min = 1.0; fQsq_Max = 35.0;
 	  fW_Min = 2.0; fW_Max = 10.0;
 	  fT_Max = 2.0;
@@ -330,15 +330,15 @@ void eic(Json::Value obj) {
 	  UseSolve = false;
 	}
 	
-	SigPar = ReadCrossSectionPar(particle, hadron);
+	SigPar = ReadCrossSectionPar(Ejectile, RecoilHadron);
 	
-        if(particle != "pi0"){ // Default case now
-	  Reaction* r1 = new Reaction(particle, hadron);
+        if(Ejectile != "pi0"){ // Default case now
+	  Reaction* r1 = new Reaction(Ejectile, RecoilHadron);
 	  r1->process_reaction();
 	  delete r1;
 	}
 	else{  // Treat pi0 slightly differently for now
-	  Reaction* r1 = new Reaction(particle);
+	  Reaction* r1 = new Reaction(Ejectile);
 	  r1->process_reaction();
 	  delete r1;
 	}
@@ -402,29 +402,29 @@ TString ExtractCharge(TString particle) {
   return charge;
 }
 
-vector<vector<vector<vector<double>>>> ReadCrossSectionPar(TString particle, TString hadron){
+vector<vector<vector<vector<double>>>> ReadCrossSectionPar(TString EjectileX, TString RecoilHad){
   
   string sigL_ParamFile, sigT_ParamFile;
  
-  if (particle == "Pi+" && hadron == "Neutron"){
+  if (EjectileX == "Pi+" && RecoilHad == "Neutron"){
     // When pion model parameterised in some way, add Pi+/Neutron case here - 
   }
-  else if (particle == "Pi-" && hadron == "Proton"){
+  else if (EjectileX == "Pi-" && RecoilHad == "Proton"){
     // When pion model parameterised in some way, add Pi-/Proton case here - 
   }
-  else if (particle == "K+" && hadron == "Lambda"){
+  else if (EjectileX == "K+" && RecoilHad == "Lambda"){
     sigL_ParamFile = "../src/eic_evgen/CrossSection_Params/KPlusLambda_Param_sigL";
     sigT_ParamFile = "../src/eic_evgen/CrossSection_Params/KPlusLambda_Param_sigT"; // Shouldn't really have a relative path, should look at setting a DEMPGen variable and doing this in a better way later
   }
-  else if (particle == "K+" && hadron == "Sigma0"){
+  else if (EjectileX == "K+" && RecoilHad == "Sigma0"){
     sigL_ParamFile = "../src/eic_evgen/CrossSection_Params/KPlusSigma_Param_sigL";
     sigT_ParamFile = "../src/eic_evgen/CrossSection_Params/KPlusSigma_Param_sigT";
   }
-  else if (particle == "Pi0"){
+  else if (EjectileX == "Pi0"){
     // When pi0 model parameterised, add it here
   }
   else{
-    cerr << " !!!!! " << endl << "Warning!" << endl << "Combination of specified ejectile and recoil particles not found!" << "Cross section parameters cannot be read, check inputs!" << endl << "Warning!" << endl << " !!!!! " << endl;
+    cerr << " !!!!! " << endl << "Warning!" << endl << "Combination of specified ejectile and recoil hadron not found!" << "Cross section parameters cannot be read, check inputs!" << endl << "Warning!" << endl << " !!!!! " << endl;
     exit(-1);
   }
  

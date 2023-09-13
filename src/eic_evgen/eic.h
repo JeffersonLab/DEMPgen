@@ -58,7 +58,7 @@ void SetEICSeed(int);
 TString ExtractParticle(TString);
 TString ExtractCharge(TString);
 
-vector<vector<vector<vector<double>>>> ReadCrossSectionPar(TString particle, TString hadron);
+vector<vector<vector<vector<double>>>> ReadCrossSectionPar(TString EjectileX, TString RecoilHad);
 
 #endif
 

@@ -23,8 +23,8 @@
     //**************************************
     /// This section if for EIC simulation only
     "Kinematics_type" : 1,         // Kinematics type (1->FF, 2->TSSA)
-    "particle": "Pion+", 		   // Choices: omega, pi+, pi0, K+
-    "hadron": "neutron",                // Choices: Neutron, proton, Lambda or Sigma0
+    "ejectile": "Pion+", 		   // Choices: omega, pi+, pi0, K+
+    "recoil_hadron": "neutron",                // Choices: Neutron, proton, Lambda or Sigma0
     "ebeam": 5,                         // Electron beam energy in GeV
     "hbeam": 100,                        // Hadron beam energy in GeV
     "hbeam_part":"Proton",           // Hadron beam particle, proton, deut or helium3, work in progress, will need to be added to shell script later on as an argument

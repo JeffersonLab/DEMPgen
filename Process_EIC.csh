@@ -4,7 +4,7 @@
 
 echo""
 echo "This file is intended to be run as part of a batch job submission, however, you can also run it on its own."
-echo "Expected input is - FileNumber NumberOfEvents ElectronBeamEnergy HadronBeamEnergy RandomSeed OutputType IP Particle Hadron(Optional, for K+)"
+echo "Expected input is - FileNumber NumberOfEvents ElectronBeamEnergy HadronBeamEnergy RandomSeed OutputType IP Ejectile RecoilHadron(Optional, for K+)"
 echo "Please see the README for more info."
 echo ""
 
@@ -22,35 +22,35 @@ set HBeamE=$4
 set RandomSeed=$5
 set OutputType=$6
 set InteractionPoint=$7
-set Particle=$8
+set Ejectile=$8
 
-if ($Particle == "K+" && $#argv == 8 ) then
+if ($Ejectile == "K+" && $#argv == 8 ) then
     echo "! WARNING !"
     echo "! WARNING ! - For K+ production expect a hadron specified, defaulting to Lambda - ! WARNING !"
     echo "! WARNING !"
-    set Hadron="Lambda"
-else if ($Particle == "K+" && $#argv == 9 ) then
-    set Hadron=$9
+    set RecoilHadron="Lambda"
+else if ($Ejectile == "K+" && $#argv == 9 ) then
+    set RecoilHadron=$9
 else 
-    set Hadron=""
+    set RecoilHadron=""
 endif
 
-echo "Running target polarisation up, FF setting for file $FileNum with $NumEvents events per file for $EBeamE GeV e- on $HBeamE GeV p using random seed $RandomSeed, using $OutputType format output for $Particle $Hadron events."
+echo "Running target polarisation up, FF setting for file $FileNum with $NumEvents events per file for $EBeamE GeV e- on $HBeamE GeV p using random seed $RandomSeed, using $OutputType format output for $Ejectile $RecoilHadron events."
     
 # Set the config file name based upon inputs
-set ConfigFilename = 'Config_EIC_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Particle$Hadron'_'$NumEvents'_'$FileNum'.json'
+set ConfigFilename = 'Config_EIC_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Ejectile$RecoilHadron'_'$NumEvents'_'$FileNum'.json'
 
 # Copy the default config file to our constructed filename
 cp Config_EIC.json $ConfigFilename
 
 # Use sed commands to change our config file based upon inputs
-sed -i 's/"file_name" \:.*/"file_name" \: "DEMPGen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Particle$Hadron'_'$NumEvents'_'$FileNum'",/' $ConfigFilename
+sed -i 's/"file_name" \:.*/"file_name" \: "DEMPGen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Ejectile$RecoilHadron'_'$NumEvents'_'$FileNum'",/' $ConfigFilename
 sed -i 's/"n_events" \:.*/"n_events" \: '$NumEvents',/' $ConfigFilename
 sed -i 's/"generator_seed"\:.*/"generator_seed" \: '$RandomSeed',/' $ConfigFilename
 sed -i 's/"ebeam"\:.*/"ebeam" \: '$EBeamE',/' $ConfigFilename
 sed -i 's/"hbeam"\:.*/"hbeam" \: '$HBeamE',/' $ConfigFilename
-sed -i 's/"particle"\:.*/"particle" \: "'$Particle'",/' $ConfigFilename
-sed -i 's/"hadron"\:.*/"hadron" \: "'$Hadron'",/' $ConfigFilename
+sed -i 's/"ejectile"\:.*/"ejectile" \: "'$Ejectile'",/' $ConfigFilename
+sed -i 's/"recoil_hadron"\:.*/"recoil_hadron" \: "'$RecoilHadron'",/' $ConfigFilename
 sed -i 's/"det_location"\:.*/"det_location" \: "'$InteractionPoint'",/' $ConfigFilename
 sed -i 's/"OutputType"\:.*/"OutputType"\: "'$OutputType'",/' $ConfigFilename
 
@@ -60,8 +60,8 @@ cd data/
 sleep 5
 
 # Filename as it's created is a bit odd, so rename it
-set OriginalOutput = 'eic_input_DEMPGen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Particle$Hadron'_'$NumEvents'_'$FileNum'.dat'
-set RenamedOutput = 'eic_DEMPGen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Particle$Hadron'_'$NumEvents'_'$FileNum'.dat'
+set OriginalOutput = 'eic_input_DEMPGen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Ejectile$RecoilHadron'_'$NumEvents'_'$FileNum'.dat'
+set RenamedOutput = 'eic_DEMPGen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Ejectile$RecoilHadron'_'$NumEvents'_'$FileNum'.dat'
 mv "OutputFiles/"$OriginalOutput "OutputFiles/"$RenamedOutput
 
 rm -rf ../$ConfigFilename

@@ -19,12 +19,11 @@ using namespace std;
 
 /*--------------------------------------------------*/
 /// Reaction 
+Reaction::Reaction(TString ejectile_str) { 
 
-Reaction::Reaction(TString particle_str) { 
-
- 	rEjectile = particle_str;
-	cout << "Produced particle is: " << GetParticle() << endl; 
-	cout << "Generated process: e + p -> e' + p' + " << GetParticle() << endl; 
+ 	rEjectile = ejectile_str;
+	cout << "Produced ejectile is: " << GetEjectile() << endl; 
+	cout << "Generated process: e + p -> e' + p' + " << GetEjectile() << endl; 
     	tTime.Start(); 
  
  	cout << "/*--------------------------------------------------*/" << endl;
@@ -37,13 +36,13 @@ Reaction::Reaction(TString particle_str) {
 }
 
 // SJDK 09/02/22 - New reaction where the particle and hadron are specified
-Reaction::Reaction(TString particle_str, TString hadron_str) { 
+Reaction::Reaction(TString ejectile_str, TString recoil_hadron_str) { 
 
- 	rEjectile = particle_str;
-	rRecoil = hadron_str;
-	cout << "Produced particle is: " << GetParticle() << endl; 
-	cout << "Produced hadron is: " << GetHadron() << endl;
-	cout << "Generated process: e + p -> e'+ " << GetHadron() << " + " << GetParticle() << endl; 
+ 	rEjectile = ejectile_str;
+	rRecoil = recoil_hadron_str;
+	cout << "Produced ejectile is: " << GetEjectile() << endl; 
+	cout << "Produced recoil hadron is: " << GetRecoilHadron() << endl;
+	cout << "Generated process: e + p -> e'+ " << GetRecoilHadron() << " + " << GetEjectile() << endl; 
     	tTime.Start(); 
  
  	cout << "/*--------------------------------------------------*/" << endl;

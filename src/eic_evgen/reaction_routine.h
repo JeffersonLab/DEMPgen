@@ -29,8 +29,8 @@ class Reaction{
   ~Reaction();
 
   void process_reaction();		
-  TString GetParticle() {return rEjectile;};		
-  TString GetHadron() {return rRecoil;};
+  TString GetEjectile() {return rEjectile;};		
+  TString GetRecoilHadron() {return rRecoil;};
   
  protected:
   TStopwatch tTime;
@@ -48,8 +48,8 @@ class DEMP_Reaction {
   ~DEMP_Reaction();
 
   void process_reaction();		
-  TString GetParticle() {return rEjectile;};		
-  TString GetHadron() {return rRecoil;};
+  TString GetEjectile() {return rEjectile;};		
+  TString GetRecoilHadron() {return rRecoil;};
 
  protected:
 
