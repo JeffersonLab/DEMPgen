@@ -38,6 +38,18 @@ Event generator for Deep Exclusive Meson Production
 
 The file Config.json contains all the configuration options. Use this as a template for other configuration files, which may be given as an argument to the event generator.
 
+## Ejectile calculation methods
+
+- The EIC module of DEMPgen has two different calculation methods that may be used to calculate the ejectile properties.
+- These are referred to as the "Analytical" and "Solve" methods. Either can be used in a simulation run, just change the config file to switch between them.
+- In your config .json file, select between the two versions using the
+  -"calc_method" argument, this can be set to Analytical or Solve, e.g.
+  		 - "calc_method": "Analytical",
+		 - OR
+		 - "calc_method": "Solve",
+
+- If you are using the shell scripts provided to run a lot of simulations, modify Config_EIC.json BEFORE running the shell scripts.
+
 ## Output
 
 The event data is output to the configured file location relative to the build directory. The TTree in this file contains all kinematic data for all particles in the laboratory rest frame. Variables with the prefix "Vert" represent values read at the interaction vertex. Values with the prefix "Lab" represent values read after all correcting effects (multiple scattering, ionization, etc.) have been applied. 
