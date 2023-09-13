@@ -38,12 +38,12 @@ Event generator for Deep Exclusive Meson Production
 
 The file Config.json contains all the configuration options. Use this as a template for other configuration files, which may be given as an argument to the event generator.
 
-## Ejectile calculation methods
+### Ejectile calculation methods
 
 - The EIC module of DEMPgen has two different calculation methods that may be used to calculate the ejectile properties.
 - These are referred to as the "Analytical" and "Solve" methods. Either can be used in a simulation run, just change the config file to switch between them.
 - In your config .json file, select between the two versions using the
-  -"calc_method" argument, this can be set to Analytical or Solve, e.g.
+  - "calc_method" argument, this can be set to Analytical or Solve, e.g.
   		 - "calc_method": "Analytical",
 		 - OR
 		 - "calc_method": "Solve",
