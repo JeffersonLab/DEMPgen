@@ -783,65 +783,64 @@ Double_t DEMP_Reaction::Get_Total_Cross_Section() {
 
 /*--------------------------------------------------*/
 /// Output generator detail
-// 06/09/23 SJDK - Formatting of these is all messed up annoyingly, would be nice to get the final numbers to align. They don't currently.
-// Cuts are now ordered as they are applied in the generator
+// 06/09/23 SJDK - Cuts are now ordered as they are applied in the generator
 void DEMP_Reaction::Detail_Output() {
 
-  DEMPDetails << "Seed used for the Random Number Generator                    " << setw(20) << fSeed         << endl;
+  DEMPDetails << left << setw(70) << "Seed used for the Random Number Generator" << right << setw(20) << fSeed << endl;
   DEMPDetails << endl;
-  DEMPDetails << "Total events tried                                           " << setw(20) << fNGenerated   << endl;
+  DEMPDetails << left << setw(70) << "Total events tried" << right << setw(20) << fNGenerated << endl;
   if(UseSolve == true){
-    DEMPDetails << "Total events cut                                             " << setw(20) << (qsq_ev + w_ev + w_neg_ev + fNaN + fConserve + t_ev + fNSigmaNeg + fSolveEvents_0Sol) << setw(20) << ((double) (qsq_ev + w_ev + w_neg_ev + fNaN + fConserve + t_ev + fNSigmaNeg + fSolveEvents_0Sol)/(double)fNGenerated)*100 << " %" << endl;
-    DEMPDetails << "Total events recorded                                        " << setw(20) << fNRecorded << setw(20) << ((double)fNRecorded/(double)fNGenerated)*100 << " %" << endl;
+    DEMPDetails << left << setw(70) << "Total events cut" << right << setw(20) << (qsq_ev + w_ev + w_neg_ev + fNaN + fConserve + t_ev + fNSigmaNeg + fSolveEvents_0Sol) << right << setw(20) << ((double) (qsq_ev + w_ev + w_neg_ev + fNaN + fConserve + t_ev + fNSigmaNeg + fSolveEvents_0Sol)/(double)fNGenerated)*100 << " %" << endl;
+    DEMPDetails << left << setw(70) << "Total events recorded" << right << setw(20) << fNRecorded << right << setw(20) << ((double)fNRecorded/(double)fNGenerated)*100 << " %" << endl;
     if (fNGenerated != (qsq_ev + w_ev + w_neg_ev + fNaN + fConserve + t_ev + fNSigmaNeg + fNRecorded + fSolveEvents_0Sol)){
-      DEMPDetails << "Total events cut + recorded = events tried?                " << setw(20) << "NO! ERROR!" << endl;
+      DEMPDetails << left << setw(70) << "Total events cut + recorded = events tried?" << right << setw(20) << "NO! ERROR!" << endl;
     }
     else{
-      DEMPDetails << "Total events cut + recorded = events tried?                " << setw(22) << "Yes! :)" << endl;
+      DEMPDetails << left << setw(70) << "Total events cut + recorded = events tried?" << right << setw(20) << "Yes! :)" << endl;
     }
 
   }
   else{
-    DEMPDetails << "Total events cut                                             " << setw(20) << (qsq_ev + w_ev + w_neg_ev + fNaN + fConserve + t_ev + fNSigmaNeg) << setw(20) << ((double) (qsq_ev + w_ev + w_neg_ev + fNaN + fConserve + t_ev + fNSigmaNeg)/(double)fNGenerated)*100 << " %" << endl;
-    DEMPDetails << "Total events recorded                                        " << setw(20) << fNRecorded << setw(20) << ((double)fNRecorded/(double)fNGenerated)*100 << " %" << endl;
+    DEMPDetails << left << setw(70) << "Total events cut" << right << setw(20) << (qsq_ev + w_ev + w_neg_ev + fNaN + fConserve + t_ev + fNSigmaNeg) << right << setw(20) << ((double) (qsq_ev + w_ev + w_neg_ev + fNaN + fConserve + t_ev + fNSigmaNeg)/(double)fNGenerated)*100 << " %" << endl;
+    DEMPDetails << left << setw(70) << "Total events recorded" << right << setw(20) << fNRecorded << right << setw(20) << ((double)fNRecorded/(double)fNGenerated)*100 << " %" << endl;
     if (fNGenerated != (qsq_ev + w_ev + w_neg_ev + fNaN + fConserve + t_ev + fNSigmaNeg + fNRecorded)){
-      DEMPDetails << "Total events cut + recorded = events tried?                " << setw(20) << "NO! ERROR!" << endl;
+      DEMPDetails << left << setw(70) << "Total events cut + recorded = events tried?" << right << setw(20) << "NO! ERROR!" << endl;
     }
     else{
-      DEMPDetails << "Total events cut + recorded = events tried?                " << setw(22) << "Yes! :)" << endl;
+      DEMPDetails << left << setw(70) << "Total events cut + recorded = events tried?" << right << setw(20) << "Yes! :)" << endl;
     }
   }
   
-  DEMPDetails << endl << "Cut details -" << endl;
-  DEMPDetails << "Events cut due to qsq < " << fQsq_Min << " or qsq > "<< fQsq_Max << "                        " << setw(20) << qsq_ev << setw(20) << ((double)qsq_ev/(double)fNGenerated)*100 << " %" << endl;
-  DEMPDetails << "Events cut due to negative Wsq value                         " << setw(20) << w_neg_ev << setw(20) << ((double)w_neg_ev/(double)fNGenerated)*100 << " %" << endl;  
-  DEMPDetails << "Events cut due to W < " << fW_Min << " or W > " << fW_Max << "                          " << setw(20) << w_ev << setw(20) << ((double)w_ev/(double)fNGenerated)*100 << " %" << endl;
+  DEMPDetails << left << setw(70) << endl << "Cut details -" << endl;
+  DEMPDetails << left << setw(70) << Form("Events cut due to qsq < %.1lf or qsq > %.1lf", fQsq_Min, fQsq_Max) << right << setw(20) << qsq_ev << right << setw(20) << ((double)qsq_ev/(double)fNGenerated)*100 << " %" << endl;
+  DEMPDetails << left << setw(70) << "Events cut due to negative Wsq value " << right << setw(20) << w_neg_ev << right << setw(20) << ((double)w_neg_ev/(double)fNGenerated)*100 << " %" << endl;  
+  DEMPDetails << left << setw(70) << Form("Events cut due to W < %.1lf or W > %.1lf", fW_Min, fW_Max) << right << setw(20) << w_ev << right << setw(20) << ((double)w_ev/(double)fNGenerated)*100 << " %" << endl;
   if(UseSolve == true){
-    DEMPDetails << "Events cut due to solve function finding 0 solutions         " << setw(20) << fSolveEvents_0Sol << setw(20) << ((double)fSolveEvents_0Sol/(double)fNGenerated)*100 << " %" << endl;
+    DEMPDetails << left << setw(70) << "Events cut due to solve function finding 0 solutions" << right << setw(20) << fSolveEvents_0Sol << right << setw(20) << ((double)fSolveEvents_0Sol/(double)fNGenerated)*100 << " %" << endl;
   }
-  DEMPDetails << "Events cut due to ejectile (X) energy NaN                    " << setw(20) << fNaN << setw(20) << ((double)fNaN/(double)fNGenerated)*100 << " %" << endl;
-  DEMPDetails << "Events cut due to conservation law check failure             " << setw(20) << fConserve << setw(20) << ((double)fConserve/(double)fNGenerated)*100 << " %" << endl;
-  DEMPDetails << "Events cut due to -t > " << fT_Max << "GeV                      " << setw(30) << t_ev << setw(20) << ((double)t_ev/(double)fNGenerated)*100 << " %" << endl;
-  DEMPDetails << "Events cut due to -ve cross section value                    " << setw(20) << fNSigmaNeg << setw(20) << ((double)fNSigmaNeg/(double)fNGenerated)*100 << " %" << endl;
+  DEMPDetails << left << setw(70) << "Events cut due to ejectile (X) energy NaN" << right << setw(20) << fNaN << right << setw(20) << ((double)fNaN/(double)fNGenerated)*100 << " %" << endl;
+  DEMPDetails << left << setw(70) << "Events cut due to conservation law check failure" << right << setw(20) << fConserve << right << setw(20) << ((double)fConserve/(double)fNGenerated)*100 << " %" << endl;
+  DEMPDetails << left << setw(70) << Form("Events cut due to -t > %.1lf GeV", fT_Max) << right << setw(20) << t_ev << right << setw(20) << ((double)t_ev/(double)fNGenerated)*100 << " %" << endl;
+  DEMPDetails << left << setw(70) << "Events cut due to -ve cross section value" << right << setw(20) << fNSigmaNeg << right << setw(20) << ((double)fNSigmaNeg/(double)fNGenerated)*100 << " %" << endl;
 
-  DEMPDetails << endl << "Conservation law checks details -" << endl;
-  DEMPDetails << "Total events PASSING conservation law check with tolerance " << fDiff << setw(17) << conserve << endl;
-  DEMPDetails << "Events cut due to energy conservation check ONLY             " << setw(20) << ene << setw(20) << ((double)ene/(double)fNGenerated)*100 << " %" << endl;
-  DEMPDetails << "Events cut due to momentum conservation check ONLY           " << setw(20) << mom << setw(20) << ((double)mom/(double)fNGenerated)*100 << " %" << endl;
-  DEMPDetails << "Events cut due to energy AND momentum conservation checks    " << setw(20) << ene_mom << setw(20) << ((double)ene_mom/(double)fNGenerated)*100 << " %" << endl;
-  DEMPDetails << "Events cut due to px conservation law check                  " << setw(20) << mom_px << setw(20) << ((double)mom_px/(double)fNGenerated)*100 << " %" << endl;
-  DEMPDetails << "Events cut due to py conservation law check                  " << setw(20) << mom_py << setw(20) << ((double)mom_py/(double)fNGenerated)*100 << " %" << endl;
-  DEMPDetails << "Events cut due to pz conservation law check                  " << setw(20) << mom_pz << setw(20) << ((double)mom_pz/(double)fNGenerated)*100 << " %" << endl;
-  DEMPDetails << "Events cut due to px and py conservation law checks          " << setw(20) << mom_pxpy << setw(20) << ((double)mom_pxpy/(double)fNGenerated)*100 << " %" << endl;
-  DEMPDetails << "Events cut due to px and pz conservation law checks          " << setw(20) << mom_pxpz << setw(20) << ((double)mom_pxpz/(double)fNGenerated)*100 << " %" << endl;
-  DEMPDetails << "Events cut due to py and pz conservation law checks          " << setw(20) << mom_pypz << setw(20) << ((double)mom_pypz/(double)fNGenerated)*100 << " %" << endl;
-  DEMPDetails << "Events cut due to px, py and pz conservation law checks      " << setw(20) << mom_pxpypz << setw(20) << ((double)mom_pxpypz/(double)fNGenerated)*100 << " %" << endl;
+  DEMPDetails << left << setw(70) << endl << "Conservation law checks details -" << endl;
+  DEMPDetails << left << setw(70) << Form("Total events PASSING conservation law check with tolerance %.2e", fDiff) << right << setw(20) << conserve << endl;
+  DEMPDetails << left << setw(70) << "Events cut due to energy conservation check ONLY" << right << setw(20) << ene << right << setw(20) << ((double)ene/(double)fNGenerated)*100 << " %" << endl;
+  DEMPDetails << left << setw(70) << "Events cut due to momentum conservation check ONLY" << right << setw(20) << mom << right << setw(20) << ((double)mom/(double)fNGenerated)*100 << " %" << endl;
+  DEMPDetails << left << setw(70) << "Events cut due to energy AND momentum conservation checks" << right << setw(20) << ene_mom << right << setw(20) << ((double)ene_mom/(double)fNGenerated)*100 << " %" << endl;
+  DEMPDetails << left << setw(70) << "Events cut due to px conservation law check" << right << setw(20) << mom_px << right << setw(20) << ((double)mom_px/(double)fNGenerated)*100 << " %" << endl;
+  DEMPDetails << left << setw(70) << "Events cut due to py conservation law check" << right << setw(20) << mom_py << right << setw(20) << ((double)mom_py/(double)fNGenerated)*100 << " %" << endl;
+  DEMPDetails << left << setw(70) << "Events cut due to pz conservation law check" << right << setw(20) << mom_pz << right << setw(20) << ((double)mom_pz/(double)fNGenerated)*100 << " %" << endl;
+  DEMPDetails << left << setw(70) << "Events cut due to px and py conservation law checks" << right << setw(20) << mom_pxpy << right << setw(20) << ((double)mom_pxpy/(double)fNGenerated)*100 << " %" << endl;
+  DEMPDetails << left << setw(70) << "Events cut due to px and pz conservation law checks" << right << setw(20) << mom_pxpz << right << setw(20) << ((double)mom_pxpz/(double)fNGenerated)*100 << " %" << endl;
+  DEMPDetails << left << setw(70) << "Events cut due to py and pz conservation law checks" << right << setw(20) << mom_pypz << right << setw(20) << ((double)mom_pypz/(double)fNGenerated)*100 << " %" << endl;
+  DEMPDetails << left << setw(70) << "Events cut due to px, py and pz conservation law checks" << right << setw(20) << mom_pxpypz << right << setw(20) << ((double)mom_pxpypz/(double)fNGenerated)*100 << " %" << endl;
 
   if(UseSolve == true){
-    DEMPDetails << endl << "Solve function, addtional info -" << endl;
-    DEMPDetails << "Number of events with 0 Solution                             " << setw(20) << fSolveEvents_0Sol << endl;
-    DEMPDetails << "Number of events with 1 Solution                             " << setw(20) << fSolveEvents_1Sol << endl;
-    DEMPDetails << "Number of events with 2 Solution                             " << setw(20) << fSolveEvents_2Sol << endl;
+    DEMPDetails << left << setw(70) << endl << "Solve function, addtional info -" << endl;
+    DEMPDetails << left << setw(70) << "Number of events with 0 Solution" << right << setw(20) << fSolveEvents_0Sol << endl;
+    DEMPDetails << left << setw(70) << "Number of events with 1 Solution" << right << setw(20) << fSolveEvents_1Sol << endl;
+    DEMPDetails << left << setw(70) << "Number of events with 2 Solution" << right << setw(20) << fSolveEvents_2Sol << endl;
   }
   
 }
