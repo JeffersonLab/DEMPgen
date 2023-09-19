@@ -10,3 +10,5 @@ build/
 Config_EIC_*
 sjdkay_job.txt
 *#*
+.cc*
+.h*

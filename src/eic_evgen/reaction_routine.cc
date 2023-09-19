@@ -19,12 +19,11 @@ using namespace std;
 
 /*--------------------------------------------------*/
 /// Reaction 
+Reaction::Reaction(TString ejectile_str) { 
 
-Reaction::Reaction(TString particle_str) { 
-
- 	rEjectile = particle_str;
-	cout << "Produced particle is: " << GetParticle() << endl; 
-	cout << "Generated process: e + p -> e' + p' + " << GetParticle() << endl; 
+ 	rEjectile = ejectile_str;
+	cout << "Produced ejectile is: " << GetEjectile() << endl; 
+	cout << "Generated process: e + p -> e' + p' + " << GetEjectile() << endl; 
     	tTime.Start(); 
  
  	cout << "/*--------------------------------------------------*/" << endl;
@@ -37,13 +36,13 @@ Reaction::Reaction(TString particle_str) {
 }
 
 // SJDK 09/02/22 - New reaction where the particle and hadron are specified
-Reaction::Reaction(TString particle_str, TString hadron_str) { 
+Reaction::Reaction(TString ejectile_str, TString recoil_hadron_str) { 
 
- 	rEjectile = particle_str;
-	rRecoil = hadron_str;
-	cout << "Produced particle is: " << GetParticle() << endl; 
-	cout << "Produced hadron is: " << GetHadron() << endl;
-	cout << "Generated process: e + p -> e'+ " << GetHadron() << " + " << GetParticle() << endl; 
+ 	rEjectile = ejectile_str;
+	rRecoil = recoil_hadron_str;
+	cout << "Produced ejectile is: " << GetEjectile() << endl; 
+	cout << "Produced recoil hadron is: " << GetRecoilHadron() << endl;
+	cout << "Generated process: e + p -> e'+ " << GetRecoilHadron() << " + " << GetEjectile() << endl; 
     	tTime.Start(); 
  
  	cout << "/*--------------------------------------------------*/" << endl;
@@ -78,17 +77,10 @@ Reaction::~Reaction() {
 ///
 
 void Reaction::process_reaction() {
-//  if (rEjectile == "Pi0") {
-//    //		Pi0_Production* r1 = new Pi0_Production("Eta");
-//    Pi0_Production* rr1 = new Pi0_Production(rEjectile);
-//    rr1->process_reaction();
-//    delete rr1;
-//  }
-//  else{
+
   // SJDK - 19/12/22 - New generic DEMP reaction class, the intention is that this should be able to handle any case
     DEMP_Reaction* rr1 = new DEMP_Reaction(rEjectile, rRecoil);
     rr1->process_reaction();
     delete rr1;
-//  }
 
 }

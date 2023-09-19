@@ -29,8 +29,8 @@ class Reaction{
   ~Reaction();
 
   void process_reaction();		
-  TString GetParticle() {return rEjectile;};		
-  TString GetHadron() {return rRecoil;};
+  TString GetEjectile() {return rEjectile;};		
+  TString GetRecoilHadron() {return rRecoil;};
   
  protected:
   TStopwatch tTime;
@@ -48,8 +48,8 @@ class DEMP_Reaction {
   ~DEMP_Reaction();
 
   void process_reaction();		
-  TString GetParticle() {return rEjectile;};		
-  TString GetHadron() {return rRecoil;};
+  TString GetEjectile() {return rEjectile;};		
+  TString GetRecoilHadron() {return rRecoil;};
 
  protected:
 
@@ -74,7 +74,7 @@ class DEMP_Reaction {
 
   Double_t Get_Total_Cross_Section(); 
 
-//  Double_t GetPi0_CrossSection();
+  //  Double_t GetPi0_CrossSection();
 
   /*--------------------------------------------------*/
   // Parameters
@@ -87,7 +87,7 @@ class DEMP_Reaction {
 
   std::string sTFile;   /// Generator output files. For documentation and monitoring purposes 
   std::string sLFile;   /// Lund input file into the EIC simulation
-  std::string sDFile;   /// Root dianostic plot in root file format
+  std::string sDFile;   /// Root diagnostic plot in root file format
 
   std::ofstream DEMPOut;     
   std::ofstream DEMPDetails;
@@ -137,11 +137,8 @@ class DEMP_Reaction {
   TLorentzVector r_l_Ejectile;
   TLorentzVector r_l_Ejectile_g;
 
-//  Particle* r_l_Ejectile_solved;
-//  Particle* l_Recoil_solved;
-
   TLorentzVector r_l_Ejectile_solved;
-  TLorentzVector l_Recoil_solved;
+  TLorentzVector r_l_Recoil_solved;
 
   double f_Ejectile_Mass;
   double f_Ejectile_Mass_GeV;
@@ -220,28 +217,19 @@ class DEMP_Reaction {
 
   ///*--------------------------------------------------*/ 
   // Rory Check algorithm
-  
-  //  Particle* Interaction;
-  //  Particle* Target;
-  //
-  //  Particle* Initial;
-  //  Particle* Final;
-  //
-  //  Particle* VertBeamElec;
-  //  Particle* VertScatElec;
-  //  Particle* Photon;
 
+  TLorentzVector* Interaction_Solve;
+  TLorentzVector* Target_Solve;
 
-  TLorentzVector Interaction_Solve;
-  TLorentzVector Target_Solve;
+  TLorentzVector* VertBeamElec;
+  TLorentzVector* VertScatElec;
   
-  TLorentzVector Initial;
-  TLorentzVector Final;
+  TLorentzVector* Initial;
+  TLorentzVector* Target;
+  TLorentzVector* Photon;
+  TLorentzVector* Interaction;
+  TLorentzVector* Final;
   
-  TLorentzVector VertBeamElec;
-  TLorentzVector VertScatElec;
-  TLorentzVector Photon;
-
   bool SolnCheck();
   double W_in_Solve(); 
   double W_out_Solve();
@@ -256,6 +244,9 @@ class DEMP_Reaction {
   int Solve();
   int Solve(double theta, double phi);
 
+  double W_in();
+  double W_out();
+  
   ///*--------------------------------------------------*/ 
   // Needed for the Solve function
 

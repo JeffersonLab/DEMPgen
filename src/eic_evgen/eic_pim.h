@@ -50,6 +50,7 @@ extern TString gfile_name;
 extern TString gParticle;
 extern TString gHadron;
 extern bool gPi0_decay;
+extern bool UseSolve;
 extern std::string gDet_location;
 extern std::string gOutputType;
 extern std::string gBeamPart;
@@ -115,6 +116,10 @@ extern unsigned long long int fConserve;
 extern unsigned long long int fNWeightUnphys;
 extern unsigned long long int fNWeightReject;
 
+extern unsigned long long int fSolveEvents_0Sol;
+extern unsigned long long int fSolveEvents_1Sol;
+extern unsigned long long int fSolveEvents_2Sol;
+
 extern unsigned long long int fNFile;
 
 extern double fK;
@@ -129,6 +134,8 @@ extern double fDEG2RAD;
 extern double fRAD2DEG;
 extern double fEBeam;
 extern double fPBeam;
+// 13/09/23 - SJDK - New generic HBeam value (rather than proton beam)
+extern double fHBeam;
 extern double fScatElec_Theta_I;
 extern double fScatElec_Theta_F;
 extern double fPion_Theta_I; // SJDK 19/12/22 - These should be removed in future, specific to pion reaction cases. Should be generic MesonX
@@ -143,6 +150,7 @@ extern double fQsq_Min;
 extern double fQsq_Max;
 extern double fW_Min;
 extern double fW_Max;
+extern double fT_Max;
 
 extern double fMandSConserve;
 extern double fTop_Pion_Mom;

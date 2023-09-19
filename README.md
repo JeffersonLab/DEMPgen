@@ -1,5 +1,5 @@
 # DEMPgen
-Event generator for Deep Exclusive Meson Production
+Event generator for Deep Exclusive Meson Production.
 
 ## Building
 
@@ -9,7 +9,7 @@ Event generator for Deep Exclusive Meson Production
 
 - After downloading the source create a build directory and cd to it. Take note of the location of the source directory (where CMakeLists.txt should be stored) and run the commands:
 
-  - mdkir build.
+  - mdkir build
   - cd build
   - cmake ..
   - make -j8
@@ -25,7 +25,7 @@ Event generator for Deep Exclusive Meson Production
 
 ### Building on the iFarm
 
-- Building on the JLab iFarm requires you to set up some software versions beforehand, to build successfully, I did the following
+- Building on the JLab iFarm requires you to set up some software versions beforehand, to build successfully, I did the following - 
   - Comment out any CUE or other initialisation in your .login/.cshrc scripts
   - Login to an ifarm node
   - module load cmake/3.19.4
@@ -36,7 +36,22 @@ Event generator for Deep Exclusive Meson Production
 
 ## Configuration
 
-The file Config.json contains all the configuration options. Use this as a template for other configuration files, which may be given as an argument to the event generator.
+The file Config_EIC.json and Config_SoLID.json contain all the configuration options for EIC and SoLID event generation respectively. Use these as a template for other configuration files, which may be given as an argument to the event generator.
+- Note that Config_EIC.json is used in shell scripts (see below) that run large numbers of jobs on batch queueing systems. *Do not* modify this file unless you know what you're doing with it or you really need to edit something.
+  - Copying the template to a new file and editing that is strongly recommended in all cases.
+
+
+### Ejectile calculation methods
+
+- The EIC module of DEMPgen has two different calculation methods that may be used to calculate the ejectile properties.
+- These are referred to as the "Analytical" and "Solve" methods. Either can be used in a simulation run, just change the config file to switch between them.
+- In your config .json file, select between the two versions using the "calc_method" argument, this can be set to Analytical or Solve, e.g.
+  - "calc_method": "Analytical"
+  - OR
+  - "calc_method": "Solve"
+  - If the method is not entered exactly as above, it will not be recognised and the generator will default to the analytical method.
+
+- If you are using the shell scripts provided to run a lot of simulations, modify Config_EIC.json BEFORE running the shell scripts.
 
 ## Output
 
@@ -96,28 +111,29 @@ This project uses [JsonCpp](https://github.com/open-source-parsers/jsoncpp "Json
 
 ## Processing Scripts and json examples
 
-- There are several shell scripts in the main directory that can be used to run the generator and produce some output, information on these scripts is provided below
-- To remove clutter from the main directory, example .json scripts were moved to a new folder
+- There are several shell scripts in the main directory that can be used to run the generator and produce some output, information on these scripts is provided below.
+- To remove clutter from the main directory, example .json scripts were moved to a new folder -
   - json_examples
+- Remember to set the ejectile calculation method in the Config_EIC.json file *before* running these scripts if you do not want to use the default analytical method.
 
 ### Process_EIC.csh
 
 !!! NOTICE !!!  
-This script copies Config_EIC.json and formats a new file based upon this, DO NOT MODIFY Config_EIC.json if you want to use this script!  
+This script copies Config_EIC.json and formats a new file based upon this, DO NOT MODIFY Config_EIC.json (other than the calculation method) if you want to use this script!  
 !!! NOTICE !!!  
 
 - To facilitate the submission of batch jobs, I created a csh script to automatically construct .json config files and run them. This script can also be utilised to run the generator manually, without the need to go and edit a json file. 
 - The script requires 8 arguments (which is a lot, I know), but in the K+ case, it expects 9. They are as follows -  
 
-  - Arg 1 - FileNum -> For batch running, we typically run X files of Y events, this argument is just X, if you're running manually as a test, just input 1 or whatever you fancy  
-  - Arg 2 - NumEvents -> The number of events thrown for this file, set this to whatever you want to run. For reference, with the Pi+/K+ generator, 1B files takes ~1 hour  
-  - Arg 3 - EBeamE -> The electron beam energy, set this to whatever you want, typically, we use 5, 10 or 18 (the nominal max for the EIC)  
-  - Arg 4 - HBeamE -> The hadron beam energy, again, set this to whatevr you want. Typically we use 41, 100 or 275 (41 and 275 being the nominal min/max)  
-  - Arg 5 - RandomSeed -> The random seed, self explanatory. Set this however you like, the batch submission job randomly generates a random seed to feed in here  
-  - Arg 6 - OutputType -> The format of the output file, select from LUND, Pythia6 (for ECCE/Fun4All) or HEPMC3 (for ePIC), the default is HEPMC3 if your choice is invalid  
-  - Arg 7 - InteractionPoint -> The interaction point, choose from ip6 or ip8. The default is ip6 if your choice is invalid  
-  - Arg 8 - Particle -> The produced particle (meson) in the reaction, choose from omega, pi+, pi0 or K+  
-  - Arg 9 - Hadron -> OPTIONAL - This only matters if you select K+ as the particle, in this case, choose from Lambda or Sigma0 here. If your choice is invalid (or you don't specify arg9), the default is Lambda  
+  - Arg 1 - FileNum -> For batch running, we typically run X files of Y events, this argument is just X, if you're running manually as a test, just input 1 or whatever you fancy.
+  - Arg 2 - NumEvents -> The number of events thrown for this file, set this to whatever you want to run. For reference, with the Pi+/K+ generator, 1B files takes ~1 hour.
+  - Arg 3 - EBeamE -> The electron beam energy, set this to whatever you want, typically, we use 5, 10 or 18 (the nominal max for the EIC). 
+  - Arg 4 - HBeamE -> The hadron beam energy, again, set this to whatevr you want. Typically we use 41, 100 or 275 (41 and 275 being the nominal min/max).
+  - Arg 5 - RandomSeed -> The random seed, self explanatory. Set this however you like, the batch submission job randomly generates a random seed to feed in here.
+  - Arg 6 - OutputType -> The format of the output file, select from LUND, Pythia6 (for ECCE/Fun4All) or HEPMC3 (for ePIC), the default is HEPMC3 if your choice is invalid.
+  - Arg 7 - InteractionPoint -> The interaction point, choose from ip6 or ip8. The default is ip6 if your choice is invalid.
+  - Arg 8 - Ejectile -> The produced ejectile (meson) in the reaction, choose from omega, pi+, pi0 or K+.
+  - Arg 9 - RecoilHadron -> OPTIONAL - This only matters if you select K+ as the ejectile, in this case, choose from Lambda or Sigma0 here. If your choice is invalid (or you don't specify arg9), the default is Lambda.
   
 - So as an example if you executed the following -  
   
@@ -130,33 +146,33 @@ This script copies Config_EIC.json and formats a new file based upon this, DO NO
 - This script creates and submits batch jobs. It is designed for use with the torque queueing system on Lark at the University of Regina.
 The jobs the script creates and submits all execute the Process_EIC.csh script described above. This script requries a very similar set of arguments -  
 
-  - Arg 1 - NumFiles -> The batch script is designed to run X jobs of Y events, this number is just X, the number of files you want to run  
-  - Arg 2 - NumEvents -> The number of events thrown for this file, set this to whatever you want to run. For reference, with the Pi+/K+ generator, 1B files takes ~1 hour  
-  - Arg 3 - EBeamE -> The electron beam energy, set this to whatever you want, typically, we use 5, 10 or 18 (the nominal max for the EIC)  
-  - Arg 4 - HBeamE -> The hadron beam energy, again, set this to whatevr you want. Typically we use 41, 100 or 275 (41 and 275 being the nominal min/max)  
-  - Arg 5 - OutputType -> The format of the output file, select from LUND, Pythia6 (for ECCE/Fun4All) or HEPMC3 (for ePIC), the default is HEPMC3 if your choice is invalid  
-  - Arg 6 - InteractionPoint -> The interaction point, choose from ip6 or ip8. The default is ip6 if your choice is invalid  
-  - Arg 7 - Particle -> The produced particle (meson) in the reaction, choose from omega, pi+, pi0 or K+  
-  - Arg 8 - Hadron -> OPTIONAL - This only matters if you select K+ as the particle, in this case, choose from Lambda or Sigma0 here. If your choice is invalid (or you don't specify arg9), the default is Lambda  
+  - Arg 1 - NumFiles -> The batch script is designed to run X jobs of Y events, this number is just X, the number of files you want to run.
+  - Arg 2 - NumEvents -> The number of events thrown for this file, set this to whatever you want to run. For reference, with the Pi+/K+ generator, 1B files takes ~1 hour.
+  - Arg 3 - EBeamE -> The electron beam energy, set this to whatever you want, typically, we use 5, 10 or 18 (the nominal max for the EIC).
+  - Arg 4 - HBeamE -> The hadron beam energy, again, set this to whatevr you want. Typically we use 41, 100 or 275 (41 and 275 being the nominal min/max).
+  - Arg 5 - OutputType -> The format of the output file, select from LUND, Pythia6 (for ECCE/Fun4All) or HEPMC3 (for ePIC), the default is HEPMC3 if your choice is invalid. 
+  - Arg 6 - InteractionPoint -> The interaction point, choose from ip6 or ip8. The default is ip6 if your choice is invalif.
+  - Arg 7 - Ejectile -> The produced ejectile (meson) in the reaction, choose from omega, pi+, pi0 or K+.
+  - Arg 8 - RecoilHadron -> OPTIONAL - This only matters if you select K+ as the ejectile, in this case, choose from Lambda or Sigma0 here. If your choice is invalid (or you don't specify arg9), the default is Lambda.
 
-- The script automatically generates a random seed itself using the /dev/urandom function  
+- The script automatically generates a random seed itself using the /dev/urandom function.
 
 ### Process_EIC_iFarm.csh
 
-- This version is for use on the JLab iFarm/Farm
-- This script uses the same arguments as Process_EIC.csh
+- This version is for use on the JLab iFarm/Farm.
+- This script uses the same arguments as Process_EIC.csh.
 - If you are processing interactively (i.e. on the iFarm), you will need to make sure that you have executed -
   - module use /group/halla/modulefiles
   - module load root
-- You should also check the path set at the top looks OK
-    - By default, /eic/users/${USER}/DEMPGen is assumed
+- You should also check the path set at the top looks OK.
+    - By default, /eic/users/${USER}/DEMPGen is assumed.
 
 ### JLab_Batch_Submission.sh
 
-- This version should be used to submit jobs to the Farm batch queueing system (swif2)
-- It uses the same arguments as Batch_Submission_EIC.sh
-- You should also check the paths set throughout the script look ok (for example, in the COMMAND: ... line)
-    - By default, /eic/users/${USER}/DEMPGen is assumed
+- This version should be used to submit jobs to the Farm batch queueing system (swif2).
+- It uses the same arguments as Batch_Submission_EIC.sh.
+- You should also check the paths set throughout the script look ok (for example, in the COMMAND: ... line).
+    - By default, /eic/users/${USER}/DEMPGen is assumed.
 
 ### json_examples
 
