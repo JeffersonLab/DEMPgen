@@ -1,0 +1,28 @@
+Seed used for the Random Number Generator                                         11552374
+
+Total events tried                                                              1000000000
+Total events cut                                                                 999768700             99.9769 %
+Total events recorded                                                               231300             0.02313 %
+Total events cut + recorded = events tried?                                        Yes! :)
+
+Cut details -                                                         
+Events cut due to qsq < 1.0 or qsq > 35.0                                        634236671             63.4237 %
+Events cut due to negative Wsq value                                             173006952             17.3007 %
+Events cut due to W < 2.0 or W > 10.0                                            183163943             18.3164 %
+Events cut due to ejectile (X) energy NaN                                          4932537            0.493254 %
+Events cut due to conservation law check failure                                         0                   0 %
+Events cut due to -t > 2.0 GeV                                                     4428561            0.442856 %
+Events cut due to -ve cross section value                                               36             3.6e-06 %
+
+Conservation law checks details -                                     
+Total events PASSING conservation law check with tolerance 1.00e-05             4.6599e+06
+Events cut due to energy conservation check ONLY                                         0                   0 %
+Events cut due to momentum conservation check ONLY                                       0                   0 %
+Events cut due to energy AND momentum conservation checks                                0                   0 %
+Events cut due to px conservation law check                                              0                   0 %
+Events cut due to py conservation law check                                              0                   0 %
+Events cut due to pz conservation law check                                              0                   0 %
+Events cut due to px and py conservation law checks                                      0                   0 %
+Events cut due to px and pz conservation law checks                                      0                   0 %
+Events cut due to py and pz conservation law checks                                      0                   0 %
+Events cut due to px, py and pz conservation law checks                                  0                   0 %

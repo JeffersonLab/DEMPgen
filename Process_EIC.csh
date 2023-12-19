@@ -35,7 +35,7 @@ else
     set RecoilHadron=""
 endif
 
-echo "Running target polarisation up, FF setting for file $FileNum with $NumEvents events per file for $EBeamE GeV e- on $HBeamE GeV p using random seed $RandomSeed, using $OutputType format output for $Ejectile $RecoilHadron events."
+echo "Running file $FileNum with $NumEvents events per file for $EBeamE GeV e- on $HBeamE GeV p using random seed $RandomSeed, using $OutputType format output for $Ejectile $RecoilHadron events."
     
 # Set the config file name based upon inputs
 set ConfigFilename = 'Config_EIC_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Ejectile$RecoilHadron'_'$NumEvents'_'$FileNum'.json'
