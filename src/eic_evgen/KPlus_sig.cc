@@ -123,8 +123,8 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
       parasigT->FixParameter(1, SigPar[1][x_1][y_1][3]);
       parasigT->FixParameter(2, SigPar[1][x_1][y_1][4]);
       sigT1=parasigT->Eval(t);
-      parasigT = NULL;
       delete parasigT;
+      parasigT = NULL;
     }
 	 
     else if (t>=SigPar[1][x_1][y_1][11] && t<SigPar[1][x_1][y_1][12]){
@@ -133,8 +133,8 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
       parasigT->FixParameter(1, SigPar[1][x_1][y_1][6]);
       parasigT->FixParameter(2, SigPar[1][x_1][y_1][7]);
       sigT1=parasigT->Eval(t); 
-      parasigT = NULL;
       delete parasigT;
+      parasigT = NULL;
     }
 	 
     else if (t>=SigPar[1][x_1][y_1][12] && t<2.0){
@@ -146,8 +146,8 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
       if (SigPar[1][x_1][y_1][8] == 0 && SigPar[1][x_1][y_1][9] == 0){
 	sigT1=0;
       }
-      parasigT = NULL;
       delete parasigT;
+      parasigT = NULL;
     }
 	 
     else {
@@ -161,8 +161,8 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
       parasigT->FixParameter(1, SigPar[1][x_1][y_2][3]);
       parasigT->FixParameter(2, SigPar[1][x_1][y_2][4]);
       sigT2=parasigT->Eval(t);
-      parasigT = NULL;
       delete parasigT;
+      parasigT = NULL;
     }
 	 
     else if (t>=SigPar[1][x_1][y_2][11] && t<SigPar[1][x_1][y_2][12]){
@@ -171,8 +171,8 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
       parasigT->FixParameter(1, SigPar[1][x_1][y_2][6]);
       parasigT->FixParameter(2, SigPar[1][x_1][y_2][7]);
       sigT2=parasigT->Eval(t); 
-      parasigT = NULL;
       delete parasigT;
+      parasigT = NULL;
     }
 	 
     else if (t>=SigPar[1][x_1][y_2][12] && t<2.0){
@@ -184,8 +184,8 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
       if (SigPar[1][x_1][y_2][8] == 0 && SigPar[1][x_1][y_2][9] == 0){
 	sigT2=0;
       }
-      parasigT = NULL;
       delete parasigT;
+      parasigT = NULL;
     }
 	 
     else {
@@ -199,8 +199,8 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
       parasigT->FixParameter(1, SigPar[1][x_2][y_1][3]);
       parasigT->FixParameter(2, SigPar[1][x_2][y_1][4]);
       sigT3=parasigT->Eval(t);
-      parasigT = NULL;
       delete parasigT;
+      parasigT = NULL;
     }
 	 
     else if (t>=SigPar[1][x_2][y_1][11] && t<SigPar[1][x_2][y_1][12]){
@@ -209,8 +209,8 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
       parasigT->FixParameter(1, SigPar[1][x_2][y_1][6]);
       parasigT->FixParameter(2, SigPar[1][x_2][y_1][7]);
       sigT3=parasigT->Eval(t); 
-      parasigT = NULL;
       delete parasigT;
+      parasigT = NULL;
     }
 	 
     else if (t>=SigPar[1][x_2][y_1][12] && t<2.0){
@@ -222,8 +222,8 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
       if (SigPar[1][x_2][y_1][8] == 0 && SigPar[1][x_2][y_1][9] == 0){
 	sigT3=0;
       }
-      parasigT = NULL;
       delete parasigT;
+      parasigT = NULL;
     }
 	 
     else {
@@ -238,8 +238,8 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
       parasigT->FixParameter(1, SigPar[1][x_2][y_2][3]);
       parasigT->FixParameter(2, SigPar[1][x_2][y_2][4]);
       sigT4=parasigT->Eval(t);
-      parasigT = NULL;
       delete parasigT;
+      parasigT = NULL;
     }
 	 
     else if (t>=SigPar[1][x_2][y_2][11] && t<SigPar[1][x_2][y_2][12]){
@@ -248,8 +248,8 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
       parasigT->FixParameter(1, SigPar[1][x_2][y_2][6]);
       parasigT->FixParameter(2, SigPar[1][x_2][y_2][7]);
       sigT4=parasigT->Eval(t); 
-      parasigT = NULL;
       delete parasigT;
+      parasigT = NULL;
     }
 	 
     else if (t>=SigPar[1][x_2][y_2][12] && t<2.0){
@@ -261,8 +261,8 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
       if (SigPar[1][x_2][y_2][8] == 0 && SigPar[1][x_2][y_2][9] == 0){
 	sigT4=0;
       }
-      parasigT = NULL;
       delete parasigT;
+      parasigT = NULL;
     }
 	 
     else {
@@ -400,8 +400,8 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	  parasigT->FixParameter(1, SigPar[1][x_1][y_1][3]);
 	  parasigT->FixParameter(2, SigPar[1][x_1][y_1][4]);
 	  sigT11=parasigT->Eval(t_1);
-          parasigT = NULL;
           delete parasigT;
+          parasigT = NULL;
 	}
 	 
 	else if (t_1>=SigPar[1][x_1][y_1][11] && t_1<SigPar[1][x_1][y_1][12]){
@@ -410,8 +410,8 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	  parasigT->FixParameter(1,SigPar[1][x_1][y_1][6]);
 	  parasigT->FixParameter(2,SigPar[1][x_1][y_1][7]);
 	  sigT11=parasigT->Eval(t_1); 
-          parasigT = NULL;
           delete parasigT;
+          parasigT = NULL;
 	} 
 	
 	else if (t_1>=SigPar[1][x_1][y_1][12] && t_1<2.0){
@@ -423,8 +423,8 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	  if (SigPar[1][x_1][y_1][8] == 0 && SigPar[1][x_1][y_1][9] == 0){
 	    sigT11 =0;
 	  }
-          parasigT = NULL;
           delete parasigT;
+          parasigT = NULL;
 	}
 	 
 	else {
@@ -439,8 +439,8 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	  parasigT->FixParameter(1, SigPar[1][x_2][y_2][3]);
 	  parasigT->FixParameter(2, SigPar[1][x_2][y_2][4]);
 	  sigT14=parasigT->Eval(t_4);
-          parasigT = NULL;
           delete parasigT;
+          parasigT = NULL;
 	}
 	 
 	else if (t_4>=SigPar[1][x_2][y_2][11] && t_1<SigPar[1][x_2][y_2][12]){
@@ -449,8 +449,8 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	  parasigT->FixParameter(1,SigPar[1][x_2][y_2][6]);
 	  parasigT->FixParameter(2,SigPar[1][x_2][y_2][7]);
 	  sigT14=parasigT->Eval(t_4); 
-          parasigT = NULL;
           delete parasigT;
+          parasigT = NULL;
 	} 
 	
 	else if (t_4>=SigPar[1][x_1][y_1][12] && t_1<2.0){
@@ -462,8 +462,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	  if (SigPar[1][x_2][y_2][8] == 0 && SigPar[1][x_2][y_2][9] == 0){
 	    sigT14 =0;
 	  }
-          parasigT = NULL;
+          
           delete parasigT;
+          parasigT = NULL;
 	}
 	 
 	else {
@@ -512,8 +513,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	parasigT->FixParameter(1, SigPar[1][x_1][y_1][3]);
 	parasigT->FixParameter(2, SigPar[1][x_1][y_1][4]);
 	sigT11=parasigT->Eval(t_1);
-        parasigT = NULL;
+        
         delete parasigT;
+        parasigT = NULL;
       }
 	 
       else if (t_1>=SigPar[1][x_1][y_1][11] && t_1<SigPar[1][x_1][y_1][12]){
@@ -522,8 +524,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	parasigT->FixParameter(1,SigPar[1][x_1][y_1][6]);
 	parasigT->FixParameter(2,SigPar[1][x_1][y_1][7]);
 	sigT11=parasigT->Eval(t_1);
-	parasigT = NULL;
-	delete parasigT; 
+	
+	delete parasigT;
+	parasigT = NULL; 
       } 
 	
       else if (t_1>=SigPar[1][x_1][y_1][12] && t_1<2.0){
@@ -534,8 +537,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	if (SigPar[1][x_1][y_1][8] == 0 && SigPar[1][x_1][y_1][9] == 0){
 	  sigT11 =0;
 	}
-	parasigT = NULL;
+	
 	delete parasigT;
+	parasigT = NULL;
       }
 	 
       else {
@@ -583,8 +587,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	parasigT->FixParameter(1, SigPar[1][x_2][y_2][3]);
 	parasigT->FixParameter(2, SigPar[1][x_2][y_2][4]);
 	sigT14=parasigT->Eval(t_4);
-	parasigT = NULL;
+	
 	delete parasigT;
+	parasigT = NULL;
       }
 	 
       else if (t_4>=SigPar[1][x_2][y_2][11] && t_1<SigPar[1][x_2][y_2][12]){
@@ -593,8 +598,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	parasigT->FixParameter(1,SigPar[1][x_2][y_2][6]);
 	parasigT->FixParameter(2,SigPar[1][x_2][y_2][7]);
 	sigT14=parasigT->Eval(t_4); 
-	parasigT = NULL;
+	
 	delete parasigT;
+	parasigT = NULL;
       } 
 	
       else if (t_4>=SigPar[1][x_1][y_1][12] && t_1<2.0){
@@ -606,8 +612,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	if (SigPar[1][x_2][y_2][8] == 0 && SigPar[1][x_2][y_2][9] == 0){
 	  sigT14 =0;
 	}
-	parasigT = NULL;
+	
 	delete parasigT;
+	parasigT = NULL;
       }
 	 
       else {
@@ -713,8 +720,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	if (SigPar[0][x_1][y_1][2] == 0 && SigPar[0][x_1][y_1][3] == 0){
 	  sigL1=0;
 	}
-        parasigL = NULL;
+        
         delete parasigL;
+        parasigL = NULL;
       }
       
       else{
@@ -723,8 +731,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	parasigL->FixParameter(1, SigPar[0][x_1][y_1][3]);
 	parasigL->FixParameter(2, SigPar[0][x_1][y_1][4]);
 	sigL1=parasigL->Eval(t);
-        parasigL = NULL;
+        
         delete parasigL;
+        parasigL = NULL;
       }
       
     }
@@ -737,8 +746,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
       if (SigPar[0][x_1][y_1][5] == 0 && SigPar[0][x_1][y_1][6] == 0){
 	sigL1=0;
       }
-      parasigL = NULL;
+      
       delete parasigL;
+      parasigL = NULL;
     }
 	 
     else if (t>=SigPar[0][x_1][y_1][11] && t<2.0){
@@ -749,8 +759,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
       if (SigPar[0][x_1][y_1][7] == 0 && SigPar[0][x_1][y_1][8] == 0){
 	sigL1=0;
       }
-      parasigL = NULL;
+      
       delete parasigL;
+      parasigL = NULL;
     }
 	 
     else {
@@ -768,8 +779,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	if (SigPar[0][x_1][y_2][2] == 0 && SigPar[0][x_1][y_2][3] == 0){
 	  sigL2=0;
 	}
-        parasigL = NULL;
+        
         delete parasigL;
+        parasigL = NULL;
       }
       
       else{
@@ -778,8 +790,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	parasigL->FixParameter(1, SigPar[0][x_1][y_2][3]);
 	parasigL->FixParameter(2, SigPar[0][x_1][y_2][4]);
 	sigL2=parasigL->Eval(t);
-        parasigL = NULL;
+        
 	delete parasigL;
+	parasigL = NULL;
       }
     }
 	 
@@ -791,8 +804,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
       if (SigPar[0][x_1][y_2][5] == 0 && SigPar[0][x_1][y_2][6] == 0){
 	sigL2=0;
       }
-      parasigL = NULL;
+      
       delete parasigL;
+      parasigL = NULL;
     }
 	 
     else if (t>=SigPar[0][x_1][y_2][11] && t<2.0){
@@ -803,8 +817,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
       if (SigPar[0][x_1][y_2][7] == 0 && SigPar[0][x_1][y_2][8] == 0){
 	sigL2=0;
       }
-      parasigL = NULL;
+      
       delete parasigL;
+      parasigL = NULL;
     }
 	 
     else {
@@ -822,8 +837,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	if (SigPar[0][x_2][y_1][2] == 0 && SigPar[0][x_2][y_1][3] == 0){
 	  sigL3=0;
 	}
-        parasigL = NULL;
+        
 	delete parasigL;
+	parasigL = NULL;
       }
       
       else{
@@ -832,8 +848,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	parasigL->FixParameter(1, SigPar[0][x_2][y_1][3]);
 	parasigL->FixParameter(2, SigPar[0][x_2][y_1][4]);
 	sigL3=parasigL->Eval(t);
-        parasigL = NULL;
+        
         delete parasigL;
+        parasigL = NULL;
       }
      
     }
@@ -847,8 +864,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
       if (SigPar[0][x_2][y_1][5] == 0 && SigPar[0][x_2][y_1][6] == 0){
 	sigL3=0;
       }
-      parasigL = NULL;
+      
       delete parasigL;
+      parasigL = NULL;
     }
 	 
     else if (t>=SigPar[0][x_2][y_1][11] && t<2.0){
@@ -860,8 +878,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
       if (SigPar[0][x_2][y_1][7] == 0 && SigPar[0][x_2][y_1][8] == 0){
 	sigL3=0;
       }
-      parasigL = NULL;
+      
       delete parasigL;
+      parasigL = NULL;
     }
 	 
     else {
@@ -879,8 +898,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	if (SigPar[0][x_2][y_2][2] == 0 && SigPar[0][x_2][y_2][3] == 0){
 	  sigL4=0;
 	}
-        parasigL = NULL;
+        
 	delete parasigL;
+	parasigL = NULL;
       }
       
       else{
@@ -889,8 +909,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	parasigL->FixParameter(1, SigPar[0][x_2][y_2][3]);
 	parasigL->FixParameter(2, SigPar[0][x_2][y_2][4]);
 	sigL4=parasigL->Eval(t);
-        parasigL = NULL;
+       
 	delete parasigL;
+	 parasigL = NULL;
       }
      
     }
@@ -904,8 +925,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
       if (SigPar[0][x_2][y_2][5] == 0 && SigPar[0][x_2][y_2][6] == 0){
 	sigL4=0;
       }
-      parasigL = NULL;
+      
       delete parasigL;
+      parasigL = NULL;
     }
 	 
     else if (t>=SigPar[0][x_2][y_2][11] && t<2.0){
@@ -917,8 +939,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
       if (SigPar[0][x_2][y_2][7] == 0 && SigPar[0][x_2][y_2][8] == 0){
 	sigL4=0;
       }
-      parasigL = NULL;
+      
       delete parasigL;
+      parasigL = NULL;
     }
 	 
     else {
@@ -1008,8 +1031,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	    if (SigPar[0][x_1][y_1][2] == 0 && SigPar[0][x_1][y_1][3] == 0){
 	      sigL11=0;
 	    }
-            parasigL = NULL;
+            
 	    delete parasigL;
+	    parasigL = NULL;
 	  }
       
 	  else{
@@ -1018,8 +1042,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	    parasigL->FixParameter(1, SigPar[0][x_1][y_1][3]);
 	    parasigL->FixParameter(2, SigPar[0][x_1][y_1][4]);
 	    sigL11=parasigL->Eval(l_1);
-            parasigL = NULL;
+            
             delete parasigL;
+            parasigL = NULL;
 	  }
 	}
 	 
@@ -1032,8 +1057,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	  if (SigPar[0][x_1][y_1][5] == 0 && SigPar[0][x_1][y_1][6] == 0){
 	    sigL11=0;
 	  }
-	  parasigL = NULL;
+	  
 	  delete parasigL;
+	  parasigL = NULL;
 	}
 	 
 	else if (l_1>=SigPar[0][x_1][y_1][11] && t<2.0){
@@ -1045,8 +1071,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	  if (SigPar[0][x_1][y_1][7] == 0 && SigPar[0][x_1][y_1][8] == 0){
 	    sigL11=0;
 	  }
-	  parasigL = NULL;
+	  
 	  delete parasigL;
+	  parasigL = NULL;
 	}
 	 
 	else {
@@ -1064,8 +1091,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	    if (SigPar[0][x_2][y_2][2] == 0 && SigPar[0][x_2][y_2][3] == 0){
 	      sigL14=0;
 	    }
-            parasigL = NULL;
+            
             delete parasigL;
+            parasigL = NULL;
 	  }
       
 	  else{
@@ -1074,8 +1102,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	    parasigL->FixParameter(1, SigPar[0][x_2][y_2][3]);
 	    parasigL->FixParameter(2, SigPar[0][x_2][y_2][4]);
 	    sigL14=parasigL->Eval(l_4);
-            parasigL = NULL;
+            
             delete parasigL;
+            parasigL = NULL;
 	  }
          
 	}
@@ -1089,8 +1118,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	  if (SigPar[0][x_2][y_2][5] == 0 && SigPar[0][x_2][y_2][6] == 0){
 	    sigL14=0;
 	  }
-          parasigL = NULL;
+          
           delete parasigL;
+          parasigL = NULL;
 	}
 	 
 	else if (l_4>=SigPar[0][x_2][y_2][11] && t<2.0){
@@ -1102,8 +1132,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	  if (SigPar[0][x_2][y_2][7] == 0 && SigPar[0][x_2][y_2][8] == 0){
 	    sigL14=0;
 	  }
-	  parasigL = NULL;
+	  
 	  delete parasigL;
+	  parasigL = NULL;
 	}
 	 
 	else {
@@ -1156,8 +1187,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	  if (SigPar[0][x_1][y_1][2] == 0 && SigPar[0][x_1][y_1][3] == 0){
 	    sigL11=0;
 	  }
-          parasigL = NULL;
+          
 	  delete parasigL;
+	  parasigL = NULL;
 	}
       
 	else{
@@ -1166,8 +1198,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	  parasigL->FixParameter(1, SigPar[0][x_1][y_1][3]);
 	  parasigL->FixParameter(2, SigPar[0][x_1][y_1][4]);
 	  sigL11=parasigL->Eval(l_1);
-          parasigL = NULL;
+          
           delete parasigL;
+          parasigL = NULL;
 	}
       }
 	 
@@ -1179,8 +1212,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	if (SigPar[0][x_1][y_1][5] == 0 && SigPar[0][x_1][y_1][6] == 0){
 	  sigL11=0;
 	}
-	parasigL = NULL;
+	
 	delete parasigL;
+	parasigL = NULL;
       }
 	 
       else if (l_1>=SigPar[0][x_1][y_1][11] && t<2.0){
@@ -1191,8 +1225,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	if (SigPar[0][x_1][y_1][7] == 0 && SigPar[0][x_1][y_1][8] == 0){
 	  sigL11=0;
 	}
-        parasigL = NULL;
+        
 	delete parasigL;
+	parasigL = NULL;
       }
 	 
       else {
@@ -1245,8 +1280,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	  if (SigPar[0][x_2][y_2][2] == 0 && SigPar[0][x_2][y_2][3] == 0){
 	    sigL14=0;
 	  }
-	  parasigL = NULL;
+	  
 	  delete parasigL;
+	  parasigL = NULL;
 	}
       
 	else{
@@ -1255,8 +1291,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	  parasigL->FixParameter(1, SigPar[0][x_2][y_2][3]);
 	  parasigL->FixParameter(2, SigPar[0][x_2][y_2][4]);
 	  sigL14=parasigL->Eval(l_4);
-	  parasigL = NULL;
+	  
 	  delete parasigL;
+	  parasigL = NULL;
 	}
          
       }
@@ -1270,8 +1307,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	if (SigPar[0][x_2][y_2][5] == 0 && SigPar[0][x_2][y_2][6] == 0){
 	  sigL14=0;
 	}
-	parasigL = NULL;
+	
 	delete parasigL;
+	parasigL = NULL;
       }
 	 
       else if (l_4>=SigPar[0][x_2][y_2][11] && t<2.0){
@@ -1283,8 +1321,9 @@ double GetKPlus_CrossSection(double ft, double fw, double fqsq, double feps, TSt
 	if (SigPar[0][x_2][y_2][7] == 0 && SigPar[0][x_2][y_2][8] == 0){
 	  sigL14=0;
 	}
-	parasigL = NULL;
+	
 	delete parasigL;
+	parasigL = NULL;
       }
 	 
       else {
