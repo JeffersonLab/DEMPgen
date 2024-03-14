@@ -20,8 +20,7 @@ To reproduce the files used for the December simulation campaign from DEMPgen, f
   - ./Batch_Submission_EIC.sh 150 1000000000 10 100 HEPMC3 ip6 K+ Sigma0 
 
 - The batch submission scripts submits these arguments to Process_EIC.sh (or Process_EIC_iFarm.csh in the JLab farm), see these scripts for further details on the arguments provided.
-
-- When the batch job is created, a random seed is generated using the - od -An -N3 -i /dev/urandom - command, such that each job has a "random" random seed.
+ - When the batch job is created, a random seed is generated using the - od -An -N3 -i /dev/urandom - command, such that each job has a "random" random seed.
 
 - The random seed for each job is recorded in a .txt file, along with information on the event generation such as the number of events cut at various stages. This is produced by the generator along with a corresponding .dat file which contains the generated events.
   - The .txt files generated from the execution of the command above are recorded in three sub directories within this folder -
@@ -43,5 +42,5 @@ To reproduce the files used for the December simulation campaign from DEMPgen, f
 - Once the files are generted with DEMPgen, they are processed through the Monte Carlo Afterburner (https://github.com/eic/afterburner) to incorporate crossing angle, beam  effects, and veterx spread for the EIC.
 
 - This is done using the - Process_Files_Afterburner.sh - script included in this directory.
-** This script is run within the ePIC container/eic-shell. See the script for further details.
-** The script takes file lists as arguments, these are included in this directory for reference/convenience.
+  - This script is run within the ePIC container/eic-shell. See the script for further details.
+  - The script takes file lists as arguments, these are included in this directory for reference/convenience.
