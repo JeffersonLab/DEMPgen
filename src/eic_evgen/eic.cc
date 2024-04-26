@@ -177,7 +177,7 @@ void eic(Json::Value obj) {
   // SJDK 03/04/23 - Change to how Qsq range is set/chosen, could add as an override variable later too
   // Set min/max Qsq values depending upon Ejectile type
   if (Ejectile == "pi+" || Ejectile == "Pion+" || Ejectile == "Pi+"){
-    fQsq_Min = 3.0; fQsq_Max = 35.0;
+    fQsq_Min = 3.5; fQsq_Max = 35.0; // Love Preet changed to 3.5 as SigT parameterization starts from Q2 = 3.5
     fW_Min = 2.0; fW_Max = 10.2;
     fT_Max = 1.3;
   }
@@ -187,7 +187,7 @@ void eic(Json::Value obj) {
     fT_Max = 0.5;
   }
   else if (Ejectile == "K+"){
-    fQsq_Min = 1.0; fQsq_Max = 35.0;
+    fQsq_Min = 1.0; fQsq_Max = 35.0; 
     fW_Min = 2.0; fW_Max = 10.0;
     fT_Max = 2.0;
   }

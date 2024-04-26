@@ -109,6 +109,7 @@ extern unsigned long long int fNGenerated;
 extern unsigned long long int fWSqNeg;
 extern unsigned long long int fNMomConserve;
 extern unsigned long long int fNSigmaNeg;
+extern unsigned long long int fNWeightNeg;
 
 extern unsigned long long int fNaN;
 extern unsigned long long int fConserve;
@@ -858,5 +859,46 @@ extern double mom_pxpypz; // Number that fail due to px, py and pz
 
 // 27/01/22 - Love Preet - Adding in vector of cross section parameters
 extern vector<vector<vector<vector<double>>>> SigPar;
+
+// Love Preet - Added for phase space factor calculations
+extern int psf_steps;
+extern double psf_ScatElec_E_Stepsize;
+extern double psf_ScatElec_Theta_Stepsize;
+extern double psf_ScatElec_Phi_Stepsize;
+extern double psf_ScatElec_E;
+extern double psf_ScatElec_Theta;
+extern double psf_ScatElec_Phi;
+extern double psf_ScalElec_Mom;
+extern double psf_Ejec_Theta_Stepsize;
+extern double psf_Ejectile_Theta;
+extern double psf_Ejectile_Phi;
+extern double psf_Q2, psf_W, psf_W2, psf_t;
+extern double psf_ScatElec_Theta_max, psf_ScatElec_Theta_min;
+extern double psf_ScatElec_E_max, psf_ScatElec_E_min;
+extern double psf_Ejectile_Theta_max, psf_Ejectile_Theta_min;
+
+// Love Preet - Added for actual phase space factor calculations
+extern double fScatElec_Energy_Col_max;
+extern double fScatElec_Energy_Col_min; 
+extern double fScatElec_Theta_Col_max; 
+extern double fScatElec_Theta_Col_min;
+extern double f_Ejectile_Theta_Col_max;
+extern double f_Ejectile_Theta_Col_min;
+extern double fPSF_org;
+
+//Love Preet - Added to be stored in the root tree
+extern double scat_e_px;
+extern double scat_e_py;
+extern double scat_e_pz;
+extern double scat_e_E;
+extern double ejec_px;
+extern double ejec_py;
+extern double ejec_pz;
+extern double ejec_E;
+extern double rclH_px;
+extern double rclH_py;
+extern double rclH_pz;
+extern double rclH_E;
+
 
 #endif

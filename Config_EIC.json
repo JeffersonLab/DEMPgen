@@ -16,7 +16,7 @@
     // "experiment" : "eic" or "solid"
     "experiment" : "eic",
 
-    "file_name" : "DEMPGen_EIC_test",
+    "file_name" : "DEMPGen_EIC_test", 
     "n_events" : 100000000,
     "generator_seed": 1234567,
 

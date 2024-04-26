@@ -39,7 +39,7 @@ int fWLessShell, fWLess1P9, fSDiff;
 
 //long int fNEvents, fNRecorded, fNGenerated, fWSqNeg, fNSigmaNeg, fNWeightUnphys, fNWeightReject, fLundRecorded, fNFile; 
 
-unsigned long long int fNEvents, fNRecorded, fNGenerated, fWSqNeg, fNSigmaNeg, fNaN, fConserve, fNWeightUnphys, fNWeightReject, fLundRecorded, fNFile, fSolveEvents_0Sol, fSolveEvents_1Sol, fSolveEvents_2Sol;
+unsigned long long int fNEvents, fNRecorded, fNGenerated, fWSqNeg, fNSigmaNeg, fNaN, fConserve, fNWeightUnphys, fNWeightReject, fLundRecorded, fNFile, fSolveEvents_0Sol, fSolveEvents_1Sol, fSolveEvents_2Sol, fNWeightNeg; // Love Preet - Added the fNWeightNeg to get number of negative weights
 
 // SJDK 03/04/23 - Added in Qsq Min/Max, W Min/Max and t max (06/09/23)
 // 13/09/23 - SJDK - New generic HBeam value (rather than proton beam)
@@ -165,6 +165,17 @@ double fMomentum[300];
 
 vector<vector<vector<vector<double>>>> SigPar;
 
+int psf_steps; // Love Preet - Added for phase space factor calculations
+
+double psf_ScatElec_E_Stepsize, psf_ScatElec_Theta_Stepsize, psf_ScatElec_Phi_Stepsize, psf_Ejec_Theta_Stepsize; // Love Preet - Added for phase space factor calculations
+
+double psf_ScatElec_E, psf_ScatElec_Theta, psf_ScatElec_Phi, psf_ScalElec_Mom, psf_Ejectile_Theta, psf_Ejectile_Phi, psf_Q2, psf_W, psf_W2, psf_t, psf_ScatElec_Theta_max, psf_ScatElec_Theta_min, psf_ScatElec_E_max, psf_ScatElec_E_min, psf_Ejectile_Theta_max, psf_Ejectile_Theta_min; // Love Preet - Added for phase space factor calculations
+
+double fScatElec_Energy_Col_max, fScatElec_Energy_Col_min, fScatElec_Theta_Col_max, fScatElec_Theta_Col_min,  f_Ejectile_Theta_Col_max, f_Ejectile_Theta_Col_min, fPSF_org;
+// Love Preet - Added for actual phase space factor calculations
+
+double scat_e_px, scat_e_py, scat_e_pz, scat_e_E, ejec_px, ejec_py, ejec_pz, ejec_E, rclH_px, rclH_py, rclH_pz, rclH_E; // Love Preet - Added to be stored in the root tree
+
 double fProb[300] = {    
 6.03456,    6.02429,    6.01155,    5.99636,    5.97873,    5.95869,    5.93626,    5.91147,    5.88435,    5.85493,
 5.82325,    5.78935,    5.75326,    5.71504,    5.67472,    5.63235,    5.58799,    5.54169,     5.4935,    5.44347,		   
@@ -289,6 +300,40 @@ void pim::Initilize() {
     fOmega_Mass_GeV                             = fOmega_Mass/1000.0;
 
     fDiff                                       = 0.00001; // 10/05/23 - Love Preet - Changed from 0.5
+    
+    // Love Preet - Adding for phase space factor calculations
+    psf_steps                                   = 500.0;
+    psf_ScatElec_E_max = std::numeric_limits<double>::min(); // Initialize maxValue for the scattered electron's energy
+    psf_ScatElec_E_min = std::numeric_limits<double>::max(); // Initialize minValue for the scattered electron's energy
+    psf_ScatElec_Theta_max = std::numeric_limits<double>::min(); // Initialize maxValue for the scattered electron's theta
+    psf_ScatElec_Theta_min = std::numeric_limits<double>::max(); // Initialize minValue for the scattered electron's theta
+    psf_Ejectile_Theta_max = std::numeric_limits<double>::min(); // Initialize maxValue for the ejectile's theta
+    psf_Ejectile_Theta_min = std::numeric_limits<double>::max(); // Initialize minValue for the ejectile's theta
+    
+    // Love Preet - Added for actual phase space factor calculations
+    fScatElec_Energy_Col_max = std::numeric_limits<double>::min(); // Initialize maxValue for the scattered electron's energy
+    fScatElec_Energy_Col_min = std::numeric_limits<double>::max(); // Initialize minValue for the scattered electron's energy
+    fScatElec_Theta_Col_max = std::numeric_limits<double>::min(); // Initialize maxValue for the scattered electron's theta
+    fScatElec_Theta_Col_min = std::numeric_limits<double>::max(); // Initialize minValue for the scattered electron's theta
+    f_Ejectile_Theta_Col_max = std::numeric_limits<double>::min(); // Initialize maxValue for the ejectile's theta
+    f_Ejectile_Theta_Col_min = std::numeric_limits<double>::max(); // Initialize minValue for the ejectile's theta
+    fPSF_org = 0;
+    
+    // Love Preet - Added to be stored in the root tree
+    scat_e_px                                  = 0;
+    scat_e_py                                  = 0;
+    scat_e_pz                                  = 0;
+    scat_e_E                                   = 0;
+    ejec_px                                    = 0;
+    ejec_py                                    = 0;
+    ejec_pz                                    = 0;
+    ejec_E                                     = 0;
+    rclH_px                                    = 0;
+    rclH_py                                    = 0;
+    rclH_pz                                    = 0;
+    rclH_E                                     = 0;
+    
+    
     // 02/06/21 - SJDK
     // Set to 0, now set in PiPlusProd.cc
     fElectron_Kin_Col_GeV                       = 0;
@@ -326,6 +371,7 @@ void pim::Initilize() {
     fWLess1P9                                   = 0;
     fWSqNeg                                     = 0;
     fNSigmaNeg                                  = 0;
+    fNWeightNeg                                 = 0;
     // SJDK 15/06/21 - Integer counters to check number returning NaN and failing conservation laws added
     fNaN                                        = 0;
     fConserve                                   = 0;
