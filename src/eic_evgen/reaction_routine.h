@@ -22,7 +22,7 @@
 
 class Reaction{
 
- public:
+public:
   Reaction();
   Reaction(TString);
   Reaction(TString, TString);
@@ -32,7 +32,7 @@ class Reaction{
   TString GetEjectile() {return rEjectile;};		
   TString GetRecoilHadron() {return rRecoil;};
   
- protected:
+protected:
   TStopwatch tTime;
 
   TString rEjectile;
@@ -42,7 +42,7 @@ class Reaction{
 
 class DEMP_Reaction {
 
-  public:
+public:
   DEMP_Reaction();
   DEMP_Reaction(TString, TString);
   ~DEMP_Reaction();
@@ -51,7 +51,7 @@ class DEMP_Reaction {
   TString GetEjectile() {return rEjectile;};		
   TString GetRecoilHadron() {return rRecoil;};
   
-  protected:
+protected:
 
   void Init();
   void Processing_Event();
@@ -74,7 +74,7 @@ class DEMP_Reaction {
 
   Double_t Get_Total_Cross_Section(); 
 
- //  Double_t GetPi0_CrossSection();
+  //  Double_t GetPi0_CrossSection();
 
   /*--------------------------------------------------*/
   // Parameters
@@ -100,8 +100,6 @@ class DEMP_Reaction {
   Double_t psf();
   TLorentzVector psf_scatelec, psf_ejectile;
   TLorentzVector psf_photon;
- 
-  
 
   long long int qsq_ev, t_ev, w_neg_ev, w_ev;
   long long int evts;

@@ -16,21 +16,21 @@ using std::vector;
 
 class pim {
 
-  public:
-  	pim(); 
-  	pim(int);
+public:
+  pim(); 
+  pim(int);
 
-  	void Initilize();
-  	int CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, TLorentzVector P_pim, TLorentzVector P_pro);
-  	int CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, TLorentzVector P_pim, TLorentzVector P_pro, double fDiff_E);
-  	void setrootfile(std::string myRootFile );
-  	double fermiMomentum();
+  void Initilize();
+  int CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, TLorentzVector P_pim, TLorentzVector P_pro);
+  int CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, TLorentzVector P_pim, TLorentzVector P_pro, double fDiff_E);
+  void setrootfile(std::string myRootFile );
+  double fermiMomentum();
 
-  private:
-	Int_t gen_seed = 0;
+private:
+  Int_t gen_seed = 0;
 	
-	std::string pParticle;
-	std::string pcharge;
+  std::string pParticle;
+  std::string pcharge;
 
   /* double correctedPhi(); */
   /* double correctedPhiS(); */
@@ -899,6 +899,5 @@ extern double rclH_px;
 extern double rclH_py;
 extern double rclH_pz;
 extern double rclH_E;
-
 
 #endif

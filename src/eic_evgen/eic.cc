@@ -187,7 +187,7 @@ void eic(Json::Value obj) {
     fT_Max = 0.5;
   }
   else if (Ejectile == "K+"){
-    fQsq_Min = 1.0; fQsq_Max = 35.0; 
+    fQsq_Min = 1.0; fQsq_Max = 35.0;
     fW_Min = 2.0; fW_Max = 10.0;
     fT_Max = 2.0;
   }
@@ -356,7 +356,6 @@ void SetEICSeed (int seed) {
 ///*--------------------------------------------------*/
 ///*--------------------------------------------------*/
 ///  Some utility functions
-
 
 ///*--------------------------------------------------*/
 /// Extracting the particle type
