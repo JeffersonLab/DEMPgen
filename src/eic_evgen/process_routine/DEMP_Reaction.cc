@@ -28,7 +28,10 @@ void DEMP_Reaction::calculate_psf_max_min(double value, double& maxValue, double
 
 //-------------------Love Preet - Added for phase space factor calculations----------------------------//
 Double_t DEMP_Reaction::psf(){
-   
+
+  // Added a print out to clarify what is happening
+  cout << "Beginning phase space calculation -" << endl;
+
   //----Note that all the calculations have been done in GeV for the psf...............................................//
    
   //-----------------------------Calculate variables for scattered electron...........................................//
@@ -40,8 +43,17 @@ Double_t DEMP_Reaction::psf(){
   psf_Ejec_Theta_Stepsize = (fEjectileX_Theta_F - fEjectileX_Theta_I)/psf_steps;   // Defined stepsize for ejectile theta
    
   //cout<<"psf_ScatElec_E_Stepsize = "<<psf_ScatElec_E_Stepsize<<" ,psf_ScatElec_Phi_Stepsize = "<<psf_ScatElec_Phi_Stepsize*TMath::RadToDeg()<<" ,psf_ScatElec_Theta_Stepsize = "<<psf_ScatElec_Theta_Stepsize*TMath::RadToDeg()<<" ,psf_Ejec_Theta_Stepsize = "<<psf_Ejec_Theta_Stepsize*TMath::RadToDeg()<<endl; // To check the stepsize
-   
+  dFractTime = time(0); 
   for (int psf_E = 0; psf_E <= psf_steps; psf_E++){ // Loop over the scattered electron's energy
+    // SJDK - 29/04/24 - Added progress report
+    if ( psf_E % ( psf_steps / 10 ) == 0 ) {
+      cout << ((1.0*psf_E)/(1.0*psf_steps))*100.0 << setw(4) << " % of Phase space checked"  
+	   << "   Day: " <<  dFractTime.GetDay() 
+	   << "   Time:   " << dFractTime.GetHour() 
+	   << ":" << dFractTime.GetMinute() 
+	   << ":" << dFractTime.GetSecond() 
+	   << endl;	  
+    }
     for (int psf_Theta = 0; psf_Theta <= psf_steps; psf_Theta++){  // Loop over the scattered electron's theta
       for (int psf_Phi = 0; psf_Phi <= 4; psf_Phi++){ // Loop over the scattered electron's Phi
 	for (int psf_Ejec_Theta =0; psf_Ejec_Theta <= psf_steps; psf_Ejec_Theta++){ // Loop over the scattered ejectile's theta
@@ -222,10 +234,11 @@ void DEMP_Reaction::Init(){
   struct stat sb;
 
   if (stat(dir_name, &sb) == 0) {
-    cout << "The path is valid!";
+    cout << "The path - " << dir_name << " is valid!" endl;
   }
   else {
-    cout << "The Path is invalid!";
+    cout << "The path - " << dir_name << " is invalid!" << endl;
+    cout << "Making OutputFiles directory!" << endl;
     mkdir(dir_name,0777);
   } 
 
@@ -1037,8 +1050,8 @@ void DEMP_Reaction::Detail_Output(){ // Love Preet changed the order of conditio
   DEMPDetails << left << setw(70) << endl << "Weight correction factors -" << endl;
   DEMPDetails << left << setw(70) << "Ratio of phase space factors (fPSF_org/fPSF)" << right << setw(20) << ((double)fPSF_org/(double)fPSF) << endl;
   DEMPDetails << left << setw(70) << "Ratio of tried to physical events" << right << setw(20) << ((double)fNGenerated / (double) (fNGenerated - fNaN - fConserve - w_neg_ev))  << endl;
-  DEMPDetails << left << setw(70) <<" 1. If the phase space factor ratio deviates significantly from 1.0, first check the number of recorded events for a specific configuration. If the number of recorded events is less than approximately 50,000, increase the attempted events to generate more data. This should hopefully resolve the issue. If the issue persists, multiply this factor by the individual weights of the generated particles during analysis to account for it. Alternatively, this number can be treated as a tolerance on weights."<<endl;
-  DEMPDetails << left << setw(70) <<" 2. If the tried to physical events ratio turns out to be significantly large, you can either multiply it by the individual weights of the particles during analysis or consider it as a tolerance on weights."<<endl;
+  DEMPDetails << left << setw(70) <<" 1. If the first ratio is not ~1.0 (+/- 0.05), check the number of recorded events. If the number of recorded events is <50,000, increase the number of attempted events to generate more data. If the the ratio does not converge to ~1.0, multiply all individual event weights by this factor during analysis. Alternatively, this number can be treated as a tolerance on weights."<<endl;
+  DEMPDetails << left << setw(70) <<" 2. If the second ratio is large (> XX), then again, multiply all invidiual event weights by this factor during analysis. Again, this could also be considered as a tolerance on weights."<<endl;
    
   DEMPDetails << left << setw(70) << endl << "Energies, angles, and phase space factors -" << endl;
   DEMPDetails << left << setw(70) <<"User-defined scattered electron energies" << right << setw(20) <<  fScatElec_E_Lo * fElectron_Energy_Col *fm << right << setw(20) <<fScatElec_E_Hi * fElectron_Energy_Col *fm<<endl; 
