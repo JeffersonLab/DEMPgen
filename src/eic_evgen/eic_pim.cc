@@ -25,6 +25,7 @@ TTree *t1;
 int gKinematics_type;
 bool gPi0_decay;
 bool UseSolve;
+bool gROOTOut; // SJDK 30/04/24 - Added boolean to enable/disable ROOTfile output
 string gDet_location;
 string gOutputType; // SJDK 12/01/22 - Added output type as a variable you can specify in the .json file
 string gBeamPart; // SJDK 12/01/22 - Added output type as a variable you can specify in the .json file
@@ -245,6 +246,8 @@ void pim::Initilize() {
   kFSI                                        = false;
   kMSele                                      = false;
   kMS                                         = false;
+  gROOTOut                                    = false; // Set to false by default
+  
   // 18/01/23 - The luminosity below is some default assumtpion, more up to date values are set in DEMP prod and depend upon beam energy combinations if they are specified
   // See slide 11 in https://indico.cern.ch/event/1072579/contributions/4796856/attachments/2456676/4210776/CAP-EIC-June-7-2022-Seryi-r2.pdf for more info
   // fLumi                                     = 0.374e33; // Jlab design

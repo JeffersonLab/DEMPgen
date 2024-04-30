@@ -23,6 +23,7 @@
     //**************************************
     /// This section if for EIC simulation only
     "Kinematics_type" : 1,         // Kinematics type (1->FF, 2->TSSA)
+    "ROOTOut": "true",             // Enable or disable root file output, true or false
     "ejectile": "Pion+", 		   // Choices: omega, pi+, pi0, K+
     "recoil_hadron": "neutron",                // Choices: Neutron, proton, Lambda or Sigma0
     "ebeam": 5,                         // Electron beam energy in GeV

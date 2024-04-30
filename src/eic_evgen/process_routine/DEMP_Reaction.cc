@@ -43,11 +43,11 @@ Double_t DEMP_Reaction::psf(){
   psf_Ejec_Theta_Stepsize = (fEjectileX_Theta_F - fEjectileX_Theta_I)/psf_steps;   // Defined stepsize for ejectile theta
    
   //cout<<"psf_ScatElec_E_Stepsize = "<<psf_ScatElec_E_Stepsize<<" ,psf_ScatElec_Phi_Stepsize = "<<psf_ScatElec_Phi_Stepsize*TMath::RadToDeg()<<" ,psf_ScatElec_Theta_Stepsize = "<<psf_ScatElec_Theta_Stepsize*TMath::RadToDeg()<<" ,psf_Ejec_Theta_Stepsize = "<<psf_Ejec_Theta_Stepsize*TMath::RadToDeg()<<endl; // To check the stepsize
-  dFractTime = time(0); 
   for (int psf_E = 0; psf_E <= psf_steps; psf_E++){ // Loop over the scattered electron's energy
     // SJDK - 29/04/24 - Added progress report
+    dFractTime = time(0); 
     if ( psf_E % ( psf_steps / 10 ) == 0 ) {
-      cout << ((1.0*psf_E)/(1.0*psf_steps))*100.0 << setw(4) << " % of Phase space checked"  
+      cout << ((1.0*psf_E)/(1.0*psf_steps))*100.0 << setw(4) << " % of phase space checked"  
 	   << "   Day: " <<  dFractTime.GetDay() 
 	   << "   Time:   " << dFractTime.GetHour() 
 	   << ":" << dFractTime.GetMinute() 
@@ -177,12 +177,13 @@ DEMP_Reaction::~DEMP_Reaction(){
   DEMPOut.close();
   DEMPDetails.close();
 
-  // Diagnostic root file with plots
-  dRootFile->Write(); // Write the contents of the ROOT file to disk.
-  delete dRootTree;   // Delete the dynamically allocated memory for the ROOT tree.
-  dRootFile->Close(); // Close the ROOT file.
-  delete dRootFile;   // Delete the dynamically allocated memory for the ROOT file object.
-
+  if (gROOTOut == true){
+    // Diagnostic root file with plots
+    dRootFile->Write(); // Write the contents of the ROOT file to disk.
+    delete dRootTree;   // Delete the dynamically allocated memory for the ROOT tree.
+    dRootFile->Close(); // Close the ROOT file.
+    delete dRootFile;   // Delete the dynamically allocated memory for the ROOT file object.
+  }
 }
 
 void DEMP_Reaction::process_reaction(){
@@ -234,41 +235,43 @@ void DEMP_Reaction::Init(){
   struct stat sb;
 
   if (stat(dir_name, &sb) == 0) {
-    cout << "The path - " << dir_name << " is valid!" endl;
+    cout << "Output file directory found from DEMPgen directory - " << dir_name  << endl;
   }
   else {
-    cout << "The path - " << dir_name << " is invalid!" << endl;
+    cout << "Output file directory not found from DEMPgen directory - " << dir_name  << endl;
     cout << "Making OutputFiles directory!" << endl;
     mkdir(dir_name,0777);
   } 
-
+  
   sTFile = Form("./%s/eic_%s.txt", dir_name, gfile_name.Data());
   sLFile = Form("./%s/eic_input_%s.dat", dir_name, gfile_name.Data());
-  sDFile = Form("./%s/eic_%s.root", dir_name, gfile_name.Data()); // LovePreet changed to make the files name consistent
 
   DEMPOut.open( sLFile.c_str() );
   DEMPDetails.open( sTFile.c_str() );
- 
-  dRootFile = new TFile(sDFile.c_str(),"RECREATE"); 
-  dRootTree = new TTree("Events", "Description of a tree");  //Love Preet added all these new braches to be stored in a root ttree
-  dRootTree->Branch("EventWeight", &fEventWeight, "fEventWeight/D");  
-  dRootTree->Branch("scat_e_px", &scat_e_px, "scat_e_px/D");
-  dRootTree->Branch("scat_e_py", &scat_e_py, "scat_e_py/D");
-  dRootTree->Branch("scat_e_pz", &scat_e_pz, "scat_e_pz/D");
-  dRootTree->Branch("scat_e_E",  &scat_e_E, "scat_e_E/D");
-  dRootTree->Branch("ejec_px", &ejec_px, "ejec_px/D");
-  dRootTree->Branch("ejec_py", &ejec_py, "ejec_py/D");
-  dRootTree->Branch("ejec_pz", &ejec_pz, "ejec_pz/D");
-  dRootTree->Branch("ejec_E",  &ejec_E, "ejec_E/D");
-  dRootTree->Branch("rclH_px", &rclH_px, "rclH_px/D");
-  dRootTree->Branch("rclH_py", &rclH_py, "rclH_py/D");
-  dRootTree->Branch("rclH_pz", &rclH_pz, "rclH_pz/D");
-  dRootTree->Branch("rclH_E",  &rclH_E, "rclH_E/D"); 
-  dRootTree->Branch("Q2", &fQsq_GeV, "fQsq_GeV/D");
-  dRootTree->Branch("W",  &fW_GeV, "fW_GeV/D");
-  dRootTree->Branch("t", &fT_GeV, "fT_GeV/D");
-  dRootTree->Branch("x_b", &fx, "fx/D");
-  dRootTree->Branch("y_E", &fy, "fy/D");
+
+  if (gROOTOut == true){ // Only initialise and open root file if output is enabled
+    sDFile = Form("./%s/eic_%s.root", dir_name, gfile_name.Data()); // LovePreet changed to make the files name consistent
+    dRootFile = new TFile(sDFile.c_str(),"RECREATE"); 
+    dRootTree = new TTree("Events", "Description of a tree");  //Love Preet added all these new braches to be stored in a root ttree
+    dRootTree->Branch("EventWeight", &fEventWeight, "fEventWeight/D");  
+    dRootTree->Branch("scat_e_px", &scat_e_px, "scat_e_px/D");
+    dRootTree->Branch("scat_e_py", &scat_e_py, "scat_e_py/D");
+    dRootTree->Branch("scat_e_pz", &scat_e_pz, "scat_e_pz/D");
+    dRootTree->Branch("scat_e_E",  &scat_e_E, "scat_e_E/D");
+    dRootTree->Branch("ejec_px", &ejec_px, "ejec_px/D");
+    dRootTree->Branch("ejec_py", &ejec_py, "ejec_py/D");
+    dRootTree->Branch("ejec_pz", &ejec_pz, "ejec_pz/D");
+    dRootTree->Branch("ejec_E",  &ejec_E, "ejec_E/D");
+    dRootTree->Branch("rclH_px", &rclH_px, "rclH_px/D");
+    dRootTree->Branch("rclH_py", &rclH_py, "rclH_py/D");
+    dRootTree->Branch("rclH_pz", &rclH_pz, "rclH_pz/D");
+    dRootTree->Branch("rclH_E",  &rclH_E, "rclH_E/D"); 
+    dRootTree->Branch("Q2", &fQsq_GeV, "fQsq_GeV/D");
+    dRootTree->Branch("W",  &fW_GeV, "fW_GeV/D");
+    dRootTree->Branch("t", &fT_GeV, "fT_GeV/D");
+    dRootTree->Branch("x_b", &fx, "fx/D");
+    dRootTree->Branch("y_E", &fy, "fy/D");
+  }
   /*--------------------------------------------------*/
   qsq_ev = 0, t_ev = 0, w_neg_ev = 0, w_ev = 0;
   rNEvents = fNEvents;
@@ -686,8 +689,7 @@ void DEMP_Reaction::Processing_Event(){
     t_ev++;
     return;
   }
-  
-  
+    
   fx = fQsq_GeV / ( 2.0 * r_lprotong.Dot( r_lphotong ) );
   fy = r_lprotong.Dot( r_lphotong ) / r_lprotong.Dot( r_lelectrong );
   fz = r_l_Ejectile.E()/r_lphoton.E();    
@@ -819,7 +821,18 @@ void DEMP_Reaction::Processing_Event(){
   calculate_psf_max_min( fScatElec_Energy_Col, fScatElec_Energy_Col_max, fScatElec_Energy_Col_min ); // -> Love Preet added to find the max and min values to calculate the actual PSF
   calculate_psf_max_min( fScatElec_Theta_Col,  fScatElec_Theta_Col_max,  fScatElec_Theta_Col_min );
   calculate_psf_max_min( f_Ejectile_Theta_Col, f_Ejectile_Theta_Col_max, f_Ejectile_Theta_Col_min ); 
- 
+   
+  if (gOutputType == "Pythia6"){
+    DEMPReact_Pythia6_Output();
+  }
+  else if (gOutputType == "LUND"){
+    Lund_Output();
+  }
+  else if (gOutputType == "HEPMC3"){
+    DEMPReact_HEPMC3_Output();
+  }
+
+  if (gROOTOut == true){
   scat_e_px =  r_lscatelecg.X(); // Love Preet - Added to be stored in the root tree
   scat_e_py =  r_lscatelecg.Y();
   scat_e_pz =  r_lscatelecg.Z();
@@ -832,19 +845,8 @@ void DEMP_Reaction::Processing_Event(){
   rclH_py   =  l_Recoil_g.Y();
   rclH_pz   =  l_Recoil_g.Z();
   rclH_E    =  l_Recoil_g.E();
-  
-  if (gOutputType == "Pythia6"){
-    DEMPReact_Pythia6_Output();
-  }
-  else if (gOutputType == "LUND"){
-    Lund_Output();
-  }
-  else if (gOutputType == "HEPMC3"){
-    DEMPReact_HEPMC3_Output();
-  }
-  
   dRootTree->Fill();
-  
+  }
 }
 
 
@@ -927,8 +929,7 @@ TLorentzVector DEMP_Reaction::GetElectronVector_lab(){
   fElectron_MomX_Col   = fElectron_Mom_Col * sin(fElectron_Theta_Col) * cos(fElectron_Phi_Col);
   fElectron_MomY_Col   = fElectron_Mom_Col * sin(fElectron_Theta_Col) * sin(fElectron_Phi_Col);  
 
-  //cout << "Define: " << fElectron_MomZ_Col << "    "<< fElectron_Mom_Col << "  " << cos(fElectron_Theta_Col) << endl;
-  
+  //cout << "Define: " << fElectron_MomZ_Col << "    "<< fElectron_Mom_Col << "  " << cos(fElectron_Theta_Col) << endl;  
         
   TLorentzVector  lelectron( fElectron_MomX_Col, fElectron_MomY_Col, fElectron_MomZ_Col, fElectron_Energy_Col);
 
@@ -1217,7 +1218,6 @@ void DEMP_Reaction::DEMPReact_Pythia6_Output(){
 	  << setw(6) << fVertex_Y
 	  << setw(6) << fVertex_Z
 	  << endl;
-
 
   ///*--------------------------------------------------*/
   // Final State

@@ -51,6 +51,7 @@ extern TString gParticle;
 extern TString gHadron;
 extern bool gPi0_decay;
 extern bool UseSolve;
+
 extern std::string gDet_location;
 extern std::string gOutputType;
 extern std::string gBeamPart;
@@ -68,6 +69,7 @@ extern bool kSConserve;
 extern bool kFSI;
 extern bool kMSele;
 extern bool kMS;
+extern bool gROOTOut; // SJDK 30/04/24 - Added boolean to enable/disable ROOTfile output
 
 extern double fKaon_Mass;
 extern double fKaon_Mass_GeV;

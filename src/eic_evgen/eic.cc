@@ -139,6 +139,16 @@ void eic(Json::Value obj) {
   //  	TDatime dsTime;
   //  	cout << "Start Time:   " << dsTime.GetHour() << ":" << dsTime.GetMinute() << endl;
   // 21/12/22 - SJDK - Should do a check if these are defined or not, should crash if not defined or set defaults, see other quantities below
+  TString ROOTFile = obj["ROOTOut"].asString();
+  if (ROOTFile == "True" || ROOTFile == "true" || ROOTFile == "TRUE"){
+    gROOTOut = true;
+    cout << "ROOT output file enabled." << endl;
+  }
+  else{
+    gROOTOut = false;
+    cout << "ROOT output file disabled." << endl;
+  }
+
   TString Ejectile = obj["ejectile"].asString();
   TString RecoilHadron = obj["recoil_hadron"].asString(); // 09/02/22 - SJDK - Added in RecoilHadron type argument for K+
   // SJDK - 08/02/22 - This is terrible, need to change this, Ejectile should just be K+
