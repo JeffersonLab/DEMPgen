@@ -301,7 +301,7 @@ void pim::Initilize() {
   fDiff                                       = 0.00001; // 10/05/23 - Love Preet - Changed from 0.5
     
   // Love Preet - Adding for phase space factor calculations
-  psf_steps                                   = 500.0;
+  psf_steps                                   = 1000.0;
   psf_ScatElec_E_max = std::numeric_limits<double>::min(); // Initialize maxValue for the scattered electron's energy
   psf_ScatElec_E_min = std::numeric_limits<double>::max(); // Initialize minValue for the scattered electron's energy
   psf_ScatElec_Theta_max = std::numeric_limits<double>::min(); // Initialize maxValue for the scattered electron's theta

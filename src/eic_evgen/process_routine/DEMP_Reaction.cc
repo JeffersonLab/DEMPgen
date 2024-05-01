@@ -26,7 +26,7 @@ void DEMP_Reaction::calculate_psf_max_min(double value, double& maxValue, double
   }
 }
 
-//-------------------Love Preet - Added for phase space factor calculations----------------------------//
+//-------------------Love Preet - Added for phase space factor (PSF) calculations----------------------------//
 Double_t DEMP_Reaction::psf(){
 
   // Added a print out to clarify what is happening
@@ -35,14 +35,12 @@ Double_t DEMP_Reaction::psf(){
   //----Note that all the calculations have been done in GeV for the psf...............................................//
    
   //-----------------------------Calculate variables for scattered electron...........................................//
-  psf_steps; // Number of steps
   psf_ScatElec_E_Stepsize = (fEBeam*(fScatElec_E_Hi - fScatElec_E_Lo))/psf_steps;  // Defined stepsize for scattered electron's energy, theta, and phi
   psf_ScatElec_Theta_Stepsize = (fScatElec_Theta_F - fScatElec_Theta_I)/psf_steps;
   psf_ScatElec_Phi_Stepsize = (2.0 * fPi)/4.0;
    
   psf_Ejec_Theta_Stepsize = (fEjectileX_Theta_F - fEjectileX_Theta_I)/psf_steps;   // Defined stepsize for ejectile theta
    
-  //cout<<"psf_ScatElec_E_Stepsize = "<<psf_ScatElec_E_Stepsize<<" ,psf_ScatElec_Phi_Stepsize = "<<psf_ScatElec_Phi_Stepsize*TMath::RadToDeg()<<" ,psf_ScatElec_Theta_Stepsize = "<<psf_ScatElec_Theta_Stepsize*TMath::RadToDeg()<<" ,psf_Ejec_Theta_Stepsize = "<<psf_Ejec_Theta_Stepsize*TMath::RadToDeg()<<endl; // To check the stepsize
   for (int psf_E = 0; psf_E <= psf_steps; psf_E++){ // Loop over the scattered electron's energy
     // SJDK - 29/04/24 - Added progress report
     dFractTime = time(0); 
@@ -55,6 +53,7 @@ Double_t DEMP_Reaction::psf(){
 	   << ":" << dFractTime.GetSecond() 
 	   << endl;	  
     }
+
     psf_ScatElec_E = (fEBeam * fScatElec_E_Lo + (psf_E * psf_ScatElec_E_Stepsize));  
     psf_ScalElec_Mom = sqrt(pow(psf_ScatElec_E,2) - pow(fElectron_Mass_GeV,2));
 
@@ -74,12 +73,10 @@ Double_t DEMP_Reaction::psf(){
 	psf_W  =  ((psf_photon + r_lprotong).Mag()); // Lorentz variable W
 	psf_W2 =  ((psf_photon + r_lprotong).Mag2()); // Lorentz variable W2
 	
-	if (( psf_Q2 >= fQsq_Min &&  psf_Q2 <= fQsq_Max) &&  psf_W2 >= 0.0 && ( psf_W >= fW_Min &&  psf_W <= fW_Max)){
-	  for (int psf_Ejec_Theta =0; psf_Ejec_Theta <= psf_steps; psf_Ejec_Theta++){ // Loop over the scattered ejectile's theta
+	if (( psf_Q2 >= fQsq_Min && psf_Q2 <= fQsq_Max) && psf_W2 >= 0.0 && ( psf_W >= fW_Min && psf_W <= fW_Max)){
+	  for (int psf_Ejec_Theta = 0; psf_Ejec_Theta <= psf_steps; psf_Ejec_Theta++){ // Loop over the scattered ejectile's theta
   
-	  //-----------------------------Calculate variables for ejectile..........................................//
-   
-   
+	    //-----------------------------Calculate variables for ejectile..........................................//      
 	    psf_Ejectile_Theta = (fEjectileX_Theta_I + (psf_Ejec_Theta *psf_Ejec_Theta_Stepsize));
 	    psf_Ejectile_Phi = 0.0;
  
@@ -140,29 +137,31 @@ Double_t DEMP_Reaction::psf(){
 	} // If condition over psf_Q2,psf_W,psf_W2
       } // End of for loop over psf_Phi
     } // End of for loop over psf_Theta
-  } // End of for loop over psf_Phi 
+  } // End of for loop over psf_Phi
     
   if ((psf_ScatElec_E_max == psf_ScatElec_Theta_max) && (psf_ScatElec_Theta_max == psf_Ejectile_Theta_max) && (psf_Ejectile_Theta_max == psf_ScatElec_E_max)){
-    cout<<"Given values of angles and energy in the Config_EIC.json files are outside the kinematic range, so further processing has been stopped."<<endl;
+    cout << "!!!!! - ERROR - !!!!!" << endl;
+    cout << "Specified scattered electron and ejectile energy/angle ranges in input .json file did not yield any valid allowed phase space." << endl << "Processing stopped, please re-specify values in input .json file." << endl;
+    cout << "!!!!! - ERROR - !!!!!" << endl;
     fPSF = 0.0;
   }
-    
   else if ((psf_ScatElec_E_min == psf_ScatElec_Theta_min) && (psf_ScatElec_Theta_min == psf_Ejectile_Theta_min) && (psf_Ejectile_Theta_min == psf_ScatElec_E_min)){
-    cout<<"Given values of angles and energy in the Config_EIC.json files are outside the kinematic range, so further processing has been stopped."<<endl;
+    cout << "!!!!! - ERROR - !!!!!" << endl;
+    cout << "Specified scattered electron and ejectile energy/angle ranges in input .json file did not yield any valid allowed phase space." << endl << " Processing stopped, please re-specify values in input .json file." << endl;
+    cout << "!!!!! - ERROR - !!!!!" << endl;
     fPSF = 0.0;
-  }
-    
+  } 
   else if ((psf_ScatElec_E_max == psf_ScatElec_E_min) || (psf_ScatElec_Theta_max == psf_ScatElec_Theta_min) || (psf_Ejectile_Theta_max == psf_Ejectile_Theta_min)) {
-    cout<<"Given values of angles and energy in the Config_EIC.json files are outside the kinematic range, so further processing has been stopped."<<endl;
+    cout << "!!!!! - ERROR - !!!!!" << endl;
+    cout << "Specified scattered electron and ejectile energy/angle ranges in input .json file include one (or more) values with equal min/max values in range." << endl << "Processing stopped, please re-specify values in input .json file." << endl;
+    cout << "!!!!! - ERROR - !!!!!" << endl;
     fPSF = 0.0;
-  }
-    
+  } 
   else {
     fPSF = (( psf_ScatElec_E_max - psf_ScatElec_E_min ) *( cos( psf_ScatElec_Theta_max ) - cos( psf_ScatElec_Theta_min ) ) * 2 * fPI *( cos( psf_Ejectile_Theta_max ) - cos( psf_Ejectile_Theta_min ) ) * 2 * fPI );
-    // cout<<"psf_ScatElec_E_max = "<<psf_ScatElec_E_max<<" ,psf_ScatElec_E_min =  "<<psf_ScatElec_E_min<<" ,psf_ScatElec_Theta_max = "<<psf_ScatElec_Theta_max * TMath::RadToDeg()<<" ,psf_ScatElec_Theta_min = "<<psf_ScatElec_Theta_min * TMath::RadToDeg()<<" ,psf_Ejectile_Theta_max = "<<psf_Ejectile_Theta_max * TMath::RadToDeg()<<" ,psf_Ejectile_Theta_min = "<<psf_Ejectile_Theta_min * TMath::RadToDeg()<<endl; // cout the max and min values
   }
   return fPSF;
-} 
+}
 
 /*--------------------------------------------------*/
 /// DEMP_Reaction
@@ -213,12 +212,8 @@ void DEMP_Reaction::process_reaction(){
   }
 
   //-------------------Love Preet - Added for actual phase space factor calculations----------------------------//
-  fPSF_org = (( fScatElec_Energy_Col_max * fm - fScatElec_Energy_Col_min * fm ) *( cos( fScatElec_Theta_Col_max ) - cos( fScatElec_Theta_Col_min ) ) * 2 * fPI *( cos( f_Ejectile_Theta_Col_max ) - cos( f_Ejectile_Theta_Col_min ) ) * 2 * fPI ); // Calculate the actual phase space factor
+  fPSF_org = (( fScatElec_Energy_Col_max * fm - fScatElec_Energy_Col_min * fm ) *( cos( fScatElec_Theta_Col_max ) - cos( fScatElec_Theta_Col_min ) ) * 2 * fPI *( cos( f_Ejectile_Theta_Col_max ) - cos( f_Ejectile_Theta_Col_min ) ) * 2 * fPI ); // Calculate the actual phase space factor, this is determined from the actual scattered electron/ejectile values in the generated events that passed all cuts
   
-  //cout<<"fScatElec_Energy_Col_max = "<<fScatElec_Energy_Col_max * fm<<" ,fScatElec_Energy_Col_min = "<<fScatElec_Energy_Col_min * fm<<" ,fScatElec_Theta_Col_max = "<<fScatElec_Theta_Col_max * TMath::RadToDeg()<<" ,fScatElec_Theta_Col_min = "<<fScatElec_Theta_Col_min * TMath::RadToDeg()<<" ,f_Ejectile_Theta_Col_max = "<<f_Ejectile_Theta_Col_max * TMath::RadToDeg()<<" ,f_Ejectile_Theta_Col_min = "<<f_Ejectile_Theta_Col_min * TMath::RadToDeg()<<endl;
-  // cout the max and min values
-     
-  //cout <<"fPSF_org =   "<<fPSF_org <<endl; // cout the actual psf 
   //-------------------Love Preet - Added for actual phase space factor calculations----------------------------// 
 
   Detail_Output();
@@ -315,9 +310,6 @@ void DEMP_Reaction::Init(){
   r_lelectrong = r_lelectron * fm;  
   cout << "Define: " << fElectron_MomZ_Col << "    "<< fElectron_Mom_Col << "  " << cos(fElectron_Theta_Col) << endl;
 
-  //cout <<" "<<r_lelectrong.Px()<<"    "<<r_lelectrong.Py()<<"  "<< r_lelectrong.Pz()<<"   "<< r_lelectrong.E()<<endl; //->Love
-  //cout <<" "<<r_lprotong.Px()<<"    "<<r_lprotong.Py()<<"  "<<r_lprotong.Pz()<<"   "<<r_lprotong.E()<<endl; //->Love
-
   ///*--------------------------------------------------*/
   /// Getting the ejectile (produced meson) particle mass from the data base
  
@@ -361,7 +353,6 @@ void DEMP_Reaction::Init(){
   f_Ejectile_Theta_F = fEjectileX_Theta_F;
   
   fPSF = psf(); // Love Preet - Added for phase space factor calculations
-  // cout << "fPSF =    " <<  fPSF << endl; // cout the psf 
    
   if (fPSF <= 0){ // if phase space factor is zero or less than zero, stop further processing // Love Preet - Added for phase space factor calculations
     return;
@@ -581,8 +572,7 @@ void DEMP_Reaction::Processing_Event(){
     fNaN++;
     return;
   }
-  //cout<<"  "<<r_l_Ejectile_g.Px()<<"  "<<r_l_Ejectile_g.Py()<<"  "<<r_l_Ejectile_g.Pz()<<"  "<<r_l_Ejectile_g.E()<<endl;
-  ///*--------------------------------------------------*/ 
+  //*--------------------------------------------------*/ 
   //-> 10/05/23 - Love added a slimmed down, simpler to read version of the CheckLaws fn
   // 
   // To check the conservation of the energy and momentum, there two methods avalaible:
@@ -850,7 +840,6 @@ void DEMP_Reaction::Processing_Event(){
   dRootTree->Fill();
   }
 }
-
 
 void DEMP_Reaction::Progress_Report(){
 
