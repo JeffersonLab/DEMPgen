@@ -22,7 +22,7 @@
 
 class Reaction{
 
- public:
+public:
   Reaction();
   Reaction(TString);
   Reaction(TString, TString);
@@ -32,7 +32,7 @@ class Reaction{
   TString GetEjectile() {return rEjectile;};		
   TString GetRecoilHadron() {return rRecoil;};
   
- protected:
+protected:
   TStopwatch tTime;
 
   TString rEjectile;
@@ -42,7 +42,7 @@ class Reaction{
 
 class DEMP_Reaction {
 
- public:
+public:
   DEMP_Reaction();
   DEMP_Reaction(TString, TString);
   ~DEMP_Reaction();
@@ -50,8 +50,8 @@ class DEMP_Reaction {
   void process_reaction();		
   TString GetEjectile() {return rEjectile;};		
   TString GetRecoilHadron() {return rRecoil;};
-
- protected:
+  
+protected:
 
   void Init();
   void Processing_Event();
@@ -62,7 +62,7 @@ class DEMP_Reaction {
   void DEMPReact_Pythia6_Output();
   void DEMPReact_HEPMC3_Out_Init();
   void DEMPReact_HEPMC3_Output();
-
+  
   TRandom2* rRanBd;
   TRandom2* rRand;
 		
@@ -94,8 +94,15 @@ class DEMP_Reaction {
 
   TFile* dRootFile;
   TTree* dRootTree;
-		
+  
+  Double_t calculate_psf_t(const TLorentzVector& psf_photon, const TLorentzVector& psf_ejectile); // Love Preet - Added for phase space factor calculations
+  void calculate_psf_max_min(double value, double& maxValue, double& minValue);
+  Double_t psf();
+  TLorentzVector psf_scatelec, psf_ejectile;
+  TLorentzVector psf_photon;
+
   long long int qsq_ev, t_ev, w_neg_ev, w_ev;
+  long long int evts;
 		
   long long int rNEvents;
   long long int rNEvent_itt;

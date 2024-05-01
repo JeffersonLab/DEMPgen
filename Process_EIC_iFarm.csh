@@ -1,4 +1,4 @@
-#!/bin/csh
+x#!/bin/csh
 
 # SJDK - 07/03/22 - New script which takes in a whole bunch of inputs to create jobs/config files. Note that I'm not 100% happy with the pathing in this file so it should be tweaked and optimised at some point
 # This version is intended for use on the JLab iFarm. Pathing is set up for this purpose and is NOT relative.
@@ -62,7 +62,7 @@ set ConfigFilename = $DEMPGENPath'/Config_EIC_'$EBeamE'on'$HBeamE'_'$Interaction
 cp "$DEMPGENPath/Config_EIC.json" $ConfigFilename
 
 # Use sed commands to change our config file based upon inputs
-sed -i 's/"file_name" \:.*/"file_name" \: "DEMPGen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Particle$Hadron'_'$NumEvents'_'$FileNum'",/' $ConfigFilename
+sed -i 's/"file_name" \:.*/"file_name" \: "DEMPgen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Particle$Hadron'_'$NumEvents'_'$FileNum'",/' $ConfigFilename
 sed -i 's/"n_events" \:.*/"n_events" \: '$NumEvents',/' $ConfigFilename
 sed -i 's/"generator_seed"\:.*/"generator_seed" \: '$RandomSeed',/' $ConfigFilename
 sed -i 's/"ebeam"\:.*/"ebeam" \: '$EBeamE',/' $ConfigFilename
@@ -78,8 +78,8 @@ eval $DEMPGENPath/build/DEMPgen $ConfigFilename
 sleep 5
 
 # Filename as it's created is a bit odd, so rename it
-set OriginalOutput = $DEMPGENPath'/data/OutputFiles/eic_input_DEMPGen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Ejectile$RecoilHadron'_'$NumEvents'_'$FileNum'.dat'
-set RenamedOutput =  $DEMPGENPath'/data/OutputFiles/eic_DEMPGen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Ejectile$RecoilHadron'_'$NumEvents'_'$FileNum'.dat'
+set OriginalOutput = $DEMPGENPath'/data/OutputFiles/eic_input_DEMPgen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Ejectile$RecoilHadron'_'$NumEvents'_'$FileNum'.dat'
+set RenamedOutput =  $DEMPGENPath'/data/OutputFiles/eic_DEMPgen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Ejectile$RecoilHadron'_'$NumEvents'_'$FileNum'.dat'
 
 mv $OriginalOutput $RenamedOutput
 
