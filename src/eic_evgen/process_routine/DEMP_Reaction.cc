@@ -46,7 +46,8 @@ Double_t DEMP_Reaction::psf(){
   for (int psf_E = 0; psf_E <= psf_steps; psf_E++){ // Loop over the scattered electron's energy
     // SJDK - 29/04/24 - Added progress report
     dFractTime = time(0); 
-    if ( psf_E % ( psf_steps / 10 ) == 0 ) {
+
+    if ( psf_E % ( psf_steps / 10 ) == 0 ){
       cout << ((1.0*psf_E)/(1.0*psf_steps))*100.0 << setw(4) << " % of phase space checked"  
 	   << "   Day: " <<  dFractTime.GetDay() 
 	   << "   Time:   " << dFractTime.GetHour() 
@@ -54,29 +55,30 @@ Double_t DEMP_Reaction::psf(){
 	   << ":" << dFractTime.GetSecond() 
 	   << endl;	  
     }
+    psf_ScatElec_E = (fEBeam * fScatElec_E_Lo + (psf_E * psf_ScatElec_E_Stepsize));  
+    psf_ScalElec_Mom = sqrt(pow(psf_ScatElec_E,2) - pow(fElectron_Mass_GeV,2));
+
     for (int psf_Theta = 0; psf_Theta <= psf_steps; psf_Theta++){  // Loop over the scattered electron's theta
+
+      psf_ScatElec_Theta = (fScatElec_Theta_I + (psf_Theta * psf_ScatElec_Theta_Stepsize));
+
       for (int psf_Phi = 0; psf_Phi <= 4; psf_Phi++){ // Loop over the scattered electron's Phi
-	for (int psf_Ejec_Theta =0; psf_Ejec_Theta <= psf_steps; psf_Ejec_Theta++){ // Loop over the scattered ejectile's theta
 
-	  psf_ScatElec_E = (fEBeam * fScatElec_E_Lo + (psf_E * psf_ScatElec_E_Stepsize));
-	  psf_ScatElec_Theta = (fScatElec_Theta_I + (psf_Theta * psf_ScatElec_Theta_Stepsize));
-	  psf_ScatElec_Phi = (0.0 + (psf_Phi * psf_ScatElec_Phi_Stepsize));
-   
-	  psf_ScalElec_Mom = sqrt(pow(psf_ScatElec_E,2) - pow(fElectron_Mass_GeV,2));
-
-	  psf_scatelec.SetPxPyPzE(psf_ScalElec_Mom * sin(psf_ScatElec_Theta) * cos( psf_ScatElec_Phi),   // Scattered's electron four momentum
-				  psf_ScalElec_Mom * sin(psf_ScatElec_Theta) * sin( psf_ScatElec_Phi),
-				  psf_ScalElec_Mom * cos(psf_ScatElec_Theta),
-				  psf_ScatElec_E);
-  
-	  psf_photon = r_lelectrong - psf_scatelec; // virtual photon four momentum
-	  psf_Q2 = -1.*(psf_photon.Mag2());         // Lorentz variable Q2
-	  psf_W  =  ((psf_photon + r_lprotong).Mag()); // Lorentz variable W
-	  psf_W2 =  ((psf_photon + r_lprotong).Mag2()); // Lorentz variable W2
+	psf_ScatElec_Phi = (0.0 + (psf_Phi * psf_ScatElec_Phi_Stepsize));
+	psf_scatelec.SetPxPyPzE(psf_ScalElec_Mom * sin(psf_ScatElec_Theta) * cos( psf_ScatElec_Phi),   // Scattered's electron four momentum
+				psf_ScalElec_Mom * sin(psf_ScatElec_Theta) * sin( psf_ScatElec_Phi),
+				psf_ScalElec_Mom * cos(psf_ScatElec_Theta),
+				psf_ScatElec_E);
+	psf_photon = r_lelectrong - psf_scatelec; // virtual photon four momentum
+	psf_Q2 = -1.*(psf_photon.Mag2());         // Lorentz variable Q2
+	psf_W  =  ((psf_photon + r_lprotong).Mag()); // Lorentz variable W
+	psf_W2 =  ((psf_photon + r_lprotong).Mag2()); // Lorentz variable W2
+	
+	if (( psf_Q2 >= fQsq_Min &&  psf_Q2 <= fQsq_Max) &&  psf_W2 >= 0.0 && ( psf_W >= fW_Min &&  psf_W <= fW_Max)){
+	  for (int psf_Ejec_Theta =0; psf_Ejec_Theta <= psf_steps; psf_Ejec_Theta++){ // Loop over the scattered ejectile's theta
   
 	  //-----------------------------Calculate variables for ejectile..........................................//
    
-	  if (( psf_Q2 >= fQsq_Min &&  psf_Q2 <= fQsq_Max) &&  psf_W2 >= 0.0 && ( psf_W >= fW_Min &&  psf_W <= fW_Max)){
    
 	    psf_Ejectile_Theta = (fEjectileX_Theta_I + (psf_Ejec_Theta *psf_Ejec_Theta_Stepsize));
 	    psf_Ejectile_Phi = 0.0;
@@ -134,8 +136,8 @@ Double_t DEMP_Reaction::psf(){
   
 	      } // if statement over psf_t
 	    } // if statement over ejectile energy
-	  } // If condition over psf_Q2,psf_W,psf_W2
-	} // End of for loop over psf_Theta_Ejec
+	  } // End of for loop over psf_Theta_Ejec
+	} // If condition over psf_Q2,psf_W,psf_W2
       } // End of for loop over psf_Phi
     } // End of for loop over psf_Theta
   } // End of for loop over psf_Phi 
