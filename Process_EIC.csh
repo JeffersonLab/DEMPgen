@@ -44,7 +44,7 @@ set ConfigFilename = 'Config_EIC_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Ejec
 cp Config_EIC.json $ConfigFilename
 
 # Use sed commands to change our config file based upon inputs
-sed -i 's/"file_name" \:.*/"file_name" \: "DEMPGen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Ejectile$RecoilHadron'_'$NumEvents'_'$FileNum'",/' $ConfigFilename
+sed -i 's/"file_name" \:.*/"file_name" \: "DEMPgen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Ejectile$RecoilHadron'_'$NumEvents'_'$FileNum'",/' $ConfigFilename
 sed -i 's/"n_events" \:.*/"n_events" \: '$NumEvents',/' $ConfigFilename
 sed -i 's/"generator_seed"\:.*/"generator_seed" \: '$RandomSeed',/' $ConfigFilename
 sed -i 's/"ebeam"\:.*/"ebeam" \: '$EBeamE',/' $ConfigFilename
@@ -60,8 +60,8 @@ cd data/
 sleep 5
 
 # Filename as it's created is a bit odd, so rename it
-set OriginalOutput = 'eic_input_DEMPGen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Ejectile$RecoilHadron'_'$NumEvents'_'$FileNum'.dat'
-set RenamedOutput = 'eic_DEMPGen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Ejectile$RecoilHadron'_'$NumEvents'_'$FileNum'.dat'
+set OriginalOutput = 'eic_input_DEMPgen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Ejectile$RecoilHadron'_'$NumEvents'_'$FileNum'.dat'
+set RenamedOutput = 'eic_DEMPgen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Ejectile$RecoilHadron'_'$NumEvents'_'$FileNum'.dat'
 mv "OutputFiles/"$OriginalOutput "OutputFiles/"$RenamedOutput
 
 rm -rf ../$ConfigFilename

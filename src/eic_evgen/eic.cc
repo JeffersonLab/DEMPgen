@@ -139,6 +139,16 @@ void eic(Json::Value obj) {
   //  	TDatime dsTime;
   //  	cout << "Start Time:   " << dsTime.GetHour() << ":" << dsTime.GetMinute() << endl;
   // 21/12/22 - SJDK - Should do a check if these are defined or not, should crash if not defined or set defaults, see other quantities below
+  TString ROOTFile = obj["ROOTOut"].asString();
+  if (ROOTFile == "True" || ROOTFile == "true" || ROOTFile == "TRUE"){
+    gROOTOut = true;
+    cout << "ROOT output file enabled." << endl;
+  }
+  else{
+    gROOTOut = false;
+    cout << "ROOT output file disabled." << endl;
+  }
+
   TString Ejectile = obj["ejectile"].asString();
   TString RecoilHadron = obj["recoil_hadron"].asString(); // 09/02/22 - SJDK - Added in RecoilHadron type argument for K+
   // SJDK - 08/02/22 - This is terrible, need to change this, Ejectile should just be K+
@@ -177,7 +187,7 @@ void eic(Json::Value obj) {
   // SJDK 03/04/23 - Change to how Qsq range is set/chosen, could add as an override variable later too
   // Set min/max Qsq values depending upon Ejectile type
   if (Ejectile == "pi+" || Ejectile == "Pion+" || Ejectile == "Pi+"){
-    fQsq_Min = 3.0; fQsq_Max = 35.0;
+    fQsq_Min = 3.5; fQsq_Max = 35.0; // Love Preet changed to 3.5 as SigT parameterization starts from Q2 = 3.5
     fW_Min = 2.0; fW_Max = 10.2;
     fT_Max = 1.3;
   }
@@ -356,7 +366,6 @@ void SetEICSeed (int seed) {
 ///*--------------------------------------------------*/
 ///*--------------------------------------------------*/
 ///  Some utility functions
-
 
 ///*--------------------------------------------------*/
 /// Extracting the particle type
