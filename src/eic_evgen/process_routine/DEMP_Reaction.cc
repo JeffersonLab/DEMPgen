@@ -33,13 +33,12 @@ Double_t DEMP_Reaction::psf(){
   cout << "Beginning phase space calculation -" << endl;
 
   //----Note that all the calculations have been done in GeV for the psf...............................................//
-   
   //-----------------------------Calculate variables for scattered electron...........................................//
-  psf_ScatElec_E_Stepsize = (fEBeam*(fScatElec_E_Hi - fScatElec_E_Lo))/psf_steps;  // Defined stepsize for scattered electron's energy, theta, and phi
-  psf_ScatElec_Theta_Stepsize = (fScatElec_Theta_F - fScatElec_Theta_I)/psf_steps;
+  psf_ScatElec_E_Stepsize = (fEBeam*(fScatElec_E_Hi - fScatElec_E_Lo))/psf_steps; //in GeV // Defined stepsize for scattered electron's energy, theta, and phi 
+  psf_ScatElec_Theta_Stepsize = (fScatElec_Theta_F - fScatElec_Theta_I)/psf_steps; // in radian
   psf_ScatElec_Phi_Stepsize = (2.0 * fPi)/4.0;
    
-  psf_Ejec_Theta_Stepsize = (fEjectileX_Theta_F - fEjectileX_Theta_I)/psf_steps;   // Defined stepsize for ejectile theta
+  psf_Ejec_Theta_Stepsize = (fEjectileX_Theta_F - fEjectileX_Theta_I)/psf_steps; // in radian  // Defined stepsize for ejectile theta
    
   for (int psf_E = 0; psf_E <= psf_steps; psf_E++){ // Loop over the scattered electron's energy
     // SJDK - 29/04/24 - Added progress report
@@ -158,6 +157,21 @@ Double_t DEMP_Reaction::psf(){
     fPSF = 0.0;
   } 
   else {
+    // Calculate the PSF by expanding the limits on both sides by a step size of 1.0.
+    psf_ScatElec_E_min      = psf_ScatElec_E_min     - ( 1.0 * psf_ScatElec_E_Stepsize ); // Units are in GeV
+    psf_ScatElec_E_max      = psf_ScatElec_E_max     + ( 1.0 * psf_ScatElec_E_Stepsize );
+    psf_ScatElec_Theta_min  = psf_ScatElec_Theta_min - ( 1.0 * psf_ScatElec_Theta_Stepsize ); // Units are in Radian
+    psf_ScatElec_Theta_max  = psf_ScatElec_Theta_max + ( 1.0 * psf_ScatElec_Theta_Stepsize );
+    psf_Ejectile_Theta_min  = psf_Ejectile_Theta_min - ( 1.0 * psf_Ejec_Theta_Stepsize ); // Units are in Radian
+    psf_Ejectile_Theta_max  = psf_Ejectile_Theta_max + ( 1.0 * psf_Ejec_Theta_Stepsize );
+  	
+    if ( psf_ScatElec_E_min < ( fEBeam * fScatElec_E_Lo ) || psf_ScatElec_E_min == ( fEBeam * fScatElec_E_Lo ) ) { psf_ScatElec_E_min = ( fEBeam * fScatElec_E_Lo ); }
+    if ( psf_ScatElec_E_max > ( fEBeam * fScatElec_E_Hi ) || psf_ScatElec_E_max == ( fEBeam * fScatElec_E_Hi ) ) { psf_ScatElec_E_max = ( fEBeam * fScatElec_E_Hi ); }
+    if ( psf_ScatElec_Theta_min < fScatElec_Theta_I || psf_ScatElec_Theta_min == fScatElec_Theta_I ) { psf_ScatElec_Theta_min = fScatElec_Theta_I; }
+    if ( psf_ScatElec_Theta_max > fScatElec_Theta_F || psf_ScatElec_Theta_max == fScatElec_Theta_F ) { psf_ScatElec_Theta_max = fScatElec_Theta_F; }
+    if ( psf_Ejectile_Theta_min < fEjectileX_Theta_I || psf_Ejectile_Theta_min == fEjectileX_Theta_I ) { psf_Ejectile_Theta_min = fEjectileX_Theta_I; }
+    if ( psf_Ejectile_Theta_max > fEjectileX_Theta_F || psf_Ejectile_Theta_max == fEjectileX_Theta_F ) { psf_Ejectile_Theta_max = fEjectileX_Theta_F; }
+  
     fPSF = (( psf_ScatElec_E_max - psf_ScatElec_E_min ) *( cos( psf_ScatElec_Theta_max ) - cos( psf_ScatElec_Theta_min ) ) * 2 * fPI *( cos( psf_Ejectile_Theta_max ) - cos( psf_Ejectile_Theta_min ) ) * 2 * fPI );
   }
   return fPSF;
@@ -194,6 +208,15 @@ void DEMP_Reaction::process_reaction(){
   if (fPSF <= 0){// If phase space factor is zero or less than zero, stop further processing // Love Preet - Added for phase space factor calculations
     return;
   }
+  
+  //-------------------Love Preet - Added to print out the considered ranges for PSF calculations----------------------------//
+  
+  cout << "------------------------------------------------------------------------------------------------------------------------------------------------------" << endl;
+  cout << "Specified scattered electron and ejectile energy/angle ranges in input .json file are ajusted to ensure that they fall within the allowed phase space." << endl;
+  cout << "Ee_Low = " << psf_ScatElec_E_min << ", Ee_High = " << psf_ScatElec_E_max << ", e_Theta_Low = " << psf_ScatElec_Theta_min * TMath::RadToDeg() << ", e_Theta_High = " << psf_ScatElec_Theta_max * TMath::RadToDeg() << ", EjectileX_Theta_Low = " << psf_Ejectile_Theta_min * TMath::RadToDeg() << ", EjectileX_Theta_High = " << psf_Ejectile_Theta_max * TMath::RadToDeg() << endl;
+  cout << "------------------------------------------------------------------------------------------------------------------------------------------------------" << endl;
+  
+  //-------------------Love Preet - Added to print out the considered ranges for PSF calculations----------------------------//
   
   if (gOutputType == "Pythia6"){
     DEMPReact_Pythia6_Out_Init();
@@ -250,7 +273,7 @@ void DEMP_Reaction::Init(){
     sDFile = Form("./%s/eic_%s.root", dir_name, gfile_name.Data()); // LovePreet changed to make the files name consistent
     dRootFile = new TFile(sDFile.c_str(),"RECREATE"); 
     dRootTree = new TTree("Events", "Description of a tree");  //Love Preet added all these new braches to be stored in a root ttree
-    dRootTree->Branch("EventWeight", &fEventWeight, "fEventWeight/D");  
+    dRootTree->Branch("EventWeight", &fEventWeight, "EventWeight/D");
     dRootTree->Branch("scat_e_px", &scat_e_px, "scat_e_px/D");
     dRootTree->Branch("scat_e_py", &scat_e_py, "scat_e_py/D");
     dRootTree->Branch("scat_e_pz", &scat_e_pz, "scat_e_pz/D");
@@ -263,11 +286,11 @@ void DEMP_Reaction::Init(){
     dRootTree->Branch("rclH_py", &rclH_py, "rclH_py/D");
     dRootTree->Branch("rclH_pz", &rclH_pz, "rclH_pz/D");
     dRootTree->Branch("rclH_E",  &rclH_E, "rclH_E/D"); 
-    dRootTree->Branch("Q2", &fQsq_GeV, "fQsq_GeV/D");
-    dRootTree->Branch("W",  &fW_GeV, "fW_GeV/D");
-    dRootTree->Branch("t", &fT_GeV, "fT_GeV/D");
-    dRootTree->Branch("x_b", &fx, "fx/D");
-    dRootTree->Branch("y_E", &fy, "fy/D");
+    dRootTree->Branch("Q2", &fQsq_GeV, "Q2/D");
+    dRootTree->Branch("W",  &fW_GeV, "W/D");
+    dRootTree->Branch("t", &fT_GeV, "t/D");
+    dRootTree->Branch("x_b", &fx, "x_b/D");
+    dRootTree->Branch("y_E", &fy, "y_E/D");
   }
   /*--------------------------------------------------*/
   qsq_ev = 0, t_ev = 0, w_neg_ev = 0, w_ev = 0;
@@ -353,7 +376,6 @@ void DEMP_Reaction::Init(){
   f_Ejectile_Theta_F = fEjectileX_Theta_F;
   
   fPSF = psf(); // Love Preet - Added for phase space factor calculations
-   
   if (fPSF <= 0){ // if phase space factor is zero or less than zero, stop further processing // Love Preet - Added for phase space factor calculations
     return;
   }
@@ -447,15 +469,17 @@ void DEMP_Reaction::Processing_Event(){
   // ---------------------------------------------------------------------
   // Specify the energy and solid angle of scatterd electron in Collider (lab) frame
   // ---------------------------------------------------------------------
-  fScatElec_Theta_Col  = acos( fRandom->Uniform( cos( fScatElec_Theta_I ) , cos( fScatElec_Theta_F ) ) );
+  //fScatElec_Theta_Col  = acos( fRandom->Uniform( cos( fScatElec_Theta_I ) , cos( fScatElec_Theta_F ) ) );
+  fScatElec_Theta_Col  = acos( fRandom->Uniform( cos( psf_ScatElec_Theta_min ) , cos( psf_ScatElec_Theta_max ) ) ); // Love Preet changed to the allowed region calculated from psf 
   fScatElec_Phi_Col    = fRandom->Uniform( 0 , 2.0 * fPi);
-  fScatElec_Energy_Col = fRandom->Uniform( fScatElec_E_Lo * fElectron_Energy_Col , fScatElec_E_Hi * fElectron_Energy_Col );  
-
+  //fScatElec_Energy_Col = fRandom->Uniform( fScatElec_E_Lo * fElectron_Energy_Col , fScatElec_E_Hi * fElectron_Energy_Col ); // in MeV
+  fScatElec_Energy_Col = fRandom->Uniform( psf_ScatElec_E_min * fK, psf_ScatElec_E_max * fK ); // in MeV // Love Preet changed to the allowed region calculated from psf 
+ 
   // ----------------------------------------------------
   // Produced ejectile in Collider frame
   // ----------------------------------------------------  
-
-  f_Ejectile_Theta_Col      = acos( fRandom->Uniform( cos(f_Ejectile_Theta_I), cos(f_Ejectile_Theta_F ) ) ); 
+  //f_Ejectile_Theta_Col      = acos( fRandom->Uniform( cos(f_Ejectile_Theta_I), cos(f_Ejectile_Theta_F ) ) ); 
+  f_Ejectile_Theta_Col      = acos( fRandom->Uniform( cos( psf_Ejectile_Theta_min ), cos( psf_Ejectile_Theta_max ) ) ); // Love Preet changed to the allowed region calculated from psf 
   f_Ejectile_Phi_Col        = fRandom->Uniform( 0 , 2.0 * fPi );  
   
   //---------------------------------------------------------------------
@@ -644,13 +668,17 @@ void DEMP_Reaction::Processing_Event(){
   // -----------------------------------------------------------------------------------------
   // 18/05/23 - SJDK - Should these be proton mass still or not?
 
-  fBeta_CM_RF        = (lphoton_rf.Vect()).Mag() / (lphoton_rf.E() + r_lhadron_beam_mass);
+  //fBeta_CM_RF        = (lphoton_rf.Vect()).Mag() / (lphoton_rf.E() + r_lhadron_beam_mass);
+  fBeta_CM_RF        = ( lphoton_rfg.Vect() ).Mag() / ( lphoton_rfg.E() + ( r_lhadron_beam_mass * fm ) ); // involved quantities are in GeV
 
-  fGamma_CM_RF       = (lphoton_rf.E() + r_lhadron_beam_mass) / fW;
+  //fGamma_CM_RF       = (lphoton_rf.E() + r_lhadron_beam_mass) / fW;
+  fGamma_CM_RF       = ( lphoton_rfg.E() + ( r_lhadron_beam_mass * fm ) ) / ( fW * fm ); // involved quantities are in GeV
   f_Ejectile_Energy_CM       = (pow(fW, 2) + pow(f_Ejectile_Mass,2) - pow(f_Recoil_Mass,2) ) / (2.0* fW);    
   f_Ejectile_Mom_CM          = sqrt(pow(f_Ejectile_Energy_CM,2) - pow(f_Ejectile_Mass,2));    
-  f_Ejectile_Energy_CM_GeV   = f_Ejectile_Energy_CM / 1000.0;
-  f_Ejectile_Mom_CM_GeV      = f_Ejectile_Mom_CM / 1000.0;
+  //f_Ejectile_Energy_CM_GeV   = f_Ejectile_Energy_CM / 1000.0;
+  //f_Ejectile_Mom_CM_GeV      = f_Ejectile_Mom_CM / 1000.0;
+  f_Ejectile_Energy_CM_GeV   = f_Ejectile_Energy_CM * fm;
+  f_Ejectile_Mom_CM_GeV      = f_Ejectile_Mom_CM * fm;
 
   // this equation is valid for parallel kinematics only!
   fT_Para = ( pow(((r_lphoton.Vect()).Mag() - (r_l_Ejectile.Vect()).Mag()),2) - pow((r_lphoton.E() - r_l_Ejectile.E()),2));
@@ -736,15 +764,20 @@ void DEMP_Reaction::Processing_Event(){
   // epsilon=1./(1.+ 2.*(pgam_restg**2)/q2g * *(tand(thscat_rest/2.))**2)
   // -----------------------------------------------------------------------------------
  
-  double fTheta_EEp = (lelectron_rf.Vect()).Angle(lscatelec_rf.Vect());
+  //double fTheta_EEp = (lelectron_rf.Vect()).Angle(lscatelec_rf.Vect());
+  double fTheta_EEp = ( lelectron_rfg.Vect() ).Angle( lscatelec_rfg.Vect() ); // involved quantities are in GeV
 
   fEpsilon = 1.0 / ( 1.0 + 2.0 * ( pow( (lphoton_rfg.Vect()).Mag(),2)/fQsq_GeV ) * pow( tan( fTheta_EEp / 2 ) , 2 ) );
 
   // ----------------------------------------------------
   // Virtual Photon flux factor in units of 1/(GeV*Sr)
   // ----------------------------------------------------
-  fFlux_Factor_Col = (fAlpha/(2.0*pow(fPi,2))) * (r_lscatelecg.E() / r_lelectrong.E()) * 
-    ( pow(fW_GeV,2) - pow(fProton_Mass_GeV,2) ) / (2.0*fProton_Mass_GeV*fQsq_GeV*(1.0 - fEpsilon));
+  // fFlux_Factor_Col = (fAlpha/(2.0*pow(fPi,2))) * (r_lscatelecg.E() / r_lelectrong.E()) * 
+  //   ( pow(fW_GeV,2) - pow(fProton_Mass_GeV,2) ) / (2.0*fProton_Mass_GeV*fQsq_GeV*(1.0 - fEpsilon));
+  
+  fFlux_Factor_Col = ( fAlpha / ( 2.0 * pow( fPi , 2 ) ) ) * ( r_lscatelecg.E() / r_lelectrong.E() ) *  // All are in GeV (more organised form)
+    ( pow( fW_GeV , 2 ) - pow( fProton_Mass_GeV , 2 ) ) / 
+    ( 2.0 * fProton_Mass_GeV * fQsq_GeV * ( 1.0 - fEpsilon ) );
          
   fFlux_Factor_RF = ( fAlpha / ( 2.0 * pow( fPi , 2 ) ) ) * ( lscatelec_rfg.E() / lelectron_rfg.E() ) *
     ( pow( fW_GeV , 2 ) - pow( fProton_Mass_GeV , 2 ) ) /
@@ -755,20 +788,28 @@ void DEMP_Reaction::Processing_Event(){
   // ----------------------------------------------------
   //  Jacobian  dt/dcos(theta*)dphi in units of GeV2/sr
   // ----------------------------------------------------
-  fJacobian_CM = ( (lphoton_rfg.Vect()).Mag() - fBeta_CM_RF * lphoton_rfg.E() ) / ( fGamma_CM_RF * ( 1.0 - pow(fBeta_CM_RF,2) ) ); // Eqn 22 in paper
- 
+  // fJacobian_CM = ( (lphoton_rfg.Vect()).Mag() - fBeta_CM_RF * lphoton_rfg.E() ) / ( fGamma_CM_RF * ( 1.0 - pow(fBeta_CM_RF,2) ) ); // Eqn 22 in paper
+  fJacobian_CM = fGamma_CM_RF * ( ( lphoton_rfg.Vect() ).Mag() - ( fBeta_CM_RF * lphoton_rfg.E() ) ); // All are in GeV // Love Preeet changed it 
+  
   fA = fJacobian_CM * f_Ejectile_Mom_CM_GeV / fPi; // Eqn 21 in paper
  
   // ----------------------------------------------------
   // Jacobian dOmega* / dOmega dimensionless
   // ----------------------------------------------------
-  fJacobian_CM_RF  = ( pow((l_Ejectile_rf.Vect()).Mag(),2)*fW) / 
+  /*fJacobian_CM_RF  = ( pow((l_Ejectile_rf.Vect()).Mag(),2)*fW) / 
     ( f_Ejectile_Mom_CM * std::abs( ( fProton_Mass + lphoton_rf.E()) * (l_Ejectile_rf.Vect()).Mag() - 
-				    ( l_Ejectile_rf.E() * (lphoton_rf.Vect()).Mag() * cos( l_Ejectile_rf.Theta() ) ) ) ); // Differs from next line in photon vect -> lphoton_rf vs r_lphoton
+    ( l_Ejectile_rf.E() * (lphoton_rf.Vect()).Mag() * cos( l_Ejectile_rf.Theta() ) ) ) ); // Differs from next line in photon vect -> lphoton_rf vs r_lphoton
  
-  fJacobian_CM_Col = ( ( pow((r_l_Ejectile.Vect()).Mag(),2) * fW ) / // This one is actually used subsequently, so this must be Eqn 20
-		       ( f_Ejectile_Mom_CM * std::abs( ( fProton_Mass + r_lphoton.E() ) * (r_l_Ejectile.Vect()).Mag() -
-						       ( r_l_Ejectile.E() * (r_lphoton.Vect()).Mag() * cos( r_l_Ejectile.Theta() ) ) ) ) ); 
+    fJacobian_CM_Col = ( ( pow((r_l_Ejectile.Vect()).Mag(),2) * fW ) / // This one is actually used subsequently, so this must be Eqn 20
+    ( f_Ejectile_Mom_CM * std::abs( ( fProton_Mass + r_lphoton.E() ) * (r_l_Ejectile.Vect()).Mag() -
+    ( r_l_Ejectile.E() * (r_lphoton.Vect()).Mag() * cos( r_l_Ejectile.Theta() ) ) ) ) ); */
+
+  fBeta_Col  = ( r_lphotong.Vect() + r_lprotong.Vect() ).Mag() / ( r_lphotong.E() + r_lprotong.E() ); // All are in GeV // Love Preeet changed it 
+  fGamma_Col = ( r_lphotong.E() + r_lprotong.E() ) / ( fW * fm );
+  ftheta_Col = ( r_lphotong.Angle( r_l_Ejectile_g.Vect() ) ); // angle between the virtualphoton and the ejectile in the collider frame
+   
+  fJacobian_CM_Col = ( pow( ( r_l_Ejectile_g.Vect()).Mag() , 2 ) /
+		       fGamma_Col * f_Ejectile_Mom_CM_GeV * ( ( r_l_Ejectile_g.Vect() ).Mag() - ( fBeta_Col * r_l_Ejectile_g.E() * cos( ftheta_Col ) ) ) );
 
 
   //	 cout <<  l_Ejectile_rf.Vect().Mag() << "  " << << << << << << << << endl;
@@ -786,8 +827,8 @@ void DEMP_Reaction::Processing_Event(){
   // CKY sigma L and T ends
   // -----------------------------------------------------------------------------------------------------------
  
-  //fSigma_Col = r_fSig * fFlux_Factor_Col * fA * fJacobian_CM_Col; 
-  fSigma_Col = r_fSig * fFlux_Factor_RF * fA * fJacobian_CM_Col; // Love Preet changed flux factor from collider to rest frame
+  fSigma_Col = r_fSig * fFlux_Factor_Col * fA * fJacobian_CM_Col; 
+  // fSigma_Col = r_fSig * fFlux_Factor_RF * fA * fJacobian_CM_Col; // Love Preet changed flux factor from collider to rest frame
 
   if ( ( fSigma_Col <= 0 ) || std::isnan( fSigma_Col ) ) { 
     fNSigmaNeg ++;
@@ -825,19 +866,19 @@ void DEMP_Reaction::Processing_Event(){
   }
 
   if (gROOTOut == true){
-  scat_e_px =  r_lscatelecg.X(); // Love Preet - Added to be stored in the root tree
-  scat_e_py =  r_lscatelecg.Y();
-  scat_e_pz =  r_lscatelecg.Z();
-  scat_e_E  =  r_lscatelecg.E();
-  ejec_px   =  r_l_Ejectile_g.X();
-  ejec_py   =  r_l_Ejectile_g.Y();
-  ejec_pz   =  r_l_Ejectile_g.Z();
-  ejec_E    =  r_l_Ejectile_g.E(); 
-  rclH_px   =  l_Recoil_g.X();
-  rclH_py   =  l_Recoil_g.Y();
-  rclH_pz   =  l_Recoil_g.Z();
-  rclH_E    =  l_Recoil_g.E();
-  dRootTree->Fill();
+    scat_e_px =  r_lscatelecg.X(); // Love Preet - Added to be stored in the root tree
+    scat_e_py =  r_lscatelecg.Y();
+    scat_e_pz =  r_lscatelecg.Z();
+    scat_e_E  =  r_lscatelecg.E();
+    ejec_px   =  r_l_Ejectile_g.X();
+    ejec_py   =  r_l_Ejectile_g.Y();
+    ejec_pz   =  r_l_Ejectile_g.Z();
+    ejec_E    =  r_l_Ejectile_g.E(); 
+    rclH_px   =  l_Recoil_g.X();
+    rclH_py   =  l_Recoil_g.Y();
+    rclH_pz   =  l_Recoil_g.Z();
+    rclH_E    =  l_Recoil_g.E();
+    dRootTree->Fill();
   }
 }
 
@@ -1042,21 +1083,26 @@ void DEMP_Reaction::Detail_Output(){ // Love Preet changed the order of conditio
   DEMPDetails << left << setw(70) << endl << "Weight correction factors -" << endl;
   DEMPDetails << left << setw(70) << "Ratio of phase space factors (fPSF_org/fPSF)" << right << setw(20) << ((double)fPSF_org/(double)fPSF) << endl;
   DEMPDetails << left << setw(70) << "Ratio of tried to physical events" << right << setw(20) << ((double)fNGenerated / (double) (fNGenerated - fNaN - fConserve - w_neg_ev))  << endl;
-  DEMPDetails << left << setw(70) <<" 1. If the first ratio is not ~1.0 (+/- 0.05), check the number of recorded events. If the number of recorded events is <50,000, increase the number of attempted events to generate more data. If the the ratio does not converge to ~1.0, multiply all individual event weights by this factor during analysis. Alternatively, this number can be treated as a tolerance on weights."<<endl;
+  DEMPDetails << left << setw(70) <<" 1. If the first ratio is not ~1.0 (+/- 0.05), check the number of recorded events. If the number of recorded events is < 50,000, increase the number of attempted events to generate more data. If the the ratio does not converge to ~1.0, multiply all individual event weights by this factor during analysis. Alternatively, this number can be treated as a tolerance on weights."<<endl;
   DEMPDetails << left << setw(70) <<" 2. If the second ratio is large (> XX), then again, multiply all invidiual event weights by this factor during analysis. Again, this could also be considered as a tolerance on weights."<<endl;
    
   DEMPDetails << left << setw(70) << endl << "Energies, angles, and phase space factors -" << endl;
-  DEMPDetails << left << setw(70) <<"User-defined scattered electron energies" << right << setw(20) <<  fScatElec_E_Lo * fElectron_Energy_Col *fm << right << setw(20) <<fScatElec_E_Hi * fElectron_Energy_Col *fm<<endl; 
-  DEMPDetails << left << setw(70) << "User-defined scattered electron angles" << right << setw(20) <<  (fScatElec_Theta_I * TMath::RadToDeg()) << right << setw(20)   <<(fScatElec_Theta_F * TMath::RadToDeg())<<endl; 
-  DEMPDetails << left << setw(70) << "User-defined scattered ejectile angles" <<right << setw(20) <<(f_Ejectile_Theta_I * TMath::RadToDeg())<<right << setw(20)<<(f_Ejectile_Theta_F * TMath::RadToDeg())<<endl;
-  DEMPDetails << left << setw(70) << "Calculated scattered electron energies for psf" << right << setw(20) << psf_ScatElec_E_min << right << setw(20) <<psf_ScatElec_E_max<<endl; 
-  DEMPDetails << left << setw(70) << "Calculated scattered electron angles for psf" << right << setw(20) << psf_ScatElec_Theta_min * TMath::RadToDeg() << right << setw(20) <<psf_ScatElec_Theta_max * TMath::RadToDeg()<<endl; 
-  DEMPDetails << left << setw(70) << "Calculated scattered ejectile angles for psf" << right << setw(20) << psf_Ejectile_Theta_min * TMath::RadToDeg() << right << setw(20) <<psf_Ejectile_Theta_max * TMath::RadToDeg()<<endl; 
-  DEMPDetails << left << setw(70) << "Calculated phase space factors (fPSF)" << right << setw(20) << fPSF << endl;
-  DEMPDetails << left << setw(70) << "Actual scattered electron energies for psf" << right << setw(20) << fScatElec_Energy_Col_min * fm << right << setw(20) <<fScatElec_Energy_Col_max * fm<<endl; 
-  DEMPDetails << left << setw(70) << "Actual scattered electron angles for psf" << right << setw(20) << fScatElec_Theta_Col_min * TMath::RadToDeg()<< right << setw(20) <<fScatElec_Theta_Col_max * TMath::RadToDeg()<<endl; 
-  DEMPDetails << left << setw(70) << "Actual scattered ejectile angles for psf" << right << setw(20) << f_Ejectile_Theta_Col_min * TMath::RadToDeg() << right << setw(20) <<f_Ejectile_Theta_Col_max * TMath::RadToDeg()<<endl;
-  DEMPDetails << left << setw(70) << "Actual phase space factors (fPSF_org)" << right << setw(20) << fPSF_org << endl;
+  
+  DEMPDetails << right << setw(90) << "User-defined" << right << setw(20) << "Calculated" << right <<  setw(20) << "Actual" << endl;
+  
+  DEMPDetails << left << setw(70) << "Scattered electron energies (Low)" << right << setw(20) << fScatElec_E_Lo * fElectron_Energy_Col *fm << right << setw(20) << psf_ScatElec_E_min << right << setw(20) << fScatElec_Energy_Col_min * fm << endl;
+  
+  DEMPDetails << left << setw(70) << "Scattered electron energies (High)" << right << setw(20) << fScatElec_E_Hi * fElectron_Energy_Col *fm << right << setw(20) << psf_ScatElec_E_max << right << setw(20) << fScatElec_Energy_Col_max * fm << endl;
+  
+  DEMPDetails << left << setw(70) << "Scattered electron angles (Low)" << right << setw(20) << (fScatElec_Theta_I * TMath::RadToDeg()) << right << setw(20) << psf_ScatElec_Theta_min * TMath::RadToDeg() << right << setw(20) << fScatElec_Theta_Col_min * TMath::RadToDeg() << endl; 
+  
+  DEMPDetails << left << setw(70) << "Scattered electron angles (High)" << right << setw(20) << (fScatElec_Theta_F * TMath::RadToDeg()) << right << setw(20) << psf_ScatElec_Theta_max * TMath::RadToDeg() << right << setw(20) << fScatElec_Theta_Col_max * TMath::RadToDeg() << endl; 
+  
+  DEMPDetails << left << setw(70) << "Scattered ejectile angles (Low)" << right << setw(20) << (f_Ejectile_Theta_I * TMath::RadToDeg()) << right << setw(20) << psf_Ejectile_Theta_min * TMath::RadToDeg() << right << setw(20) << f_Ejectile_Theta_Col_min * TMath::RadToDeg() << endl;
+  
+  DEMPDetails << left << setw(70) << "Scattered ejectile angles (High)" << right << setw(20) << (f_Ejectile_Theta_F * TMath::RadToDeg()) << right << setw(20) << psf_Ejectile_Theta_max * TMath::RadToDeg() << right << setw(20) << f_Ejectile_Theta_Col_max * TMath::RadToDeg() << endl;
+  
+  DEMPDetails << left << setw(70) << "Phase space factors (fPSF fSF_org)" << right << setw(20) << fPSF << right << setw(20) << fPSF_org << endl;
   
   if(UseSolve == true){
     DEMPDetails << left << setw(70) << endl << "Solve function, addtional info -" << endl;
@@ -1463,3 +1509,4 @@ int DEMP_Reaction::Solve(double theta, double phi){
   return 1;
 
 }
+

@@ -37,5 +37,5 @@
     "e_Theta_Low": 60.0, // The minimum scattered electron angle (theta) that will be generated in degrees
     "e_Theta_High": 175.0, // The maximum scattered electron angle (theta) that will be generated in degrees
     "EjectileX_Theta_Low": 0.0, // The minimum ejectile angle (theta) that will be generated in degrees
-    "EjectileX_Theta_High": 50.0, // The maximum ejectile angle (theta) that will be generated in degrees
+    "EjectileX_Theta_High": 100.0, // The maximum ejectile angle (theta) that will be generated in degrees
 }

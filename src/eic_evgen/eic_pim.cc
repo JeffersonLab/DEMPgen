@@ -177,6 +177,8 @@ double fScatElec_Energy_Col_max, fScatElec_Energy_Col_min, fScatElec_Theta_Col_m
 
 double scat_e_px, scat_e_py, scat_e_pz, scat_e_E, ejec_px, ejec_py, ejec_pz, ejec_E, rclH_px, rclH_py, rclH_pz, rclH_E; // Love Preet - Added to be stored in the root tree
 
+double fBeta_Col, fGamma_Col, ftheta_Col; //Love Preet - Added for jacobian calculation in collider frame
+
 double fProb[300] = {    
 		     6.03456,    6.02429,    6.01155,    5.99636,    5.97873,    5.95869,    5.93626,    5.91147,    5.88435,    5.85493,
 		     5.82325,    5.78935,    5.75326,    5.71504,    5.67472,    5.63235,    5.58799,    5.54169,     5.4935,    5.44347,		   
@@ -301,7 +303,7 @@ void pim::Initilize() {
   fDiff                                       = 0.00001; // 10/05/23 - Love Preet - Changed from 0.5
     
   // Love Preet - Adding for phase space factor calculations
-  psf_steps                                   = 1000.0;
+  psf_steps                                   = 1000.0; //1000.0;
   psf_ScatElec_E_max = std::numeric_limits<double>::min(); // Initialize maxValue for the scattered electron's energy
   psf_ScatElec_E_min = std::numeric_limits<double>::max(); // Initialize minValue for the scattered electron's energy
   psf_ScatElec_Theta_max = std::numeric_limits<double>::min(); // Initialize maxValue for the scattered electron's theta
@@ -331,7 +333,11 @@ void pim::Initilize() {
   rclH_py                                    = 0;
   rclH_pz                                    = 0;
   rclH_E                                     = 0;    
-    
+  
+  //Love Preet - Added for jacobian calculation in collider frame
+  fBeta_Col                                  = 0;
+  fGamma_Col                                 = 0;
+  ftheta_Col                                 = 0;
   // 02/06/21 - SJDK
   // Set to 0, now set in PiPlusProd.cc
   fElectron_Kin_Col_GeV                       = 0;
