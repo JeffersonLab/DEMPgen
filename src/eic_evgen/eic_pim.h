@@ -907,5 +907,4 @@ extern double fBeta_Col;
 extern double fGamma_Col;
 extern double ftheta_Col;
 
-
 #endif

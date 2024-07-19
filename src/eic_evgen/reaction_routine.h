@@ -19,7 +19,6 @@
 #include "Particle.hxx"
 #include "CustomRand.hxx"
 
-
 class Reaction{
 
 public:
