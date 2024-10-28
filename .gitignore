@@ -3,7 +3,6 @@ data/RootFiles/
 data/LundFiles
 data/OutputFiles
 data/OutputFiles/
-*.root
 *.lund
 build/
 *_job.txt
