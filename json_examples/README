@@ -1,7 +1,0 @@
-SJDK - 09/02/22 - University of Regina
-
-This folder contains some example .json files that feed into DEMPGen to run it. 
-
-Some of these are quite outdated, double check they have the relevant arguments for what you want to try and do.
-
-In the main directory, there is a active .json file for EIC files. Consult this if you want to see what is should look like.

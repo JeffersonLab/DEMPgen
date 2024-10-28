@@ -176,7 +176,49 @@ The jobs the script creates and submits all execute the Process_EIC.csh script d
 
 ### json_examples
 
-- There were several .json files clogging up the main directory, many of these were very outdated. As such, I've moved them all to a subfolder -
+- There were several .json files clogging up the main directory, many of these were very outdated. These outdated files are now in a subfolder -
   - json_examples
 - This folder has .json config files for a variety of different conditions.
   - Due to several of them being quite outdated, the Config_EIC.json file in the main (the directory of this README) directory should be consulted to see the options that are actually available.
+
+## File/Directory Structure
+
+The files within the top level directory and the directory structure of the generator are outlined below. Note that files within subdirectories are not outlined in full. Please refer to comments within each source/header files and README files within subdirectories (where applicable) for details on individual files within subdirectories.
+
+### Top Level Directory Files
+
+- [Batch_Submission_EIC.sh](Batch_Submission_EIC.sh) - Shell script to generate and submit EIC event generation jobs to a local batch queueing system. See file comments and description above for details on usage.
+- [JLab_Batch_Submission.sh](JLab_Batch_Submission.sh) - Shell script to generate and submit EIC event generation jobs to the JLab farm batch queueing system. See file comments and description above for details on usage.
+- [Process_EIC.csh](Process_EIC.csh) - .csh script that creates a `.json` config file based upon inputs and runs DEMPgen with produced configuration file. See file comments and description above for details on usage.
+- [Process_EIC_iFarm.csh](Process_EIC_iFarm.csh) - .csh script that creates a `.json` config file based upon inputs and runs DEMPgen with produced configuration file. This version is configured for use on the JLab iFarm system. See file comments and description above for details on usage.
+- [Config_EIC.json](Config_EIC.json) - An example `.json` config file for EIC event generation. Used by shell scripts above. See comments within file for details on flags.
+- [Config_SoLID.json](Config_SoLID.json) - An example `.json` config file for SoLID event generation. See comments within file for details on flags.
+- [CMakeLists.txt](CMakeLists.txt)- CMakeLists.txt file.
+- [LICENSE](LICENSE) - Copyright and license information.
+- [EvGenFlowChart.xml](EvGenFlowChart.xml) - Event generation flow chart.
+- [Test_EIC.json](Test_EIC.json) - `.json` file with all configuration options to gereate a test EIC event sample. See `reference_README.md` within the `reference_output` directory for details.
+- [README.md](README.md) - The README file.
+
+### Directory Structure
+
+- [data/](data/) - Stores output files from DEMPgen.
+  - [data/input/](data/input) - Contains input cross-section files.
+- [debug/](debug) - Contains debug files for the SoLID module.
+- [include/](include) - Contains header files for the SoLID module and the following subdirectory:
+  - [json/](include/json/) - Contains `.json` files associated with the header files for the SoLID module.
+- [src/](src/) - Contains source files for DEMPgen and the following subdirectories:
+  - [eic_evgen/](src/eic_evgen/) - Contains source files, header files, and pion cross-section parameterization files for the EIC module. Also contains the following subdirectories:
+    - [CrossSection_Params/](src/eic_evgen/CrossSection_Params/) - Contains kaon cross-section parameterization files for the EIC module.
+    - [process_routine/](src/eic_evgen/process_routine/) - Contains the main DEMPgen processing routine.
+- [Dec2023_ePIC_Simulation_Campaign/](Dec2023_ePIC_Simulation_Campaign/) - Contain information about the files submitted to the ePIC simulation campaign in December 2023 respectively, see documentation within directory for more details.
+- [Jul2024_ePIC_Simulation_Campaign/](Jul2024_ePIC_Simulation_Campaign/) - Contain information about the files submitted to the ePIC simulation campaign in July 2024, see documentation within directory for more details.
+- [reference_output/](reference_output/) - Contains test sample files and the instructions on how to reproduce them, as detailed in the `reference_README.md` file within this directory.
+
+### Instructions for Comprehensive Test Run
+
+Instructions for a comprehensive test run, and a reference file to compare to (using for example, diff) are included in -
+
+- [reference_output/reference_README.md](reference_output/reference_README.md)
+
+## License
+DEMPgen is licensed under the GNU General Public License v3.0.
