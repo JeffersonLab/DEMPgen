@@ -19,20 +19,19 @@
 #include "Particle.hxx"
 #include "CustomRand.hxx"
 
-
 class Reaction{
 
- public:
+public:
   Reaction();
   Reaction(TString);
   Reaction(TString, TString);
   ~Reaction();
 
   void process_reaction();		
-  TString GetParticle() {return rEjectile;};		
-  TString GetHadron() {return rRecoil;};
+  TString GetEjectile() {return rEjectile;};		
+  TString GetRecoilHadron() {return rRecoil;};
   
- protected:
+protected:
   TStopwatch tTime;
 
   TString rEjectile;
@@ -42,16 +41,16 @@ class Reaction{
 
 class DEMP_Reaction {
 
- public:
+public:
   DEMP_Reaction();
   DEMP_Reaction(TString, TString);
   ~DEMP_Reaction();
 
   void process_reaction();		
-  TString GetParticle() {return rEjectile;};		
-  TString GetHadron() {return rRecoil;};
-
- protected:
+  TString GetEjectile() {return rEjectile;};		
+  TString GetRecoilHadron() {return rRecoil;};
+  
+protected:
 
   void Init();
   void Processing_Event();
@@ -62,7 +61,7 @@ class DEMP_Reaction {
   void DEMPReact_Pythia6_Output();
   void DEMPReact_HEPMC3_Out_Init();
   void DEMPReact_HEPMC3_Output();
-
+  
   TRandom2* rRanBd;
   TRandom2* rRand;
 		
@@ -74,7 +73,7 @@ class DEMP_Reaction {
 
   Double_t Get_Total_Cross_Section(); 
 
-  Double_t GetPi0_CrossSection();
+  //  Double_t GetPi0_CrossSection();
 
   /*--------------------------------------------------*/
   // Parameters
@@ -87,11 +86,22 @@ class DEMP_Reaction {
 
   std::string sTFile;   /// Generator output files. For documentation and monitoring purposes 
   std::string sLFile;   /// Lund input file into the EIC simulation
+  std::string sDFile;   /// Root diagnostic plot in root file format
 
   std::ofstream DEMPOut;     
   std::ofstream DEMPDetails;
-		
+
+  TFile* dRootFile;
+  TTree* dRootTree;
+  
+  Double_t calculate_psf_t(const TLorentzVector& psf_photon, const TLorentzVector& psf_ejectile); // Love Preet - Added for phase space factor calculations
+  void calculate_psf_max_min(double value, double& maxValue, double& minValue);
+  Double_t psf();
+  TLorentzVector psf_scatelec, psf_ejectile;
+  TLorentzVector psf_photon;
+
   long long int qsq_ev, t_ev, w_neg_ev, w_ev;
+  long long int evts;
 		
   long long int rNEvents;
   long long int rNEvent_itt;
@@ -133,11 +143,8 @@ class DEMP_Reaction {
   TLorentzVector r_l_Ejectile;
   TLorentzVector r_l_Ejectile_g;
 
-//  Particle* r_l_Ejectile_solved;
-//  Particle* l_Recoil_solved;
-
   TLorentzVector r_l_Ejectile_solved;
-  TLorentzVector l_Recoil_solved;
+  TLorentzVector r_l_Recoil_solved;
 
   double f_Ejectile_Mass;
   double f_Ejectile_Mass_GeV;
@@ -216,28 +223,19 @@ class DEMP_Reaction {
 
   ///*--------------------------------------------------*/ 
   // Rory Check algorithm
-  
-  //  Particle* Interaction;
-  //  Particle* Target;
-  //
-  //  Particle* Initial;
-  //  Particle* Final;
-  //
-  //  Particle* VertBeamElec;
-  //  Particle* VertScatElec;
-  //  Particle* Photon;
 
+  TLorentzVector* Interaction_Solve;
+  TLorentzVector* Target_Solve;
 
-  TLorentzVector Interaction_Solve;
-  TLorentzVector Target_Solve;
+  TLorentzVector* VertBeamElec;
+  TLorentzVector* VertScatElec;
   
-  TLorentzVector Initial;
-  TLorentzVector Final;
+  TLorentzVector* Initial;
+  TLorentzVector* Target;
+  TLorentzVector* Photon;
+  TLorentzVector* Interaction;
+  TLorentzVector* Final;
   
-  TLorentzVector VertBeamElec;
-  TLorentzVector VertScatElec;
-  TLorentzVector Photon;
-
   bool SolnCheck();
   double W_in_Solve(); 
   double W_out_Solve();
@@ -252,6 +250,9 @@ class DEMP_Reaction {
   int Solve();
   int Solve(double theta, double phi);
 
+  double W_in();
+  double W_out();
+  
   ///*--------------------------------------------------*/ 
   // Needed for the Solve function
 
@@ -268,62 +269,62 @@ class DEMP_Reaction {
 
 };
 
-class Pi0_Production:DEMP_Reaction{
- 
- public:
-  Pi0_Production();
-  Pi0_Production(TString);
-  ~Pi0_Production();
-
-  void process_reaction();
-  void Detail_Output();
-  void Processing_Event();
-  Double_t Get_CrossSection();
-
-  void Pi0_decay(TLorentzVector);
-
-  bool if_pi0_decay;
-
-  void Pi0_Decay_Pythia6_Out_Init();
-  void Pi0_Decay_Pythia6_Output();
-  
-  ///----------------------------------------------------*/
-  /// Output algorithm into HEPMC3 format
-
-  void Pi0_HEPMC3_Out_Init();
-  void Pi0_HEPMC3_Output();
-
-  unsigned long long int print_itt;
-
- private:
-
-  Double_t theta_X_rf;
-
-  Double_t ft_min;
-  Double_t fu_min;
-
-  Double_t ft;
-  Double_t fu;
-
-  std::ofstream polar_out;     
-
-  TLorentzVector l_photon_1;
-  TLorentzVector l_photon_2;
-
-  void Pi0_Lund_Output();
-  void Pi0_Decay_Lund_Output();
-
-  //  		template <class T> 
-  //  		inline int 
-  //  		sgn(T val) {
-  //      		return (T(0) < val) - (val < T(0));
-  //  		}
-
-  template <class T>
-    T Sign (T a, T b) {
-    return (a < b) - (b < a);
-  }
-
-};
+//class Pi0_Production:DEMP_Reaction{
+// 
+// public:
+//  Pi0_Production();
+//  Pi0_Production(TString);
+//  ~Pi0_Production();
+//
+//  void process_reaction();
+//  void Detail_Output();
+//  void Processing_Event();
+//  Double_t Get_CrossSection();
+//
+//  void Pi0_decay(TLorentzVector);
+//
+//  bool if_pi0_decay;
+//
+//  void Pi0_Decay_Pythia6_Out_Init();
+//  void Pi0_Decay_Pythia6_Output();
+//  
+//  ///----------------------------------------------------*/
+//  /// Output algorithm into HEPMC3 format
+//
+//  void Pi0_HEPMC3_Out_Init();
+//  void Pi0_HEPMC3_Output();
+//
+//  unsigned long long int print_itt;
+//
+// private:
+//
+//  Double_t theta_X_rf;
+//
+//  Double_t ft_min;
+//  Double_t fu_min;
+//
+//  Double_t ft;
+//  Double_t fu;
+//
+//  std::ofstream polar_out;     
+//
+//  TLorentzVector l_photon_1;
+//  TLorentzVector l_photon_2;
+//
+//  void Pi0_Lund_Output();
+//  void Pi0_Decay_Lund_Output();
+//
+//  //  		template <class T> 
+//  //  		inline int 
+//  //  		sgn(T val) {
+//  //      		return (T(0) < val) - (val < T(0));
+//  //  		}
+//
+//  template <class T>
+//    T Sign (T a, T b) {
+//    return (a < b) - (b < a);
+//  }
+//
+//};
 
 # endif

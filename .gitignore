@@ -1,10 +1,14 @@
 data/LundFiles/
 data/RootFiles/
 data/LundFiles
-*.root
+data/OutputFiles
+data/OutputFiles/
 *.lund
 build/
 *_job.txt
 Config_EIC_*
 sjdkay_job.txt
 *#*
+.cc*
+.h*
+*.o

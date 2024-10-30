@@ -34,8 +34,8 @@ double GetPiPlus_CrossSection(double ft, double fw, double fqsq, double feps ){
     fSig_L = fitCKYLonglandau->Eval(ft);
     if ( lpar0 == 0 || lpar1 == 0 || lpar2 == 0 )
       fSig_L = 0;
-    fitCKYLonglandau = NULL;
     delete fitCKYLonglandau;
+    fitCKYLonglandau = NULL;
   }
   else if ( ( ft > 0.15 ) && ( ft < 0.5 ) ) {
     PiPlus_sigmaL_Param( fw,  fqsq, lpar0, lpar1, lpar2 , lpar3 , lpar4 , lpar5 , lpar6 );
@@ -45,8 +45,8 @@ double GetPiPlus_CrossSection(double ft, double fw, double fqsq, double feps ){
     fSig_L = fitCKYLongexpo1->Eval(ft);
     if ( lpar3 == 0 || lpar4 == 0 )
       fSig_L = 0;
-    fitCKYLongexpo1 = NULL;
     delete fitCKYLongexpo1;
+    fitCKYLongexpo1 = NULL;
   }
   else if ( ( ft > 0.5 ) && ( ft < 1.3 ) ) {
     PiPlus_sigmaL_Param( fw,  fqsq, lpar0, lpar1, lpar2 , lpar3 , lpar4 , lpar5 , lpar6 );
@@ -56,8 +56,8 @@ double GetPiPlus_CrossSection(double ft, double fw, double fqsq, double feps ){
     fSig_L = fitCKYLongexpo2->Eval(ft);
     if ( lpar5 == 0 || lpar6 == 0 )
       fSig_L = 0;
-    fitCKYLongexpo2 = NULL;
     delete fitCKYLongexpo2;
+    fitCKYLongexpo2 = NULL;
   }
   else {
     fSig_L = 0;
@@ -75,8 +75,8 @@ double GetPiPlus_CrossSection(double ft, double fw, double fqsq, double feps ){
     fSig_T = fitCKYTranspol2->Eval(ft);
     if ( tpar0 == 0 || tpar1 == 0 || tpar2 == 0 )
       fSig_T = 0;
-    fitCKYTranspol2 = NULL;
     delete fitCKYTranspol2;
+    fitCKYTranspol2 = NULL;
   }
   else if ( ( ft > 0.2 ) && ( ft < 1.3 ) ) {
     PiPlus_sigmaT_Param( fw,  fqsq, tpar0, tpar1, tpar2 , tpar3 , tpar4 );
@@ -86,8 +86,8 @@ double GetPiPlus_CrossSection(double ft, double fw, double fqsq, double feps ){
     fSig_T = fitCKYTransexpo->Eval(ft);
     if ( tpar3 == 0 || tpar4 == 0 )
       fSig_T = 0;
-    fitCKYTransexpo = NULL;
     delete fitCKYTransexpo;
+    fitCKYTransexpo = NULL;
   }
  
   // -------------------------------------------------------------------------------------------

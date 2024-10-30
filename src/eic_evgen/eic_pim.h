@@ -16,21 +16,21 @@ using std::vector;
 
 class pim {
 
-  public:
-  	pim(); 
-  	pim(int);
+public:
+  pim(); 
+  pim(int);
 
-  	void Initilize();
-  	int CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, TLorentzVector P_pim, TLorentzVector P_pro);
-  	int CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, TLorentzVector P_pim, TLorentzVector P_pro, double fdiff_E);
-  	void setrootfile(std::string myRootFile );
-  	double fermiMomentum();
+  void Initilize();
+  int CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, TLorentzVector P_pim, TLorentzVector P_pro);
+  int CheckLaws(TLorentzVector P_E0, TLorentzVector P_t, TLorentzVector P_e, TLorentzVector P_pim, TLorentzVector P_pro, double fDiff_E);
+  void setrootfile(std::string myRootFile );
+  double fermiMomentum();
 
-  private:
-	Int_t gen_seed = 0;
+private:
+  Int_t gen_seed = 0;
 	
-	std::string pParticle;
-	std::string pcharge;
+  std::string pParticle;
+  std::string pcharge;
 
   /* double correctedPhi(); */
   /* double correctedPhiS(); */
@@ -50,6 +50,8 @@ extern TString gfile_name;
 extern TString gParticle;
 extern TString gHadron;
 extern bool gPi0_decay;
+extern bool UseSolve;
+
 extern std::string gDet_location;
 extern std::string gOutputType;
 extern std::string gBeamPart;
@@ -67,6 +69,7 @@ extern bool kSConserve;
 extern bool kFSI;
 extern bool kMSele;
 extern bool kMS;
+extern bool gROOTOut; // SJDK 30/04/24 - Added boolean to enable/disable ROOTfile output
 
 extern double fKaon_Mass;
 extern double fKaon_Mass_GeV;
@@ -108,6 +111,7 @@ extern unsigned long long int fNGenerated;
 extern unsigned long long int fWSqNeg;
 extern unsigned long long int fNMomConserve;
 extern unsigned long long int fNSigmaNeg;
+extern unsigned long long int fNWeightNeg;
 
 extern unsigned long long int fNaN;
 extern unsigned long long int fConserve;
@@ -115,7 +119,10 @@ extern unsigned long long int fConserve;
 extern unsigned long long int fNWeightUnphys;
 extern unsigned long long int fNWeightReject;
 
-extern unsigned long long int fLundRecorded;
+extern unsigned long long int fSolveEvents_0Sol;
+extern unsigned long long int fSolveEvents_1Sol;
+extern unsigned long long int fSolveEvents_2Sol;
+
 extern unsigned long long int fNFile;
 
 extern double fK;
@@ -130,6 +137,8 @@ extern double fDEG2RAD;
 extern double fRAD2DEG;
 extern double fEBeam;
 extern double fPBeam;
+// 13/09/23 - SJDK - New generic HBeam value (rather than proton beam)
+extern double fHBeam;
 extern double fScatElec_Theta_I;
 extern double fScatElec_Theta_F;
 extern double fPion_Theta_I; // SJDK 19/12/22 - These should be removed in future, specific to pion reaction cases. Should be generic MesonX
@@ -144,7 +153,7 @@ extern double fQsq_Min;
 extern double fQsq_Max;
 extern double fW_Min;
 extern double fW_Max;
-
+extern double fT_Max;
 
 extern double fMandSConserve;
 extern double fTop_Pion_Mom;
@@ -837,44 +846,65 @@ extern double fradical;
 extern double fMomentum[300];
 extern double fProb[300];
 
-extern double conserve;      // 16/06/21 AU -> New Variables for conservation law checks
-extern double ene;
-extern double mom;
+extern double conserve;      // 16/06/21 AU -> New Variables for conservation law checks. This is the number that PASS both conservation check
+extern double ene; // The number that FAIL due to failing energy conservation check ONLY
+extern double mom; // The number that FAIL due to failing the momentum conservation check ONLY
+extern double ene_mom; // The number that FAIL BOTH energy and momentum check
+
+extern double mom_px; // Number that fail due to px only
+extern double mom_py; // Number that fail due to py only
+extern double mom_pz; // Number that fail due to pz only
+extern double mom_pxpy; // Number that fail due to px and py
+extern double mom_pxpz; // Number that fail due to px and pz
+extern double mom_pypz; // Number that fail due to py and pz
+extern double mom_pxpypz; // Number that fail due to px, py and pz
 
 // 27/01/22 - Love Preet - Adding in vector of cross section parameters
 extern vector<vector<vector<vector<double>>>> SigPar;
 
-//extern double fProb[300] = {    
-//6.03456,    6.02429,    6.01155,    5.99636,    5.97873,    5.95869,    5.93626,    5.91147,    5.88435,    5.85493,
-//5.82325,    5.78935,    5.75326,    5.71504,    5.67472,    5.63235,    5.58799,    5.54169,     5.4935,    5.44347,		   
-//5.39167,    5.33816,    5.28299,    5.22623,    5.16794,    5.10818,    5.04703,    4.98455,    4.92081,    4.85588,
-//4.78982,    4.71692,    4.63621,    4.55583,    4.47582,    4.39621,    4.31702,    4.23828,    4.16002,    4.08227,
-//4.00506,     3.9284,    3.85233,    3.77686,    3.70202,    3.62783,    3.55432,    3.48149,    3.40937,    3.33798,
-//3.26733,    3.19745,    3.12834,    3.06002,    2.99251,    2.92581,    2.85995,    2.79493,    2.73075,    2.66744,
-//2.605,      2.54344,    2.48276,    2.41728,    2.35244,    2.28922,    2.22759,    2.16751,    2.10895,    2.05186,
-//1.99621,    1.94198,    1.88913,    1.83762,    1.78743,    1.73851,    1.69086,    1.64442,    1.59918,    1.55511,			   
-//1.51217,    1.47035,    1.42961,    1.38993,    1.35128,    1.31364,    1.27698,    1.24129,    1.20653,    1.17269,			   
-//1.13973,    1.10765,    1.07642,    1.04601,    1.01626,   0.986934,   0.958443,   0.930759,   0.903861,   0.877727,			   
-//0.852335,   0.827665,   0.803696,   0.780409,   0.757785,   0.735806,   0.714452,   0.693708,   0.673555,   0.653978,			   
-//0.63496,   0.616485,   0.598538,   0.581105,    0.56417,   0.547721,   0.531743,   0.516223,   0.501148,   0.486506,			   
-//0.472284,    0.45847,   0.445054,   0.432024,   0.419368,   0.407077,   0.395125,   0.383513,   0.372237,   0.361289,			   
-//0.350658,   0.340336,   0.330314,   0.320583,   0.311135,   0.301962,   0.293056,   0.284409,   0.276014,   0.267863,			   
-//0.25995,   0.252268,   0.244809,   0.237569,   0.230539,   0.223715,   0.217091,    0.21066,   0.204417,   0.198357,			   
-//0.192474,   0.186763,   0.181219,   0.175838,   0.170615,   0.165545,   0.160623,   0.155843,   0.151185,   0.146666,			   
-//0.142282,   0.138028,   0.133902,   0.129898,   0.126013,   0.122245,   0.118588,   0.115041,   0.111599,   0.108261,			   
-//0.105021,   0.101879,  0.0988298,  0.0958719,  0.0930022,  0.0902182,  0.0875173,   0.084897,  0.0823549,  0.0798886,			   
-//0.0774961,  0.0751749,  0.0729231,  0.0707385,  0.0686192,  0.0665631,  0.0645685,  0.0626335,  0.0607563,  0.0589545,			   
-//0.057219,  0.0555322,   0.053893,  0.0523001,  0.0507522,  0.0492481,  0.0477867,  0.0463667,  0.0449872,  0.0436468,			   
-//0.0423448,  0.0410798,  0.0398511,  0.0386576,  0.0374982,  0.0363722,  0.0352785,  0.0342164,  0.0331849,  0.0321831,			   
-//0.0312104,  0.0302658,  0.0293486,  0.0284581,  0.0275935,   0.026754,  0.0259391,  0.0251479,  0.0243799,  0.0236344,			   
-//0.0229107,  0.0221901,  0.0214923,  0.0208167,  0.0201626,  0.0195293,  0.0189162,  0.0183226,  0.0177478,  0.0171913,			   
-//0.0166525,  0.0161308,  0.0156257,  0.0151366,  0.0146629,  0.0142044,  0.0137603,  0.0133303,  0.0129139,  0.0125107,			   
-//0.0121203,  0.0117421,   0.011376,  0.0110214,   0.010678,  0.0103455,  0.0100234, 0.00971153, 0.00940947, 0.00911693,			   
-//0.00883361,  0.0085592, 0.00829385, 0.00803735, 0.00778883, 0.00754804, 0.00731474,  0.0070887, 0.00686967, 0.00665746,			   
-//0.00645184, 0.00625261, 0.00605957, 0.00587252, 0.00569128, 0.00551567, 0.00534551, 0.00518063, 0.00502086, 0.00486605,			   
-//0.00471604, 0.00457069, 0.00442984, 0.00429336,  0.0041611, 0.00403295, 0.00390877, 0.00378843, 0.00367182, 0.00355882,			   
-//0.00344932, 0.00334321, 0.00324038, 0.00314073, 0.00304505,  0.0029524, 0.00286252, 0.00277533, 0.00269076, 0.00260872,			   
-//0.00252913, 0.00245194, 0.00237706, 0.00230444, 0.00223399, 0.00216566, 0.00209939, 0.00203512, 0.00197277, 0.00191231 };
-//
+// Love Preet - Added for phase space factor calculations
+extern int psf_steps;
+extern double psf_ScatElec_E_Stepsize;
+extern double psf_ScatElec_Theta_Stepsize;
+extern double psf_ScatElec_Phi_Stepsize;
+extern double psf_ScatElec_E;
+extern double psf_ScatElec_Theta;
+extern double psf_ScatElec_Phi;
+extern double psf_ScalElec_Mom;
+extern double psf_Ejec_Theta_Stepsize;
+extern double psf_Ejectile_Theta;
+extern double psf_Ejectile_Phi;
+extern double psf_Q2, psf_W, psf_W2, psf_t;
+extern double psf_ScatElec_Theta_max, psf_ScatElec_Theta_min;
+extern double psf_ScatElec_E_max, psf_ScatElec_E_min;
+extern double psf_Ejectile_Theta_max, psf_Ejectile_Theta_min;
+
+// Love Preet - Added for actual phase space factor calculations
+extern double fScatElec_Energy_Col_max;
+extern double fScatElec_Energy_Col_min; 
+extern double fScatElec_Theta_Col_max; 
+extern double fScatElec_Theta_Col_min;
+extern double f_Ejectile_Theta_Col_max;
+extern double f_Ejectile_Theta_Col_min;
+extern double fPSF_org;
+
+//Love Preet - Added to be stored in the root tree
+extern double scat_e_px;
+extern double scat_e_py;
+extern double scat_e_pz;
+extern double scat_e_E;
+extern double ejec_px;
+extern double ejec_py;
+extern double ejec_pz;
+extern double ejec_E;
+extern double rclH_px;
+extern double rclH_py;
+extern double rclH_pz;
+extern double rclH_E;
+
+//Love Preet - Added for jacobian calculation in collider frame
+extern double fBeta_Col; 
+extern double fGamma_Col;
+extern double ftheta_Col;
 
 #endif
