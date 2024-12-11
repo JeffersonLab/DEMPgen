@@ -1324,6 +1324,10 @@ void DEMP_Reaction::DEMPReact_HEPMC3_Out_Init(){
   print_itt = 0;
   DEMPOut << "HepMC::Version 3.02.02" << endl;
   DEMPOut << "HepMC::Asciiv3-START_EVENT_LISTING" << endl;
+  // Book 1 weight
+  DEMPOut << "W" << " " << "1" << endl;
+  // Name it "weight"
+  DEMPOut << "N" << " " << "weight" << endl;
 
 }
 
@@ -1337,8 +1341,10 @@ void DEMP_Reaction::DEMPReact_HEPMC3_Output(){
   print_itt++;
   // Second line, Units - U - ENERGY UNIT - DISTANCE UNIT
   DEMPOut << "U" << " " << "GEV" << " " << "MM" << endl;
-  // Third line, optional attributes, the weight
+  // Third line, optional attributes, the weight (LEGACY)
   DEMPOut << "A" << " " << "0" << " " << "weight" << " " <<  fEventWeight << endl;
+  // Weight value
+  DEMPOut << "W" << " " << fEventWeight << endl;
   // Beam particles, particle line - P - Particle ID - Parent Vertex ID - PDG id - px - py - pz - energy - particle mass - status (4, incoming beam particle)
   DEMPOut << "P" << " " << "1" << " " << "0" << " " << "11" << " " << r_lelectrong.X() << " " << r_lelectrong.Y() << " " << r_lelectrong.Z() << " " << r_lelectrong.E() << " " << r_lelectrong.M() << " " << "4" << endl;
   DEMPOut << "P" << " " << "2" << " " << "0" << " " << "2212" << " " << r_lprotong.X() << " " << r_lprotong.Y() << " " << r_lprotong.Z() << " " << r_lprotong.E() << " " <<  r_lprotong.M()<< " " << "4" << endl;
