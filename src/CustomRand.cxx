@@ -84,15 +84,7 @@ CustomRand::CustomRand(const char * fname,
   ERand = new TF1(EName, "1", ERange[0], ERange[1]);
 }
 
-
-
-
 /*--------------------------------------------------*/
-
-
-
-
-
 
 double CustomRand::Phi()
 {

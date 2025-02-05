@@ -156,23 +156,23 @@ void AsyPars(string in_filepath, string out_filepath,
 void AsyAll()
 {
   AsyPars("../data/input/asyout.txt",
-          "../data/output/test.root",
+          "test.root",
           "asy",
           4);
   AsyPars("../data/input/asysfiout.txt",
-          "../data/output/test.root",
+          "test.root",
           "asysfi",
           3);
   AsyPars("../data/input/asy2fiout.txt",
-          "../data/output/test.root",
+          "test.root",
           "asy2fi",
           3);
   AsyPars("../data/input/asyfpfsout.txt",
-          "../data/output/test.root",
+          "test.root",
           "asyfpfs",
           3);
   AsyPars("../data/input/asy3fout.txt",
-          "../data/output/test.root",
+          "test.root",
           "asy3f",
           3);
 }

@@ -1,12 +1,21 @@
+// SJDK - 09/02/22 - University of Regina
+
 {
+    // This is an exmaple Json configuration file that will accept 
+    // parameters for both EIC and Solid simulation.
     //Config
     // All values should use units of MeV for energies and momenta,
     // and degrees for angles.
     // n_events indicates number of attempts
-    // SJDK 17/06/22 - This is an old .json I found from DEMPEvGen, I believe these are still valid options for DEMPGen
+    // "experiment" : "eic" or "solid"
     "experiment" : "solid",
-    "output_file" : "Test.root",
-    "n_events" : 10000,
+
+    "file_name" : "test",
+    "n_events" : 100000000,
+    "generator_seed": 12345,
+
+    //**************************************
+    "Kinematics_type" : 2,         // Kinematics type (1->FF, 2->TSSA)
     "particle": "Pion+",
     "beam_energy": 11000,
     "targ_pol_x": 0.865,

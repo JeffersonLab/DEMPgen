@@ -28,7 +28,6 @@ TreeBuilder::TreeBuilder(const char * file_name, const char * name) {
   File_Out = new TFile(file_name, "RECREATE");
   Tree_Out = new TTree(tree_name, tree_name);
 
-
   Tree_Out->SetAutoSave();
 
   nParticles = 0;

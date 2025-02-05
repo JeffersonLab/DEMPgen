@@ -83,6 +83,7 @@ int main(int argc, char** argv){
     file_name = file_name + "_" + get_date();
   } 
 
+  
   int gen_seed = obj["generator_seed"].asInt();
   TString particle = obj["particle"].asString();
 
@@ -105,10 +106,14 @@ int main(int argc, char** argv){
     //		bool = obj["pi0_particle"].asBool()
     eic(obj);
  
-  } else if (obj["experiment"].asString() == "solid") {
+  }
+
+  else if (obj["experiment"].asString() == "solid") {
  
     Gen_seed = gen_seed;
 
+    cout << "SoLID is used " << endl;
+    
     if (obj["ionisation"].asBool())
       cout << "Ionisation Enabled" << endl;
     if (obj["bremsstrahlung"].asBool())
@@ -119,12 +124,11 @@ int main(int argc, char** argv){
       cout << "Multiple Scattering Enabled" << endl;
     if (obj["final_state_interaction"].asBool())
       cout << "FSI Enabled" << endl;
- 
    
     MatterEffects* ME = new MatterEffects();
-      
-    WorkFile = new TFile("../data/output/test.root");
-   
+
+    WorkFile = new TFile("data/input/Asymmetries.root");
+    
     // Initilization of DEMPEvent objects for different reference frames
     DEMPEvent* VertEvent = new DEMPEvent("Vert");
     // VertEvent contains particles with kinematic properties at the vertex.
@@ -139,9 +143,9 @@ int main(int argc, char** argv){
     DEMPEvent* LCorEvent = new DEMPEvent("Lab");
     // LCorEvent is the event after all corrections and effects have been applied,
     // in the laboratory reference frame.
-   
+    
     SigmaCalc* Sig = new SigmaCalc(VertEvent, CofMEvent, RestEvent, TConEvent);
-   
+    
     // Retrieval of pointers to particles in VertEvent.
     // For clarity: these are the same objects as are referenced by VertEvent,
     // not copies. Operations on these objects affect the original. 
@@ -150,7 +154,7 @@ int main(int argc, char** argv){
     Particle* VertScatElec = VertEvent->ScatElec;
     Particle* VertProdPion = VertEvent->ProdPion;
     Particle* VertProdProt = VertEvent->ProdProt;
-   
+    
     Particle* Photon = VertEvent->VirtPhot;
     Photon->SetName("VirtPhot");
 
@@ -158,23 +162,24 @@ int main(int argc, char** argv){
    
     Particle* InTotal = new Particle();
     Particle* OutTotal = new Particle();
-   
+    
     VertBeamElec->SetThetaPhiE(0, 0, obj["beam_energy"].asDouble());
    
     double elecERange[2] = {obj["scat_elec_Emin"].asDouble(),
-			    obj["scat_elec_Emax"].asDouble()};
+      obj["scat_elec_Emax"].asDouble()};
     double elecThetaRange[2] = {obj["scat_elec_thetamin"].asDouble()/DEG,
-				obj["scat_elec_thetamax"].asDouble()/DEG};
+      obj["scat_elec_thetamax"].asDouble()/DEG};
     double elecPhiRange[2] = {0, 360/DEG};
    
     TargetGen * NeutGen = new TargetGen(neutron_mass_mev, obj["fermi_momentum"].asBool());
-   
+    
     ScatteredParticleGen * ElecGen =
       new ScatteredParticleGen(electron_mass_mev,
 			       elecERange,
 			       elecThetaRange,
 			       elecPhiRange);
-   
+
+    
     FSI* FSIobj = new FSI();
    
     /*
@@ -184,7 +189,7 @@ int main(int argc, char** argv){
 
     ProductGen * ProtonPionGen = new ProductGen(Photon,
 						VertTargNeut);
-   
+
     int nSuccess = 0;
     int nFail = 0;
     int nNeg = 0;
@@ -194,8 +199,7 @@ int main(int argc, char** argv){
    
     int event_status = 0;
    
-
-    file_name = "RootFiles/Solid_DEMP_" + file_name + ".root";
+    file_name = "data/output/Solid_DEMP_" + file_name + ".root";
 
     TreeBuilder * Output = new TreeBuilder(file_name.Data(), "t1");
    
@@ -289,7 +293,6 @@ int main(int argc, char** argv){
     Output -> AddDouble(VertEvent->Vertex_y, "Vertex_y");
     Output -> AddDouble(VertEvent->Vertex_z, "Vertex_z");
    
-    cout << "Starting Main Loop." << endl;
     // Main loop of the generator
     for (int i=0; i<nEvents; i++){
    
@@ -339,18 +342,16 @@ int main(int argc, char** argv){
       //        VertScatElec->Pz() = 2281.09; 
       //        VertScatElec->E()  = 2535.16; 
 
-      VertScatElec->SetPxPyPzE(15.934, 1106.06, 2281.09, 2535.16);
+      // VertScatElec->SetPxPyPzE(15.934, 1106.06, 2281.09, 2535.16);
 
-      *Photon = *VertBeamElec - *VertScatElec;
+      // *Photon = *VertBeamElec - *VertScatElec;
 
-      cout << "              " << VertBeamElec->Px() << "  " << VertBeamElec->Py() << "  " << VertBeamElec->Pz() << "  " << VertBeamElec->E() << "  " << VertBeamElec->GetMass() << endl;
+      // cout << "              " << VertBeamElec->Px() << "  " << VertBeamElec->Py() << "  " << VertBeamElec->Pz() << "  " << VertBeamElec->E() << "  " << VertBeamElec->GetMass() << endl;
  
-      cout << "              " << VertScatElec->Px() << "  " << VertScatElec->Py() << "  " << VertScatElec->Pz() << "  " << VertScatElec->E() << "  " << VertScatElec->GetMass() << endl;
+      // cout << "              " << VertScatElec->Px() << "  " << VertScatElec->Py() << "  " << VertScatElec->Pz() << "  " << VertScatElec->E() << "  " << VertScatElec->GetMass() << endl;
 
-      cout << "asdasdabbbbb  " << Photon->Px() << "  " << Photon->Py() << "  " 
-	   << Photon->Pz() << "  " << Photon->E() << "  " << Photon->GetMass() << endl; 
-
-
+      // cout << "asdasdabbbbb  " << Photon->Px() << "  " << Photon->Py() << "  " 
+      // 	   << Photon->Pz() << "  " << Photon->E() << "  " << Photon->GetMass() << endl;
 
   
       // Solve for remaining particles
@@ -504,7 +505,6 @@ int main(int argc, char** argv){
       // or small angle.
       // If more detailed analysis is desired, geant can do it better.
       // Turn off effects and use GEMC.
-   
    
       //cout << targetthickness << endl;
    
@@ -766,7 +766,6 @@ int main(int argc, char** argv){
    
 	t1->GetEntry(i);
    
-   
 	VertScatElec->SetThetaPhiE(ScatElec_Theta_Col/DEG, ScatElec_Phi_Col/DEG,
 				   ScatElec_Energy_Col_GeV * 1000);
 	*VertTargNeut = *NeutGen->GetParticle();
@@ -774,8 +773,7 @@ int main(int argc, char** argv){
 	/// Setting Photon
 	*Photon = *VertBeamElec - *VertScatElec;
    
-	ProtonPionGen->Solve(Pion_Theta_Col/DEG,Pion_Phi_Col/DEG);
-   
+	ProtonPionGen->Solve(Pion_Theta_Col/DEG,Pion_Phi_Col/DEG);   
 
 	/// Setting Pion
 	*VertProdPion = *ProtonPionGen->ProdPion();
@@ -807,8 +805,7 @@ int main(int argc, char** argv){
 	if (phi_s<0) phi_s+=2*TMath::Pi();
 	double theta = *RestEvent->Theta;
 	if (theta <0) theta+=2*TMath::Pi();
-   
-   
+      
 	sigma_l = Sig->sigma_l();
 	sigma_t = Sig->sigma_t();
 	sigma_lt = Sig->sigma_lt();
@@ -920,7 +917,9 @@ int main(int argc, char** argv){
       }
     }
  
-  } else {
+  }
+
+  else {
  
     cerr << endl;
     cerr << "/*--------------------------------------------------*/" << endl;
