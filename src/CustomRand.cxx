@@ -21,7 +21,7 @@ CustomRand::CustomRand(const char * fname,
 
   int seed = 0;
   
-  cout << "Seed setting: " << Gen_seed << endl;
+  //cout << "Seed setting: " << Gen_seed << endl;
   
 //  exit(0);
 

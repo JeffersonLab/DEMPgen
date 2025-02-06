@@ -11,7 +11,7 @@
     "experiment" : "solid",
 
     "file_name" : "test",
-    "n_events" : 100000000,
+    "n_events" : 100000,
     "generator_seed": 12345,
 
     //**************************************
@@ -30,8 +30,8 @@
     "multiple_scattering": false,
     "ionization": false,
     "bremsstrahlung": false,
-    "final_state_interaction": false,
-    "fermi_momentum": false,
+    "final_state_interaction": true,
+    "fermi_momentum": true,
     "weight_cut": true,
     "w_cut": true,
     "w_min": 2,

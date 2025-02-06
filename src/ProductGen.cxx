@@ -51,7 +51,6 @@ ProductGen::ProductGen(Particle* inInteraction, Particle* inTarget):
 
 //  cout << "CCCC "<< inInteraction->Px() << "  " << inInteraction->Py() << "  " << inInteraction->Pz() << "  " << inInteraction->E() << "  " << inInteraction->GetMass() << endl;
 
-
 }
 
 void ProductGen::SetInteraction(Particle * inInteraction)
@@ -86,10 +85,7 @@ int ProductGen::Solve()
   double theta = AngleGen->Theta();
   double phi = AngleGen->Phi();
 
-//  theta = 0.282478;   
-//  phi = 3.49651;
-
-//  cout << " Theta Phi: "<< theta << "   " << phi << endl; 
+  //cout << " Theta Phi: "<< theta << "   " << phi << endl; 
 
   return this->Solve(theta, phi);
 }
@@ -104,8 +100,6 @@ int ProductGen::Solve(double theta, double phi)
     //cout << "W < 0 " << endl;
     return 1;
   }
-
-  //cout << proton_mass_mev << endl;
 
   UnitVect->SetTheta(theta);
   UnitVect->SetPhi(phi);
@@ -131,13 +125,11 @@ int ProductGen::Solve(double theta, double phi)
 //  cout << pars[3] << "  " << pars[4]  << "  " << pars[5] << endl;
 //  cout << pars[6] << "  " << pars[7]  << "  " << pars[8] << endl;
 
-
   F->SetParameters(pars);
 
   double P = F->GetX(0, 0, pars[6], 0.0001, 10000);
 
   //std::cout << "Zero: " << F->Eval(P) << std::endl;
-
 
   Particle * Pion1 = new Particle(pion_mass_mev,
                                   P*pars[0],

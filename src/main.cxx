@@ -179,17 +179,12 @@ int main(int argc, char** argv){
 			       elecThetaRange,
 			       elecPhiRange);
 
-    
+
     FSI* FSIobj = new FSI();
-   
-    /*
-      Particle * Photon = new Particle();
-      VertEvent->VirtPhot = Photon;
-    */
 
     ProductGen * ProtonPionGen = new ProductGen(Photon,
 						VertTargNeut);
-
+    
     int nSuccess = 0;
     int nFail = 0;
     int nNeg = 0;
@@ -202,7 +197,7 @@ int main(int argc, char** argv){
     file_name = "data/output/Solid_DEMP_" + file_name + ".root";
 
     TreeBuilder * Output = new TreeBuilder(file_name.Data(), "t1");
-   
+
     Output->AddEvent(VertEvent);
     //Output->AddEvent(CofMEvent);
     //Output->AddEvent(RestEvent);
@@ -212,7 +207,7 @@ int main(int argc, char** argv){
     Output->AddParticle(FSIProt);
    
     Output->AddParticle(Photon);
-   
+
     // These parameters are calculated using multiple reference frames (DEMPEvent objects),
     // and need to be added to the output seperately.
     double sigma_l;
@@ -292,7 +287,7 @@ int main(int argc, char** argv){
     Output -> AddDouble(VertEvent->Vertex_x, "Vertex_x");
     Output -> AddDouble(VertEvent->Vertex_y, "Vertex_y");
     Output -> AddDouble(VertEvent->Vertex_z, "Vertex_z");
-   
+
     // Main loop of the generator
     for (int i=0; i<nEvents; i++){
    
@@ -334,7 +329,8 @@ int main(int argc, char** argv){
       // Generate target and scattered electron
       *VertTargNeut = *NeutGen->GetParticle();
       *VertScatElec = *ElecGen->GetParticle();
-
+      *Photon = *VertBeamElec - *VertScatElec;
+      
       /*--------------------------------------------------*/ 
       /// Test only 
       //        VertScatElec->Px() = 15.934; 
@@ -344,16 +340,14 @@ int main(int argc, char** argv){
 
       // VertScatElec->SetPxPyPzE(15.934, 1106.06, 2281.09, 2535.16);
 
-      // *Photon = *VertBeamElec - *VertScatElec;
+      /*
+       cout << "Beam Elec     " << VertBeamElec->Px() << "  " << VertBeamElec->Py() << "  " << VertBeamElec->Pz() << "  " << VertBeamElec->E() << "  " << VertBeamElec->GetMass() << endl;
+       cout << "Scat Elec     " << VertScatElec->Px() << "  " << VertScatElec->Py() << "  " << VertScatElec->Pz() << "  " << VertScatElec->E() << "  " << VertScatElec->GetMass() << endl;
+       cout << "Photon        " << Photon->Px() << "  " << Photon->Py() << "  " << Photon->Pz() << "  " << Photon->E() << "  " << Photon->GetMass() << endl;
+       cout << "Neutron       " << VertTargNeut->Px() << "  " << VertTargNeut->Py() << "  " << VertTargNeut->Pz() << "  " << VertTargNeut->E() << "  " << VertTargNeut->GetMass() << endl;
+       cout << "Target + photon" << (*VertTargNeut+*Photon).Px() << "  " << (*VertTargNeut+*Photon).Py() << "  " << (*VertTargNeut+*Photon).Pz() << "  " << (*VertTargNeut+*Photon).E() << "  " << (*VertTargNeut+*Photon).GetMass() << endl;
+      */
 
-      // cout << "              " << VertBeamElec->Px() << "  " << VertBeamElec->Py() << "  " << VertBeamElec->Pz() << "  " << VertBeamElec->E() << "  " << VertBeamElec->GetMass() << endl;
- 
-      // cout << "              " << VertScatElec->Px() << "  " << VertScatElec->Py() << "  " << VertScatElec->Pz() << "  " << VertScatElec->E() << "  " << VertScatElec->GetMass() << endl;
-
-      // cout << "asdasdabbbbb  " << Photon->Px() << "  " << Photon->Py() << "  " 
-      // 	   << Photon->Pz() << "  " << Photon->E() << "  " << Photon->GetMass() << endl;
-
-  
       // Solve for remaining particles
       event_status = ProtonPionGen->Solve();
       if (event_status == 0)
@@ -365,6 +359,8 @@ int main(int argc, char** argv){
       *VertProdPion = *ProtonPionGen->ProdPion();
       *VertProdProt = *ProtonPionGen->ProdProton();
       //    cout<<VertProdPion->GetPid() << endl;
+      //cout << "Prod Pion     " << VertProdPion->Px() << "  " << VertProdPion->Py() << "  " << VertProdPion->Pz() << "  " << VertProdPion->E() << "  " << VertProdPion->GetMass() << endl;
+      //cout << "Prod Proton   " << VertProdProt->Px() << "  " << VertProdProt->Py() << "  " << VertProdProt->Pz() << "  " << VertProdProt->E() << "  " << VertProdProt->GetMass() << endl;
       
       VertEvent->Update();
       // VertEvent and its components are not to be modified beyond this point.
