@@ -10,7 +10,7 @@ Event generator for Deep Exclusive Meson Production.
 
 - Before attempting to build, run the setup script -
   - source setup.sh
-  OR
+  - OR
   - source setup.csh
 
 Depending upon shell.
