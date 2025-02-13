@@ -26,6 +26,7 @@
 #include "json/json-forwards.h"
 
 //Root includes
+#include "TROOT.h"
 #include "TRandom.h"
 #include "TFile.h"
 #include "TH1.h"
@@ -73,11 +74,11 @@ int main(int argc, char** argv){
   // Check if the environment variable was found
   DEMPgen_Path = getenv("DEMPgen");
   if (DEMPgen_Path == nullptr) {
-      cerr << "!!!!! ERROR !!!!! DEMPgen environment variable not set !!!!! ERROR !!!!!" << endl;
-      cerr << "!!!!! ERROR !!!!! Source the setup.sh (or .csh) script and rerun !!!!! ERROR !!!!!" << endl;
-      exit(0);
-    }
-
+    cerr << "!!!!! ERROR !!!!! DEMPgen environment variable not set !!!!! ERROR !!!!!" << endl;
+    cerr << "!!!!! ERROR !!!!! Source the setup.sh (or .csh) script and rerun !!!!! ERROR !!!!!" << endl;
+    exit(0);
+  }
+  
   // Parsing of config file.
   //ifstream ifs("../Config.json");
   ifstream ifs(argv[1]);
@@ -93,17 +94,9 @@ int main(int argc, char** argv){
     file_name.Form("%i", nEvents);	
     file_name = file_name + "_" + get_date();
   } 
-
   
   int gen_seed = obj["generator_seed"].asInt();
   TString particle = obj["particle"].asString();
-
-  //TString HBeamPart = obj["hbeam_part"].asString(); // Work in progress
-
-  //	cout << obj["experiment"].asString() << endl;
-  //	cout << "File name: " << file_name << "  " << get_date() << endl;
-  //	cout << particle << endl;
-  //	exit(0);
 
   if (obj["experiment"].asString() == "eic") {
  
@@ -121,9 +114,12 @@ int main(int argc, char** argv){
 
   else if (obj["experiment"].asString() == "solid") {
  
+    gROOT->ProcessLine( "gErrorIgnoreLevel = 3001;");
+
     Gen_seed = gen_seed;
 
     cout << "SoLID is used " << endl;
+    cout << "ROOT based error printouts supressed, comment line 117 of src/main.cxx and recompile to re-enable" << endl;
     
     if (obj["ionisation"].asBool())
       cout << "Ionisation Enabled" << endl;
@@ -308,7 +304,7 @@ int main(int argc, char** argv){
     Output -> AddDouble(VertEvent->Vertex_y, "Vertex_y");
     Output -> AddDouble(VertEvent->Vertex_z, "Vertex_z");
 
-    // Main loop of the generator
+    // Main loop of the generator (SoLID module)
     for (int i=0; i<nEvents; i++){
    
       if (i%100 == 0)
@@ -351,23 +347,6 @@ int main(int argc, char** argv){
       *VertScatElec = *ElecGen->GetParticle();
       *Photon = *VertBeamElec - *VertScatElec;
       
-      /*--------------------------------------------------*/ 
-      /// Test only 
-      //        VertScatElec->Px() = 15.934; 
-      //        VertScatElec->Py() = 1106.06; 
-      //        VertScatElec->Pz() = 2281.09; 
-      //        VertScatElec->E()  = 2535.16; 
-
-      // VertScatElec->SetPxPyPzE(15.934, 1106.06, 2281.09, 2535.16);
-
-      /*
-       cout << "Beam Elec     " << VertBeamElec->Px() << "  " << VertBeamElec->Py() << "  " << VertBeamElec->Pz() << "  " << VertBeamElec->E() << "  " << VertBeamElec->GetMass() << endl;
-       cout << "Scat Elec     " << VertScatElec->Px() << "  " << VertScatElec->Py() << "  " << VertScatElec->Pz() << "  " << VertScatElec->E() << "  " << VertScatElec->GetMass() << endl;
-       cout << "Photon        " << Photon->Px() << "  " << Photon->Py() << "  " << Photon->Pz() << "  " << Photon->E() << "  " << Photon->GetMass() << endl;
-       cout << "Neutron       " << VertTargNeut->Px() << "  " << VertTargNeut->Py() << "  " << VertTargNeut->Pz() << "  " << VertTargNeut->E() << "  " << VertTargNeut->GetMass() << endl;
-       cout << "Target + photon" << (*VertTargNeut+*Photon).Px() << "  " << (*VertTargNeut+*Photon).Py() << "  " << (*VertTargNeut+*Photon).Pz() << "  " << (*VertTargNeut+*Photon).E() << "  " << (*VertTargNeut+*Photon).GetMass() << endl;
-      */
-
       // Solve for remaining particles
       event_status = ProtonPionGen->Solve();
       if (event_status == 0)
@@ -378,9 +357,6 @@ int main(int argc, char** argv){
       }
       *VertProdPion = *ProtonPionGen->ProdPion();
       *VertProdProt = *ProtonPionGen->ProdProton();
-      //    cout<<VertProdPion->GetPid() << endl;
-      //cout << "Prod Pion     " << VertProdPion->Px() << "  " << VertProdPion->Py() << "  " << VertProdPion->Pz() << "  " << VertProdPion->E() << "  " << VertProdPion->GetMass() << endl;
-      //cout << "Prod Proton   " << VertProdProt->Px() << "  " << VertProdProt->Py() << "  " << VertProdProt->Pz() << "  " << VertProdProt->E() << "  " << VertProdProt->GetMass() << endl;
       
       VertEvent->Update();
       // VertEvent and its components are not to be modified beyond this point.
@@ -420,7 +396,7 @@ int main(int argc, char** argv){
       sigma_k4 = Sig->Sigma_k(4);
    
       sigma = Sig->sigma();
-   
+
       epsilon = Sig->epsilon();
 
       // Cuts
@@ -954,8 +930,6 @@ int main(int argc, char** argv){
   return 0;
 }
 
-
-
 string get_date(void) {
  
   int MAX_DATE = 22;
@@ -974,6 +948,3 @@ string get_date(void) {
 
   return string(the_date);
 }
-
-	
-

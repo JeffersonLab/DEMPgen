@@ -11,9 +11,8 @@
     "experiment" : "solid",
 
     "file_name" : "test",
-    //"n_events" : 100000,
-    "n_events" : 1,
-    "generator_seed": 12345,
+    "n_events" : 100000,
+    "generator_seed": 1234,
 
     //**************************************
     "Kinematics_type" : 2,         // Kinematics type (1->FF, 2->TSSA)

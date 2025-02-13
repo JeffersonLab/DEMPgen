@@ -25,20 +25,20 @@ Depending upon shell.
 - As a one liner - 
   - mkdir build && cd build && cmake ../ && make -j8
 
-- The event generator can now be run using the following command in the data/ directory.
+- The event generator can now be run using the following command from the main (root) directory.
 
-  - cd data/
-  - ./../build/DEMPgen ../Config.json
+  - ./build/DEMPgen Config.json
   - Data will be saved under data/OutputFiles/
+  - As long as the path to the generator and config file are correct, DEMPgen should be executable from anywhere
   
 ### Building on the JLab iFarm
 
 - Building on the JLab iFarm requires you to set up some software versions beforehand, to build successfully, I did the following - 
   - Comment out any CUE or other initialisation in your .login/.cshrc scripts
   - Login to an ifarm node
+  - module use /cvmfs/oasis.opensciencegrid.org/jlab/scicomp/sw/el9/modulefiles
+  - module load root/6.30.06-gcc11.4.0
   - module load cmake/3.19.4
-  - module use /group/halla/modulefiles
-  - module load root
  
 - Following this, build DEMGen using the one liner above without any issues, you will need to load these modules when running the generator subsequently (this is done by default in the farm job scripts)
 
