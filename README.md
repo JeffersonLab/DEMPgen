@@ -210,14 +210,14 @@ The jobs the script creates and submits all execute the Process_EIC.csh script d
   - module use /group/halla/modulefiles
   - module load root
 - You should also check the path set at the top looks OK.
-    - By default, /eic/users/${USER}/DEMPGen is assumed.
+    - By default, /eic/users/${USER}/DEMPgen is assumed.
 
 ### JLab_Batch_Submission.sh
 
 - This version should be used to submit jobs to the Farm batch queueing system (swif2).
 - It uses the same arguments as Batch_Submission_EIC.sh.
 - You should also check the paths set throughout the script look ok (for example, in the COMMAND: ... line).
-    - By default, /eic/users/${USER}/DEMPGen is assumed.
+    - By default, /eic/users/${USER}/DEMPgen is assumed.
 
 ## Acknowledgments
 
