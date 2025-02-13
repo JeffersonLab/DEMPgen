@@ -8,7 +8,14 @@ Event generator for Deep Exclusive Meson Production.
 
 - CMake is also required. CMake 2.8 is the minimum supported version, and CMake 3 has been tested as well.
 
-- After downloading the source create a build directory and cd to it. Take note of the location of the source directory (where CMakeLists.txt should be stored) and run the commands:
+- Before attempting to build, run the setup script -
+  - source setup.sh
+  OR
+  - source setup.csh
+
+Depending upon shell.
+
+- Next, create a build directory and cd to it. Take note of the location of the source directory (where CMakeLists.txt should be stored) and run the commands:
 
   - mdkir build
   - cd build
@@ -22,8 +29,8 @@ Event generator for Deep Exclusive Meson Production.
 
   - cd data/
   - ./../build/DEMPgen ../Config.json
-  - Data will be saved under data/OutputFiles/ , the default format is in HEMPC3 Ascii format.
-
+  - Data will be saved under data/OutputFiles/
+  
 ### Building on the JLab iFarm
 
 - Building on the JLab iFarm requires you to set up some software versions beforehand, to build successfully, I did the following - 
@@ -33,8 +40,7 @@ Event generator for Deep Exclusive Meson Production.
   - module use /group/halla/modulefiles
   - module load root
  
-- I then build DEMGen using the one liner above without any issues, you will need to load these modules when running the generator subsequently (this is done by default in the farm job scripts)
-
+- Following this, build DEMGen using the one liner above without any issues, you will need to load these modules when running the generator subsequently (this is done by default in the farm job scripts)
 
 ## File/Directory Structure
 

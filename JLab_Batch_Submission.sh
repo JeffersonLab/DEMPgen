@@ -37,7 +37,8 @@ else # Any other case (non K+), set RecoilHadron to be a blank string. We don't 
     RecoilHadron=""
 fi
 
-Workflow="EIC_DEMPGen_${USER}" # Change this as desired
+Timestamp=$(date +'%d_%m_%Y')
+Workflow="EIC_DEMPgen_${USER}_${Timestamp}" # Change this as desired
 
 while true; do
     read -p "Do you wish to begin a new batch submission? (Please answer yes or no) " yn

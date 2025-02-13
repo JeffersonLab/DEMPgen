@@ -1,4 +1,4 @@
-x#!/bin/csh
+#!/bin/csh
 
 # SJDK - 07/03/22 - New script which takes in a whole bunch of inputs to create jobs/config files. Note that I'm not 100% happy with the pathing in this file so it should be tweaked and optimised at some point
 # This version is intended for use on the JLab iFarm. Pathing is set up for this purpose and is NOT relative.
@@ -7,18 +7,29 @@ x#!/bin/csh
 
 # Set path depending upon hostname. Change or add more as needed  
 if ( "$HOSTNAME" =~ *farm* ) then
-    set DEMPGENPath="/group/eic/users/${USER}/DEMPGen"
-    module use /group/halla/modulefiles
-    module load root
+    set DEMPGENPath="/group/eic/users/${USER}/DEMPgen"
+    module use /cvmfs/oasis.opensciencegrid.org/jlab/scicomp/sw/el9/modulefiles
+    module load root/6.30.06-gcc11.4.0
 else if ( "$HOSTNAME" =~ *qcd* ) then
-    set DEMPGENPath="/group/eic/users/${USER}/DEMPGen"
-    module use /group/halla/modulefiles
-    module load root
+    set DEMPGENPath="/group/eic/users/${USER}/DEMPgen"
+    module use /cvmfs/oasis.opensciencegrid.org/jlab/scicomp/sw/el9/modulefiles
+    module load root/6.30.06-gcc11.4.0
 else
     set DEMPGENPath=$PWD
 endif
 
 cd "$DEMPGENPath"
+
+# This is effectively a copy of setup.csh - Set the DEMPgen environment variable for subsequent use
+setenv DEMPgen $DEMPGENPath
+if ( ! ($?LD_LIBRARY_PATH) ) then
+   setenv LD_LIBRARY_PATH ""
+endif
+# Check if DYLD_LIBRARY_PATH is defined
+if ( ! ($?DYLD_LIBRARY_PATH) ) then
+   setenv DYLD_LIBRARY_PATH ""
+endif
+setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:${DEMPgen}"
 
 echo""
 echo "This file is intended to be run as part of a batch job submission, however, you can also run it on its own."
@@ -62,7 +73,7 @@ set ConfigFilename = $DEMPGENPath'/Config_EIC_'$EBeamE'on'$HBeamE'_'$Interaction
 cp "$DEMPGENPath/Config_EIC.json" $ConfigFilename
 
 # Use sed commands to change our config file based upon inputs
-sed -i 's/"file_name" \:.*/"file_name" \: "DEMPgen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Particle$Hadron'_'$NumEvents'_'$FileNum'",/' $ConfigFilename
+sed -i 's/"file_name" \:.*/"file_name" \: "DEMPgen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Ejectile$RecoilHadron'_'$NumEvents'_'$FileNum'",/' $ConfigFilename
 sed -i 's/"n_events" \:.*/"n_events" \: '$NumEvents',/' $ConfigFilename
 sed -i 's/"generator_seed"\:.*/"generator_seed" \: '$RandomSeed',/' $ConfigFilename
 sed -i 's/"ebeam"\:.*/"ebeam" \: '$EBeamE',/' $ConfigFilename
@@ -73,13 +84,12 @@ sed -i 's/"det_location"\:.*/"det_location" \: "'$InteractionPoint'",/' $ConfigF
 sed -i 's/"OutputType"\:.*/"OutputType"\: "'$OutputType'",/' $ConfigFilename
 
 # Run our new config file
-cd "$DEMPGENPath/data/"
 eval $DEMPGENPath/build/DEMPgen $ConfigFilename
 sleep 5
 
 # Filename as it's created is a bit odd, so rename it
-set OriginalOutput = $DEMPGENPath'/data/OutputFiles/eic_input_DEMPgen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Ejectile$RecoilHadron'_'$NumEvents'_'$FileNum'.dat'
-set RenamedOutput =  $DEMPGENPath'/data/OutputFiles/eic_DEMPgen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Ejectile$RecoilHadron'_'$NumEvents'_'$FileNum'.dat'
+set OriginalOutput = $DEMPGENPath'/data/output/eic_input_DEMPgen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Ejectile$RecoilHadron'_'$NumEvents'_'$FileNum'.dat'
+set RenamedOutput =  $DEMPGENPath'/data/output/eic_DEMPgen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Ejectile$RecoilHadron'_'$NumEvents'_'$FileNum'.dat'
 
 mv $OriginalOutput $RenamedOutput
 

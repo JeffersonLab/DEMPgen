@@ -2,6 +2,8 @@
 
 # SJDK - 09/02/22 - New script which takes in a whole bunch of inputs to create jobs/config files. Note that I'm not 100% happy with the pathing in this file so it should be tweaked and optimised at some point
 
+source setup.csh
+
 echo""
 echo "This file is intended to be run as part of a batch job submission, however, you can also run it on its own."
 echo "Expected input is - FileNumber NumberOfEvents ElectronBeamEnergy HadronBeamEnergy RandomSeed OutputType IP Ejectile RecoilHadron(Optional, for K+)"
@@ -55,13 +57,12 @@ sed -i 's/"det_location"\:.*/"det_location" \: "'$InteractionPoint'",/' $ConfigF
 sed -i 's/"OutputType"\:.*/"OutputType"\: "'$OutputType'",/' $ConfigFilename
 
 # Run our new config file
-cd data/
-./../build/DEMPgen ../$ConfigFilename
+./build/DEMPgen $ConfigFilename
 sleep 5
 
 # Filename as it's created is a bit odd, so rename it
 set OriginalOutput = 'eic_input_DEMPgen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Ejectile$RecoilHadron'_'$NumEvents'_'$FileNum'.dat'
 set RenamedOutput = 'eic_DEMPgen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Ejectile$RecoilHadron'_'$NumEvents'_'$FileNum'.dat'
-mv "OutputFiles/"$OriginalOutput "OutputFiles/"$RenamedOutput
+mv "data/output/"$OriginalOutput "data/output/"$RenamedOutput
 
 rm -rf ../$ConfigFilename

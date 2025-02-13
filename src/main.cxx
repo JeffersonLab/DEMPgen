@@ -33,6 +33,7 @@
 #include "TApplication.h"
 #include "TMath.h"
 #include "TVector3.h"
+#include "TSystem.h"
 
 //Project includes
 #include "Particle.hxx"
@@ -52,7 +53,8 @@
 using namespace std;
 using namespace constants;
 
-TFile * WorkFile;
+TFile * AsymmFile;
+char* DEMPgen_Path;
 
 Json::Value obj; //Declared here for global access
 
@@ -66,7 +68,16 @@ int main(int argc, char** argv){
   cout << "This program comes with ABSOLUTELY NO WARRANTY." << endl; 
   cout << "This is free software, and you are welcome to redistribute it under certain conditions; contact authors for details." << endl;
   cout << "See - https://github.com/JeffersonLab/DEMPgen - for author contact details." << endl << endl;
- 
+
+  // Grab DEMPgen_path
+  // Check if the environment variable was found
+  DEMPgen_Path = getenv("DEMPgen");
+  if (DEMPgen_Path == nullptr) {
+      cerr << "!!!!! ERROR !!!!! DEMPgen environment variable not set !!!!! ERROR !!!!!" << endl;
+      cerr << "!!!!! ERROR !!!!! Source the setup.sh (or .csh) script and rerun !!!!! ERROR !!!!!" << endl;
+      exit(0);
+    }
+
   // Parsing of config file.
   //ifstream ifs("../Config.json");
   ifstream ifs(argv[1]);
@@ -127,7 +138,16 @@ int main(int argc, char** argv){
    
     MatterEffects* ME = new MatterEffects();
 
-    WorkFile = new TFile("data/input/Asymmetries.root");
+    // Check an asymmetries file exists to load in for later use. Throw error if not.
+    if(gSystem->AccessPathName(Form("%s/data/input/Asymmetries.root", DEMPgen_Path)) == kTRUE){
+      cerr << Form("!!!!! ERROR !!!!! %s/data/input/Asymmetries.root not found  !!!!! ERROR !!!!!", DEMPgen_Path) << endl;
+      cerr << "!!!!! ERROR !!!!! Check path! !!!!! ERROR !!!!!" << endl;
+      exit(1);
+    }
+    else{
+      // Load in the file containing asymmetry information
+      AsymmFile = new TFile(Form("%s/data/input/Asymmetries.root", DEMPgen_Path));
+    }
     
     // Initilization of DEMPEvent objects for different reference frames
     DEMPEvent* VertEvent = new DEMPEvent("Vert");
@@ -194,7 +214,7 @@ int main(int argc, char** argv){
    
     int event_status = 0;
    
-    file_name = "data/output/Solid_DEMP_" + file_name + ".root";
+    file_name = Form("%s/data/output/Solid_DEMP_%s.root", DEMPgen_Path, file_name.Data());
 
     TreeBuilder * Output = new TreeBuilder(file_name.Data(), "t1");
 
@@ -927,7 +947,7 @@ int main(int argc, char** argv){
     cerr << "/*--------------------------------------------------*/" << endl;
     cerr << endl;
  
-    exit(0);
+    exit(2);
  
   }
  

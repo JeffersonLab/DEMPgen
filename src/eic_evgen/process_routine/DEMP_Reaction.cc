@@ -5,6 +5,8 @@
 
 using namespace std;
 
+extern char* DEMPgen_Path;
+
 DEMP_Reaction::DEMP_Reaction(){ 
 
   cout << "Program Start" << endl;
@@ -251,26 +253,26 @@ void DEMP_Reaction::Init(){
 	
   rEjectile_charge = ExtractCharge(rEjectile);
 
-  const char* dir_name = "OutputFiles";
+  const char* dir_name = Form("%s/data/output", DEMPgen_Path);
   struct stat sb;
 
   if (stat(dir_name, &sb) == 0) {
-    cout << "Output file directory found from DEMPgen directory - " << dir_name  << endl;
+    cout << "data/output file directory found from DEMPgen directory - " << dir_name  << endl;
   }
   else {
-    cout << "Output file directory not found from DEMPgen directory - " << dir_name  << endl;
-    cout << "Making OutputFiles directory!" << endl;
+    cout << "data/output file directory not found from DEMPgen directory - " << dir_name  << endl;
+    cout << "Making data/output directory!" << endl;
     mkdir(dir_name,0777);
   } 
   
-  sTFile = Form("./%s/eic_%s.txt", dir_name, gfile_name.Data());
-  sLFile = Form("./%s/eic_input_%s.dat", dir_name, gfile_name.Data());
+  sTFile = Form("%s/eic_%s.txt", dir_name, gfile_name.Data());
+  sLFile = Form("%s/eic_input_%s.dat", dir_name, gfile_name.Data());
 
   DEMPOut.open( sLFile.c_str() );
   DEMPDetails.open( sTFile.c_str() );
 
   if (gROOTOut == true){ // Only initialise and open root file if output is enabled
-    sDFile = Form("./%s/eic_%s.root", dir_name, gfile_name.Data()); // LovePreet changed to make the files name consistent
+    sDFile = Form("%s/eic_%s.root", dir_name, gfile_name.Data()); // LovePreet changed to make the files name consistent
     dRootFile = new TFile(sDFile.c_str(),"RECREATE"); 
     dRootTree = new TTree("Events", "Description of a tree");  //Love Preet added all these new braches to be stored in a root ttree
     dRootTree->Branch("EventWeight", &fEventWeight, "EventWeight/D");

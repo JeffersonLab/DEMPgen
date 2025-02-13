@@ -20,6 +20,8 @@ using std::endl;
 using std::vector;
 using namespace std;
 
+extern char* DEMPgen_Path;
+
 //---------------------------------------------------------
 // g++ -o pim pimFermi.C `root-config --cflags --glibs`
 //---------------------------------------------------------
@@ -424,12 +426,12 @@ vector<vector<vector<vector<double>>>> ReadCrossSectionPar(TString EjectileX, TS
     // When pion model parameterised in some way, add Pi-/Proton case here - 
   }
   else if (EjectileX == "K+" && RecoilHad == "Lambda"){
-    sigL_ParamFile = "../src/eic_evgen/CrossSection_Params/KPlusLambda_Param_sigL";
-    sigT_ParamFile = "../src/eic_evgen/CrossSection_Params/KPlusLambda_Param_sigT"; // Shouldn't really have a relative path, should look at setting a DEMPGen variable and doing this in a better way later
+    sigL_ParamFile = Form("%s/src/eic_evgen/CrossSection_Params/KPlusLambda_Param_sigL", DEMPgen_Path);
+    sigT_ParamFile = Form("%s/src/eic_evgen/CrossSection_Params/KPlusLambda_Param_sigT", DEMPgen_Path);
   }
   else if (EjectileX == "K+" && RecoilHad == "Sigma0"){
-    sigL_ParamFile = "../src/eic_evgen/CrossSection_Params/KPlusSigma_Param_sigL";
-    sigT_ParamFile = "../src/eic_evgen/CrossSection_Params/KPlusSigma_Param_sigT";
+    sigL_ParamFile = Form("%s/src/eic_evgen/CrossSection_Params/KPlusSigma_Param_sigL", DEMPgen_Path);
+    sigT_ParamFile = Form("%s/src/eic_evgen/CrossSection_Params/KPlusSigma_Param_sigT", DEMPgen_Path);
   }
   else if (EjectileX == "Pi0"){
     // When pi0 model parameterised, add it here
