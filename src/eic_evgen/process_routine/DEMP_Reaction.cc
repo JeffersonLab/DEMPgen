@@ -5,6 +5,8 @@
 
 using namespace std;
 
+extern char* DEMPgen_Path;
+
 DEMP_Reaction::DEMP_Reaction(){ 
 
   cout << "Program Start" << endl;
@@ -251,26 +253,26 @@ void DEMP_Reaction::Init(){
 	
   rEjectile_charge = ExtractCharge(rEjectile);
 
-  const char* dir_name = "OutputFiles";
+  const char* dir_name = Form("%s/data/output", DEMPgen_Path);
   struct stat sb;
 
   if (stat(dir_name, &sb) == 0) {
-    cout << "Output file directory found from DEMPgen directory - " << dir_name  << endl;
+    cout << "data/output file directory found from DEMPgen directory - " << dir_name  << endl;
   }
   else {
-    cout << "Output file directory not found from DEMPgen directory - " << dir_name  << endl;
-    cout << "Making OutputFiles directory!" << endl;
+    cout << "data/output file directory not found from DEMPgen directory - " << dir_name  << endl;
+    cout << "Making data/output directory!" << endl;
     mkdir(dir_name,0777);
   } 
   
-  sTFile = Form("./%s/eic_%s.txt", dir_name, gfile_name.Data());
-  sLFile = Form("./%s/eic_input_%s.dat", dir_name, gfile_name.Data());
+  sTFile = Form("%s/eic_%s.txt", dir_name, gfile_name.Data());
+  sLFile = Form("%s/eic_input_%s.dat", dir_name, gfile_name.Data());
 
   DEMPOut.open( sLFile.c_str() );
   DEMPDetails.open( sTFile.c_str() );
 
   if (gROOTOut == true){ // Only initialise and open root file if output is enabled
-    sDFile = Form("./%s/eic_%s.root", dir_name, gfile_name.Data()); // LovePreet changed to make the files name consistent
+    sDFile = Form("%s/eic_%s.root", dir_name, gfile_name.Data()); // LovePreet changed to make the files name consistent
     dRootFile = new TFile(sDFile.c_str(),"RECREATE"); 
     dRootTree = new TTree("Events", "Description of a tree");  //Love Preet added all these new braches to be stored in a root ttree
     dRootTree->Branch("EventWeight", &fEventWeight, "EventWeight/D");
@@ -399,6 +401,10 @@ void DEMP_Reaction::Init(){
   }
   else if ((fEBeam == 10.0 ) && (fHBeam == 100.0) ){
     fLumi = 4.48e33;
+  }
+  // 04/03/25 SJDK - Added luminosity for early science 10x130 config. Number calculated using details here - https://agenda.infn.it/event/43344/contributions/250126/attachments/130534/194297/Early.Science.ECA.v2.pptx
+  else if ((fEBeam == 10.0 ) && (fHBeam == 130.0) ){
+    fLumi = 0.2629e33;
   }
   else if ((fEBeam == 18.0 ) && (fHBeam == 275.0) ){
     fLumi = 1.54e33;
@@ -1324,6 +1330,10 @@ void DEMP_Reaction::DEMPReact_HEPMC3_Out_Init(){
   print_itt = 0;
   DEMPOut << "HepMC::Version 3.02.02" << endl;
   DEMPOut << "HepMC::Asciiv3-START_EVENT_LISTING" << endl;
+  // Book 1 weight
+  DEMPOut << "W" << " " << "1" << endl;
+  // Name it "weight"
+  DEMPOut << "N" << " " << "weight" << endl;
 
 }
 
@@ -1337,8 +1347,10 @@ void DEMP_Reaction::DEMPReact_HEPMC3_Output(){
   print_itt++;
   // Second line, Units - U - ENERGY UNIT - DISTANCE UNIT
   DEMPOut << "U" << " " << "GEV" << " " << "MM" << endl;
-  // Third line, optional attributes, the weight
+  // Third line, optional attributes, the weight (LEGACY)
   DEMPOut << "A" << " " << "0" << " " << "weight" << " " <<  fEventWeight << endl;
+  // Weight value
+  DEMPOut << "W" << " " << fEventWeight << endl;
   // Beam particles, particle line - P - Particle ID - Parent Vertex ID - PDG id - px - py - pz - energy - particle mass - status (4, incoming beam particle)
   DEMPOut << "P" << " " << "1" << " " << "0" << " " << "11" << " " << r_lelectrong.X() << " " << r_lelectrong.Y() << " " << r_lelectrong.Z() << " " << r_lelectrong.E() << " " << r_lelectrong.M() << " " << "4" << endl;
   DEMPOut << "P" << " " << "2" << " " << "0" << " " << "2212" << " " << r_lprotong.X() << " " << r_lprotong.Y() << " " << r_lprotong.Z() << " " << r_lprotong.E() << " " <<  r_lprotong.M()<< " " << "4" << endl;

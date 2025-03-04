@@ -8,7 +8,14 @@ Event generator for Deep Exclusive Meson Production.
 
 - CMake is also required. CMake 2.8 is the minimum supported version, and CMake 3 has been tested as well.
 
-- After downloading the source create a build directory and cd to it. Take note of the location of the source directory (where CMakeLists.txt should be stored) and run the commands:
+- Before attempting to build, run the setup script -
+  - source setup.sh
+  - OR
+  - source setup.csh
+
+Depending upon shell.
+
+- Next, create a build directory and cd to it. Take note of the location of the source directory (where CMakeLists.txt should be stored) and run the commands:
 
   - mdkir build
   - cd build
@@ -18,23 +25,22 @@ Event generator for Deep Exclusive Meson Production.
 - As a one liner - 
   - mkdir build && cd build && cmake ../ && make -j8
 
-- The event generator can now be run using the following command in the data/ directory.
+- The event generator can now be run using the following command from the main (root) directory.
 
-  - cd data/
-  - ./../build/DEMPgen ../Config.json
-  - Data will be saved under data/OutputFiles/ , the default format is in HEMPC3 Ascii format.
-
+  - ./build/DEMPgen Config.json
+  - Data will be saved under data/OutputFiles/
+  - As long as the path to the generator and config file are correct, DEMPgen should be executable from anywhere
+  
 ### Building on the JLab iFarm
 
 - Building on the JLab iFarm requires you to set up some software versions beforehand, to build successfully, I did the following - 
   - Comment out any CUE or other initialisation in your .login/.cshrc scripts
   - Login to an ifarm node
+  - module use /cvmfs/oasis.opensciencegrid.org/jlab/scicomp/sw/el9/modulefiles
+  - module load root/6.30.06-gcc11.4.0
   - module load cmake/3.19.4
-  - module use /group/halla/modulefiles
-  - module load root
  
-- I then build DEMGen using the one liner above without any issues, you will need to load these modules when running the generator subsequently (this is done by default in the farm job scripts)
-
+- Following this, build DEMGen using the one liner above without any issues, you will need to load these modules when running the generator subsequently (this is done by default in the farm job scripts)
 
 ## File/Directory Structure
 
@@ -204,14 +210,14 @@ The jobs the script creates and submits all execute the Process_EIC.csh script d
   - module use /group/halla/modulefiles
   - module load root
 - You should also check the path set at the top looks OK.
-    - By default, /eic/users/${USER}/DEMPGen is assumed.
+    - By default, /eic/users/${USER}/DEMPgen is assumed.
 
 ### JLab_Batch_Submission.sh
 
 - This version should be used to submit jobs to the Farm batch queueing system (swif2).
 - It uses the same arguments as Batch_Submission_EIC.sh.
 - You should also check the paths set throughout the script look ok (for example, in the COMMAND: ... line).
-    - By default, /eic/users/${USER}/DEMPGen is assumed.
+    - By default, /eic/users/${USER}/DEMPgen is assumed.
 
 ## Acknowledgments
 

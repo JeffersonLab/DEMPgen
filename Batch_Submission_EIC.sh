@@ -48,7 +48,7 @@ while [[ $i -le $NumFiles ]]; do
     cp /dev/null ${batch}
     RandomSeed=$(od -An -N3 -i /dev/urandom)
     echo "#!/bin/csh" >> ${batch} # Tells your job which shell to run in
-    echo "#PBS -N DEMPGen_${EBeamE}on${HBeamE}_${Ejectile}${RecoilHadron}_${InteractionPoint}_${NumEvents}_${i}" >> ${batch} # Name your job                     
+    echo "#PBS -N DEMPgen_${EBeamE}on${HBeamE}_${Ejectile}${RecoilHadron}_${InteractionPoint}_${NumEvents}_${i}" >> ${batch} # Name your job                     
     echo "#PBS -m abe" >> ${batch} # Email you on job start, end or error
     #echo "#PBS -M ${USER}@jlab.org" >>${batch} # Your email address, change it to be what you like
     echo "#PBS -r n" >> ${batch} # Don't re-run if it crashes

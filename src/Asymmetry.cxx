@@ -22,7 +22,8 @@
 using namespace std;
 using namespace TMath;
 
-extern TFile * WorkFile;
+extern TFile * AsymmFile;
+extern char* DEMPgen_Path;
 TTree * GK_Raw;
 
 Asymmetry::Asymmetry(char * in_AsyName, char * in_Func,
@@ -37,14 +38,12 @@ Asymmetry::Asymmetry(char * in_AsyName, char * in_Func,
 int Asymmetry::Parameterize(vector<double> in_Qsq)
 {
 
-
   //Go to default work file if not extern not available
-  if (WorkFile->IsZombie()){
-    WorkFile = new TFile("../output/test.root");
-    // cout << "File Opened" << endl;
+  if (AsymmFile->IsZombie()){
+    AsymmFile = new TFile(Form("%s/data/input/Asymmetries.root", DEMPgen_Path));
   }
 
-  GK_Raw = (TTree*)WorkFile->Get("GK_Raw");
+  GK_Raw = (TTree*)AsymmFile->Get("GK_Raw");
 
   nQsq = in_Qsq.size();
   if (nQsq == 0) {
@@ -116,7 +115,6 @@ int Asymmetry::Parameterize()
   Qsq_Vec.resize(distance(Qsq_Vec.begin(), it));
   nQsq = Qsq_Vec.size();
   Parameterize(Qsq_Vec);
-  // cout << nQsq << endl;
   return 0;
 }
 
@@ -124,11 +122,9 @@ double Asymmetry::Extrap(double x0, double x1, double x2,
                          double y1, double y2)
 {
   if (x1==x2) {
-    //cout << "Equal x's Passed" << endl;
     return y2;
   }
   else if (y1==y2) {
-    //cout << "Equal y's Passed" << endl;
     return y2;
   }
 
@@ -200,11 +196,9 @@ double Asymmetry::GetAsyAmp(double Qsq, double tp)
 int Asymmetry::SetPars(vector<double> in_Qsq)
 {
   //Go to default work file if not extern not available
-  if (WorkFile->IsZombie()){
-    WorkFile = new TFile("../output/test.root");
-    // cout << "File Opened" << endl;
+  if (AsymmFile->IsZombie()){
+    AsymmFile = new TFile(Form("%s/data/input/Asymmetries.root", DEMPgen_Path));
   }
-
 
   nQsq = in_Qsq.size();
   if (nQsq == 0) {
@@ -214,11 +208,10 @@ int Asymmetry::SetPars(vector<double> in_Qsq)
   else{
     Qsq_Vec = in_Qsq;
   }
+  
+  TTree * Pars = (TTree*)AsymmFile->Get(AsyNameStr);
 
-  TTree * Pars = (TTree*)WorkFile->Get(AsyNameStr);
-
-  char tfnamestr[100] = "%s_%d";
-
+  char tfnamestr[100] = "%s_%d";  
   char tempname1[100];
 
   for (int i = 0; i < nQsq; i++){
@@ -227,11 +220,11 @@ int Asymmetry::SetPars(vector<double> in_Qsq)
   }
 
   nPars = AsyFunction.at(0)->GetNpar();
-
+  
   double pars[nPars];
 
   Pars->SetBranchAddress("pars",&pars);
-
+  
   for (int i=0; i<nQsq; i++){
     Pars->GetEntry(i);
     AsyFunction.at(i)->SetParameters(&pars[0]);

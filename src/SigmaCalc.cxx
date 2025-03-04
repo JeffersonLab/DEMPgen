@@ -33,7 +33,6 @@ SigmaCalc::SigmaCalc(DEMPEvent* in_VertEvent,
   TConEvent(in_TConEvent)
 {
 
-
   vector<double> qsq;
   qsq.push_back(4.107);
   qsq.push_back(4.335);
@@ -46,9 +45,9 @@ SigmaCalc::SigmaCalc(DEMPEvent* in_VertEvent,
   qsq.push_back(6.778);
   qsq.push_back(6.894);
   qsq.push_back(7.617);
-
+  
   Asyms = new vector<Asymmetry*>(5);
-
+  
   Asyms->at(0) =
     new Asymmetry("asy",
                   "[0]*exp([1]*x)+(-[2]-[0])*exp([3]*x)+[2]",
@@ -208,7 +207,6 @@ double SigmaCalc::sigma_ut()
   sigut += Sin(3*phi-phi_s)*this->Sigma_k(4);
 
   //cout << "sigma_ut2\t"<< sigut << endl;
-
 
   sigut *= pt/(Sqrt(1-Power(Sin(theta)*Sin(phi_s),2)));
   //cout << "sigma_ut3\t"<< sigut << endl;

@@ -37,7 +37,8 @@ else # Any other case (non K+), set RecoilHadron to be a blank string. We don't 
     RecoilHadron=""
 fi
 
-Workflow="EIC_DEMPGen_${USER}" # Change this as desired
+Timestamp=$(date +'%d_%m_%Y')
+Workflow="EIC_DEMPgen_${USER}_${Timestamp}" # Change this as desired
 
 while true; do
     read -p "Do you wish to begin a new batch submission? (Please answer yes or no) " yn
@@ -53,10 +54,10 @@ while true; do
 		    RandomSeed=$(od -An -N3 -i /dev/urandom)
 		    echo "PROJECT: c-kaonlt"  >> ${batch} # Is eic a valid project?
 		    echo "TRACK: analysis" >> ${batch}
-		    echo "JOBNAME: DEMPGen_${EBeamE}on${HBeamE}_${Ejectile}${RecoilHadron}_${InteractionPoint}_${NumEvents}_${i}" >> ${batch}
+		    echo "JOBNAME: DEMPgen_${EBeamE}on${HBeamE}_${Ejectile}${RecoilHadron}_${InteractionPoint}_${NumEvents}_${i}" >> ${batch}
                     echo "MEMORY: 2000 MB" >> ${batch} # Request 2GB RAM - probably too much
 		    echo "CPU: 1" >> ${batch} # Request 1 CPU core per job
-		    echo "COMMAND:/group/eic/users/${USER}/DEMPGen/Process_EIC_iFarm.csh ${i} ${NumEvents} ${EBeamE} ${HBeamE} ${RandomSeed} ${OutputType} ${InteractionPoint} ${Ejectile} ${RecoilHadron}" >> ${batch}
+		    echo "COMMAND:/group/eic/users/${USER}/DEMPgen/Process_EIC_iFarm.csh ${i} ${NumEvents} ${EBeamE} ${HBeamE} ${RandomSeed} ${OutputType} ${InteractionPoint} ${Ejectile} ${RecoilHadron}" >> ${batch}
                     echo "MAIL: ${USER}@jlab.org" >> ${batch}
 		    echo "Submitting batch"
 		    eval "swif2 add-jsub ${Workflow} -script ${batch} 2>/dev/null" # Swif2 job submission, uses old jsub scripts

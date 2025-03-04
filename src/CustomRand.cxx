@@ -21,7 +21,7 @@ CustomRand::CustomRand(const char * fname,
 
   int seed = 0;
   
-  cout << "Seed setting: " << Gen_seed << endl;
+  //cout << "Seed setting: " << Gen_seed << endl;
   
 //  exit(0);
 
@@ -84,15 +84,7 @@ CustomRand::CustomRand(const char * fname,
   ERand = new TF1(EName, "1", ERange[0], ERange[1]);
 }
 
-
-
-
 /*--------------------------------------------------*/
-
-
-
-
-
 
 double CustomRand::Phi()
 {

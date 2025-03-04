@@ -26,6 +26,7 @@
 #include "json/json-forwards.h"
 
 //Root includes
+#include "TROOT.h"
 #include "TRandom.h"
 #include "TFile.h"
 #include "TH1.h"
@@ -33,6 +34,7 @@
 #include "TApplication.h"
 #include "TMath.h"
 #include "TVector3.h"
+#include "TSystem.h"
 
 //Project includes
 #include "Particle.hxx"
@@ -52,7 +54,8 @@
 using namespace std;
 using namespace constants;
 
-TFile * WorkFile;
+TFile * AsymmFile;
+char* DEMPgen_Path;
 
 Json::Value obj; //Declared here for global access
 
@@ -66,7 +69,16 @@ int main(int argc, char** argv){
   cout << "This program comes with ABSOLUTELY NO WARRANTY." << endl; 
   cout << "This is free software, and you are welcome to redistribute it under certain conditions; contact authors for details." << endl;
   cout << "See - https://github.com/JeffersonLab/DEMPgen - for author contact details." << endl << endl;
- 
+
+  // Grab DEMPgen_path
+  // Check if the environment variable was found
+  DEMPgen_Path = getenv("DEMPgen");
+  if (DEMPgen_Path == nullptr) {
+    cerr << "!!!!! ERROR !!!!! DEMPgen environment variable not set !!!!! ERROR !!!!!" << endl;
+    cerr << "!!!!! ERROR !!!!! Source the setup.sh (or .csh) script and rerun !!!!! ERROR !!!!!" << endl;
+    exit(0);
+  }
+  
   // Parsing of config file.
   //ifstream ifs("../Config.json");
   ifstream ifs(argv[1]);
@@ -82,16 +94,9 @@ int main(int argc, char** argv){
     file_name.Form("%i", nEvents);	
     file_name = file_name + "_" + get_date();
   } 
-
+  
   int gen_seed = obj["generator_seed"].asInt();
   TString particle = obj["particle"].asString();
-
-  //TString HBeamPart = obj["hbeam_part"].asString(); // Work in progress
-
-  //	cout << obj["experiment"].asString() << endl;
-  //	cout << "File name: " << file_name << "  " << get_date() << endl;
-  //	cout << particle << endl;
-  //	exit(0);
 
   if (obj["experiment"].asString() == "eic") {
  
@@ -105,10 +110,17 @@ int main(int argc, char** argv){
     //		bool = obj["pi0_particle"].asBool()
     eic(obj);
  
-  } else if (obj["experiment"].asString() == "solid") {
+  }
+
+  else if (obj["experiment"].asString() == "solid") {
  
+    gROOT->ProcessLine( "gErrorIgnoreLevel = 3001;");
+
     Gen_seed = gen_seed;
 
+    cout << "SoLID is used " << endl;
+    cout << "ROOT based error printouts supressed, comment line 117 of src/main.cxx and recompile to re-enable" << endl;
+    
     if (obj["ionisation"].asBool())
       cout << "Ionisation Enabled" << endl;
     if (obj["bremsstrahlung"].asBool())
@@ -119,12 +131,20 @@ int main(int argc, char** argv){
       cout << "Multiple Scattering Enabled" << endl;
     if (obj["final_state_interaction"].asBool())
       cout << "FSI Enabled" << endl;
- 
    
     MatterEffects* ME = new MatterEffects();
-      
-    WorkFile = new TFile("../data/output/test.root");
-   
+
+    // Check an asymmetries file exists to load in for later use. Throw error if not.
+    if(gSystem->AccessPathName(Form("%s/data/input/Asymmetries.root", DEMPgen_Path)) == kTRUE){
+      cerr << Form("!!!!! ERROR !!!!! %s/data/input/Asymmetries.root not found  !!!!! ERROR !!!!!", DEMPgen_Path) << endl;
+      cerr << "!!!!! ERROR !!!!! Check path! !!!!! ERROR !!!!!" << endl;
+      exit(1);
+    }
+    else{
+      // Load in the file containing asymmetry information
+      AsymmFile = new TFile(Form("%s/data/input/Asymmetries.root", DEMPgen_Path));
+    }
+    
     // Initilization of DEMPEvent objects for different reference frames
     DEMPEvent* VertEvent = new DEMPEvent("Vert");
     // VertEvent contains particles with kinematic properties at the vertex.
@@ -139,9 +159,9 @@ int main(int argc, char** argv){
     DEMPEvent* LCorEvent = new DEMPEvent("Lab");
     // LCorEvent is the event after all corrections and effects have been applied,
     // in the laboratory reference frame.
-   
+    
     SigmaCalc* Sig = new SigmaCalc(VertEvent, CofMEvent, RestEvent, TConEvent);
-   
+    
     // Retrieval of pointers to particles in VertEvent.
     // For clarity: these are the same objects as are referenced by VertEvent,
     // not copies. Operations on these objects affect the original. 
@@ -150,7 +170,7 @@ int main(int argc, char** argv){
     Particle* VertScatElec = VertEvent->ScatElec;
     Particle* VertProdPion = VertEvent->ProdPion;
     Particle* VertProdProt = VertEvent->ProdProt;
-   
+    
     Particle* Photon = VertEvent->VirtPhot;
     Photon->SetName("VirtPhot");
 
@@ -158,33 +178,29 @@ int main(int argc, char** argv){
    
     Particle* InTotal = new Particle();
     Particle* OutTotal = new Particle();
-   
+    
     VertBeamElec->SetThetaPhiE(0, 0, obj["beam_energy"].asDouble());
    
     double elecERange[2] = {obj["scat_elec_Emin"].asDouble(),
-			    obj["scat_elec_Emax"].asDouble()};
+      obj["scat_elec_Emax"].asDouble()};
     double elecThetaRange[2] = {obj["scat_elec_thetamin"].asDouble()/DEG,
-				obj["scat_elec_thetamax"].asDouble()/DEG};
+      obj["scat_elec_thetamax"].asDouble()/DEG};
     double elecPhiRange[2] = {0, 360/DEG};
    
     TargetGen * NeutGen = new TargetGen(neutron_mass_mev, obj["fermi_momentum"].asBool());
-   
+    
     ScatteredParticleGen * ElecGen =
       new ScatteredParticleGen(electron_mass_mev,
 			       elecERange,
 			       elecThetaRange,
 			       elecPhiRange);
-   
+
+
     FSI* FSIobj = new FSI();
-   
-    /*
-      Particle * Photon = new Particle();
-      VertEvent->VirtPhot = Photon;
-    */
 
     ProductGen * ProtonPionGen = new ProductGen(Photon,
 						VertTargNeut);
-   
+    
     int nSuccess = 0;
     int nFail = 0;
     int nNeg = 0;
@@ -194,11 +210,10 @@ int main(int argc, char** argv){
    
     int event_status = 0;
    
-
-    file_name = "RootFiles/Solid_DEMP_" + file_name + ".root";
+    file_name = Form("%s/data/output/Solid_DEMP_%s.root", DEMPgen_Path, file_name.Data());
 
     TreeBuilder * Output = new TreeBuilder(file_name.Data(), "t1");
-   
+
     Output->AddEvent(VertEvent);
     //Output->AddEvent(CofMEvent);
     //Output->AddEvent(RestEvent);
@@ -208,7 +223,7 @@ int main(int argc, char** argv){
     Output->AddParticle(FSIProt);
    
     Output->AddParticle(Photon);
-   
+
     // These parameters are calculated using multiple reference frames (DEMPEvent objects),
     // and need to be added to the output seperately.
     double sigma_l;
@@ -288,9 +303,8 @@ int main(int argc, char** argv){
     Output -> AddDouble(VertEvent->Vertex_x, "Vertex_x");
     Output -> AddDouble(VertEvent->Vertex_y, "Vertex_y");
     Output -> AddDouble(VertEvent->Vertex_z, "Vertex_z");
-   
-    cout << "Starting Main Loop." << endl;
-    // Main loop of the generator
+
+    // Main loop of the generator (SoLID module)
     for (int i=0; i<nEvents; i++){
    
       if (i%100 == 0)
@@ -331,28 +345,8 @@ int main(int argc, char** argv){
       // Generate target and scattered electron
       *VertTargNeut = *NeutGen->GetParticle();
       *VertScatElec = *ElecGen->GetParticle();
-
-      /*--------------------------------------------------*/ 
-      /// Test only 
-      //        VertScatElec->Px() = 15.934; 
-      //        VertScatElec->Py() = 1106.06; 
-      //        VertScatElec->Pz() = 2281.09; 
-      //        VertScatElec->E()  = 2535.16; 
-
-      VertScatElec->SetPxPyPzE(15.934, 1106.06, 2281.09, 2535.16);
-
       *Photon = *VertBeamElec - *VertScatElec;
-
-      cout << "              " << VertBeamElec->Px() << "  " << VertBeamElec->Py() << "  " << VertBeamElec->Pz() << "  " << VertBeamElec->E() << "  " << VertBeamElec->GetMass() << endl;
- 
-      cout << "              " << VertScatElec->Px() << "  " << VertScatElec->Py() << "  " << VertScatElec->Pz() << "  " << VertScatElec->E() << "  " << VertScatElec->GetMass() << endl;
-
-      cout << "asdasdabbbbb  " << Photon->Px() << "  " << Photon->Py() << "  " 
-	   << Photon->Pz() << "  " << Photon->E() << "  " << Photon->GetMass() << endl; 
-
-
-
-  
+      
       // Solve for remaining particles
       event_status = ProtonPionGen->Solve();
       if (event_status == 0)
@@ -363,7 +357,6 @@ int main(int argc, char** argv){
       }
       *VertProdPion = *ProtonPionGen->ProdPion();
       *VertProdProt = *ProtonPionGen->ProdProton();
-      //    cout<<VertProdPion->GetPid() << endl;
       
       VertEvent->Update();
       // VertEvent and its components are not to be modified beyond this point.
@@ -403,7 +396,7 @@ int main(int argc, char** argv){
       sigma_k4 = Sig->Sigma_k(4);
    
       sigma = Sig->sigma();
-   
+
       epsilon = Sig->epsilon();
 
       // Cuts
@@ -504,7 +497,6 @@ int main(int argc, char** argv){
       // or small angle.
       // If more detailed analysis is desired, geant can do it better.
       // Turn off effects and use GEMC.
-   
    
       //cout << targetthickness << endl;
    
@@ -766,7 +758,6 @@ int main(int argc, char** argv){
    
 	t1->GetEntry(i);
    
-   
 	VertScatElec->SetThetaPhiE(ScatElec_Theta_Col/DEG, ScatElec_Phi_Col/DEG,
 				   ScatElec_Energy_Col_GeV * 1000);
 	*VertTargNeut = *NeutGen->GetParticle();
@@ -774,8 +765,7 @@ int main(int argc, char** argv){
 	/// Setting Photon
 	*Photon = *VertBeamElec - *VertScatElec;
    
-	ProtonPionGen->Solve(Pion_Theta_Col/DEG,Pion_Phi_Col/DEG);
-   
+	ProtonPionGen->Solve(Pion_Theta_Col/DEG,Pion_Phi_Col/DEG);   
 
 	/// Setting Pion
 	*VertProdPion = *ProtonPionGen->ProdPion();
@@ -807,8 +797,7 @@ int main(int argc, char** argv){
 	if (phi_s<0) phi_s+=2*TMath::Pi();
 	double theta = *RestEvent->Theta;
 	if (theta <0) theta+=2*TMath::Pi();
-   
-   
+      
 	sigma_l = Sig->sigma_l();
 	sigma_t = Sig->sigma_t();
 	sigma_lt = Sig->sigma_lt();
@@ -920,7 +909,9 @@ int main(int argc, char** argv){
       }
     }
  
-  } else {
+  }
+
+  else {
  
     cerr << endl;
     cerr << "/*--------------------------------------------------*/" << endl;
@@ -932,14 +923,12 @@ int main(int argc, char** argv){
     cerr << "/*--------------------------------------------------*/" << endl;
     cerr << endl;
  
-    exit(0);
+    exit(2);
  
   }
  
   return 0;
 }
-
-
 
 string get_date(void) {
  
@@ -959,6 +948,3 @@ string get_date(void) {
 
   return string(the_date);
 }
-
-	
-
