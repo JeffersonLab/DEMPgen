@@ -402,6 +402,10 @@ void DEMP_Reaction::Init(){
   else if ((fEBeam == 10.0 ) && (fHBeam == 100.0) ){
     fLumi = 4.48e33;
   }
+  // 04/03/25 SJDK - Added luminosity for early science 10x130 config. Number calculated using details here - https://agenda.infn.it/event/43344/contributions/250126/attachments/130534/194297/Early.Science.ECA.v2.pptx
+  else if ((fEBeam == 10.0 ) && (fHBeam == 130.0) ){
+    fLumi = 0.2629e33;
+  }
   else if ((fEBeam == 18.0 ) && (fHBeam == 275.0) ){
     fLumi = 1.54e33;
   }
