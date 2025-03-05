@@ -8,6 +8,9 @@ To reproduce the files used for the March 2025 simulation campaign from DEMPgen,
   - ./build/DEMPgen Config_EIC_10on130_ip6_Pi+_q2_3_10_11000000.json
   - ./build/DEMPgen Config_EIC_10on130_ip6_Pi+_q2_10_20_18000000.json
   - ./build/DEMPgen Config_EIC_10on130_ip6_Pi+_q2_20_35_34000000.json
+  - ./build/DEMPgen Config_EIC_10on130_ip6_K+Lambda_q2_3_10_7300000.json
+  - ./build/DEMPgen Config_EIC_10on130_ip6_K+Lambda_q2_10_20_15000000.json
+  - ./build/DEMPgen Config_EIC_10on130_ip6_K+Lambda_q2_20_35_25000000.json
 
  - The .txt files generated from the execution of the commands above are recorded in a sub directory within this folder -
     - pion - pi+ commands, subdivided into each beam energy combo (only 10x130 was run this time)
@@ -24,13 +27,15 @@ To reproduce the files used for the March 2025 simulation campaign from DEMPgen,
     - The first argument is the input file path. The corresponding files are provided in the Afterburner_Filelists directory for each beam energy combination within this folder.
     - The last argument is the output file name, based on the given input file.
     - In this case, a specific configuration was enabled using the -p flag
-    - The files were processed with the 10x100 hidiv setting, from /work/eic/users/sjdkay/Mar2025_Campaign_Input (within eic-shell) -
-      - abconv -p ip6_hidiv_100x10 Generator_Output/pion/10on130/eic_input_DEMPgen_10on130_ip6_Pi+_11000000_q2_3_10.hepmc3 -o Afterburner_Output/pion/10on130/DEMPgen_10on130_ip6_Pi+_q2_3_10_10x100_hidiv.root
-      - abconv -p ip6_hidiv_100x10 Generator_Output/pion/10on130/eic_input_DEMPgen_10on130_ip6_Pi+_18000000_q2_10_20.hepmc3 -o Afterburner_Output/pion/10on130/DEMPgen_10on130_ip6_Pi+_q2_10_20_10x100_hidiv.root
-      - abconv -p ip6_hidiv_100x10 Generator_Output/pion/10on130/eic_input_DEMPgen_10on130_ip6_Pi+_34000000_q2_20_35.hepmc3 -o Afterburner_Output/pion/10on130/DEMPgen_10on130_ip6_Pi+_q2_20_35_10x100_hidiv.root
-    - The files were also processed with the 10x100 hiacc setting, from /work/eic/users/sjdkay/Mar2025_Campaign_Input (within eic-shell) -
-      - abconv -p ip6_hiacc_100x10 Generator_Output/pion/10on130/eic_input_DEMPgen_10on130_ip6_Pi+_11000000_q2_3_10.hepmc3 -o Afterburner_Output/pion/10on130/DEMPgen_10on130_ip6_Pi+_q2_3_10_10x100_hiacc.root
-      - abconv -p ip6_hiacc_100x10 Generator_Output/pion/10on130/eic_input_DEMPgen_10on130_ip6_Pi+_18000000_q2_10_20.hepmc3 -o Afterburner_Output/pion/10on130/DEMPgen_10on130_ip6_Pi+_q2_10_20_10x100_hiacc.root
-      - abconv -p ip6_hiacc_100x10 Generator_Output/pion/10on130/eic_input_DEMPgen_10on130_ip6_Pi+_34000000_q2_20_35.hepmc3 -o Afterburner_Output/pion/10on130/DEMPgen_10on130_ip6_Pi+_q2_20_35_10x100_hiacc.root
-
-    
+    - The pion files were processed with the 10x100 hidiv setting, from /work/eic/users/sjdkay/Mar2025_Campaign_Input (within eic-shell) -
+      - abconv -p ip6_hidiv_100x10 Generator_Output/pion/10on130/eic_input_DEMPgen_10on130_ip6_Pi+_11000000_q2_3_10.hepmc3 -o Afterburner_Output/pion/10on130/DEMPgen_10on130_ip6_Pi+_q2_3_10_10x100_hidiv
+      - abconv -p ip6_hidiv_100x10 Generator_Output/pion/10on130/eic_input_DEMPgen_10on130_ip6_Pi+_18000000_q2_10_20.hepmc3 -o Afterburner_Output/pion/10on130/DEMPgen_10on130_ip6_Pi+_q2_10_20_10x100_hidiv
+      - abconv -p ip6_hidiv_100x10 Generator_Output/pion/10on130/eic_input_DEMPgen_10on130_ip6_Pi+_34000000_q2_20_35.hepmc3 -o Afterburner_Output/pion/10on130/DEMPgen_10on130_ip6_Pi+_q2_20_35_10x100_hidiv
+    - The pion files were also processed with the 10x100 hiacc setting, from /work/eic/users/sjdkay/Mar2025_Campaign_Input (within eic-shell) -
+      - abconv -p ip6_hiacc_100x10 Generator_Output/pion/10on130/eic_input_DEMPgen_10on130_ip6_Pi+_11000000_q2_3_10.hepmc3 -o Afterburner_Output/pion/10on130/DEMPgen_10on130_ip6_Pi+_q2_3_10_10x100_hiacc
+      - abconv -p ip6_hiacc_100x10 Generator_Output/pion/10on130/eic_input_DEMPgen_10on130_ip6_Pi+_18000000_q2_10_20.hepmc3 -o Afterburner_Output/pion/10on130/DEMPgen_10on130_ip6_Pi+_q2_10_20_10x100_hiacc
+      - abconv -p ip6_hiacc_100x10 Generator_Output/pion/10on130/eic_input_DEMPgen_10on130_ip6_Pi+_34000000_q2_20_35.hepmc3 -o Afterburner_Output/pion/10on130/DEMPgen_10on130_ip6_Pi+_q2_20_35_10x100_hiacc
+    - The kaon files were processed with the 10x100 hiacc setting ONLY, from /work/eic/users/sjdkay/Mar2025_Campaign_Input (within eic-shell) -
+      - abconv -p ip6_hiacc_100x10 Generator_Output/kaonLambda/10on130/eic_input_DEMPgen_10on130_ip6_K+Lambda_7300000_q2_3_10.hepmc3 -o Afterburner_Output/kaonLambda/10on130/DEMPgen_10on130_ip6_K+Lambda_q2_3_10_10x100_hiacc
+      - abconv -p ip6_hiacc_100x10 Generator_Output/kaonLambda/10on130/eic_input_DEMPgen_10on130_ip6_K+Lambda_15000000_q2_10_20.hepmc3 -o Afterburner_Output/kaonLambda/10on130/DEMPgen_10on130_ip6_K+Lambda_q2_10_20_10x100_hiacc
+      - abconv -p ip6_hiacc_100x10 Generator_Output/kaonLambda/10on130/eic_input_DEMPgen_10on130_ip6_K+Lambda_25000000_q2_20_35.hepmc3 -o Afterburner_Output/kaonLambda/10on130/DEMPgen_10on130_ip6_K+Lambda_q2_20_35_10x100_hiacc

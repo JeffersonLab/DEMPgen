@@ -266,8 +266,13 @@ void DEMP_Reaction::Init(){
   } 
   
   sTFile = Form("%s/eic_%s.txt", dir_name, gfile_name.Data());
-  sLFile = Form("%s/eic_input_%s.dat", dir_name, gfile_name.Data());
-
+  if(gOutputType == "HEPMC3"){
+    sLFile = Form("%s/eic_%s.hepmc3", dir_name, gfile_name.Data());
+  }
+  else{
+    sLFile = Form("%s/eic_%s.dat", dir_name, gfile_name.Data());
+  }
+  
   DEMPOut.open( sLFile.c_str() );
   DEMPDetails.open( sTFile.c_str() );
 

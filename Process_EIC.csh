@@ -60,9 +60,4 @@ sed -i 's/"OutputType"\:.*/"OutputType"\: "'$OutputType'",/' $ConfigFilename
 ./build/DEMPgen $ConfigFilename
 sleep 5
 
-# Filename as it's created is a bit odd, so rename it
-set OriginalOutput = 'eic_input_DEMPgen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Ejectile$RecoilHadron'_'$NumEvents'_'$FileNum'.dat'
-set RenamedOutput = 'eic_DEMPgen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Ejectile$RecoilHadron'_'$NumEvents'_'$FileNum'.dat'
-mv "data/output/"$OriginalOutput "data/output/"$RenamedOutput
-
 rm $ConfigFilename
