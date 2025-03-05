@@ -1,0 +1,35 @@
+// Stephen JD Kay - 05/03/25 - University of York
+
+{
+    // This is an exmaple Json configuration file that will accept 
+    // parameters for both EIC and Solid simulation.
+    //Config
+    // All values should use units of MeV for energies and momenta,
+    // and degrees for angles.
+    // n_events indicates number of attempts
+    // "experiment" : "eic" or "solid"
+    "experiment" : "eic",
+
+    "file_name" : "DEMPgen_10on130_ip6_Pi+_18000000_q2_10_20",
+    "n_events" : 18000000,
+    "generator_seed" :889694,
+
+    //**************************************
+    /// This section if for EIC simulation only
+    "Kinematics_type" : 1,         // Kinematics type (1->FF, 2->TSSA)
+    "ROOTOut": "true",             // Enable or disable root file output, true or false
+    "ejectile" : "Pi+",
+    "recoil_hadron" : "",
+    "ebeam" : 10,
+    "hbeam" : 130,
+    "hbeam_part":"Proton",           // Hadron beam particle, proton, deut or helium3, work in progress, will need to be added to shell script later on as an argument
+    "OutputType": "HEPMC3",
+    "det_location" : "ip6",
+    "calc_method": "Analytical",            // choices: Analytical or Solve, affects how the ejectile/recoil hadron 4-vectors are calculated. Default is analytical
+    "Ee_Low": 0.5, // The minimum scattered electron energy that will be generated as a fraction of the electron beam energy
+    "Ee_High": 2.5, // The maximum scattered electron energy that will be generated as a fraction of the electron beam energy
+    "e_Theta_Low": 154.25, // The minimum scattered electron angle (theta) that will be generated in degrees
+    "e_Theta_High": 161.5, // The maximum scattered electron angle (theta) that will be generated in degrees
+    "EjectileX_Theta_Low": 0.0, // The minimum ejectile angle (theta) that will be generated in degrees
+    "EjectileX_Theta_High": 100.0, // The maximum ejectile angle (theta) that will be generated in degrees
+}
