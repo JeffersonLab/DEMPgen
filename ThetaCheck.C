@@ -1,5 +1,7 @@
-// Stephen JD Kay, University of York, 21/02/25
+// Stephen JD Kay, University of York, 05/03/25
 // A short script to read in DEMPgen output and find the scattered electron theta ranges that (roughly) correspond to fixed Q2 ranges.
+// Run this on the .root output file DEMPgen produces for a file with a fully open e' theta range (i.e. the full range in generated Q2 covered).
+// It will identify the points in theta which correspond to Q2 ranges of 3-10, 10-20 and 20-35. Customise as needed.
 #include <string>
 
 void ThetaCheck(TString infile=""){
@@ -84,12 +86,14 @@ void ThetaCheck(TString infile=""){
     
   }
 
+  // Write histograms
   H1_Theta->Write();
   H2_Q2_Theta->Write();
   H2_Q2_Theta_R1->Write();
   H2_Q2_Theta_R2->Write();
   H2_Q2_Theta_R3->Write();
 
+  // Print to screen the angular ranges corresponding to the theta ranges in use
   cout << "Min elec theta = " << H2_Q2_Theta_R1->GetYaxis()->GetBinLowEdge(H2_Q2_Theta_R1->FindFirstBinAbove(0., 2)) << " deg, max elec theta = " << H2_Q2_Theta_R1->GetYaxis()->GetBinLowEdge(H2_Q2_Theta_R1->FindLastBinAbove(0., 2)) << " deg for 3 < Q2 < 10" << endl;
   cout << "Min elec theta = " << H2_Q2_Theta_R2->GetYaxis()->GetBinLowEdge(H2_Q2_Theta_R2->FindFirstBinAbove(0., 2)) << " deg, max elec theta = " << H2_Q2_Theta_R2->GetYaxis()->GetBinLowEdge(H2_Q2_Theta_R2->FindLastBinAbove(0., 2)) << " deg for 10 < Q2 < 20" << endl;
   cout << "Min elec theta = " << H2_Q2_Theta_R3->GetYaxis()->GetBinLowEdge(H2_Q2_Theta_R3->FindFirstBinAbove(0., 2)) << " deg, max elec theta = " << H2_Q2_Theta_R3->GetYaxis()->GetBinLowEdge(H2_Q2_Theta_R3->FindLastBinAbove(0., 2)) << " deg for 20 < Q2 < 35" << endl;
