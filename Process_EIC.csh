@@ -65,4 +65,4 @@ set OriginalOutput = 'eic_input_DEMPgen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'
 set RenamedOutput = 'eic_DEMPgen_'$EBeamE'on'$HBeamE'_'$InteractionPoint'_'$Ejectile$RecoilHadron'_'$NumEvents'_'$FileNum'.dat'
 mv "data/output/"$OriginalOutput "data/output/"$RenamedOutput
 
-rm -rf ../$ConfigFilename
+rm $ConfigFilename
