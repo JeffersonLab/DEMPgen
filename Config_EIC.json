@@ -1,4 +1,4 @@
-// SJDK - 09/02/22 - University of Regina
+// SJDK - 17/07/25 - University of York
 
 // !!!!! PLEASE READ THE COMMENTS BELOW !!!!!
 // This is a template config file for running DEMPgen for EIC events, consult this file for the availble options
@@ -38,4 +38,5 @@
     "e_Theta_High": 175.0, // The maximum scattered electron angle (theta) that will be generated in degrees
     "EjectileX_Theta_Low": 0.0, // The minimum ejectile angle (theta) that will be generated in degrees
     "EjectileX_Theta_High": 100.0, // The maximum ejectile angle (theta) that will be generated in degrees
+    "Kin_tMax": 0.45, // Maximum -t value that will be generated - enter this as a POSITIVE number, defaults if not set to 1.0. Kaon paramterised to 2, pion to 1.3
 }

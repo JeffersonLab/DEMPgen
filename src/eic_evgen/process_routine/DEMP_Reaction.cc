@@ -266,8 +266,13 @@ void DEMP_Reaction::Init(){
   } 
   
   sTFile = Form("%s/eic_%s.txt", dir_name, gfile_name.Data());
-  sLFile = Form("%s/eic_input_%s.dat", dir_name, gfile_name.Data());
-
+  if(gOutputType == "HEPMC3"){
+    sLFile = Form("%s/eic_%s.hepmc3", dir_name, gfile_name.Data());
+  }
+  else{
+    sLFile = Form("%s/eic_%s.dat", dir_name, gfile_name.Data());
+  }
+  
   DEMPOut.open( sLFile.c_str() );
   DEMPDetails.open( sTFile.c_str() );
 
@@ -405,6 +410,10 @@ void DEMP_Reaction::Init(){
   // 04/03/25 SJDK - Added luminosity for early science 10x130 config. Number calculated using details here - https://agenda.infn.it/event/43344/contributions/250126/attachments/130534/194297/Early.Science.ECA.v2.pptx
   else if ((fEBeam == 10.0 ) && (fHBeam == 130.0) ){
     fLumi = 0.2629e33;
+  }
+  // 24/03/25 SJDK - Added luminosity for early science 10x130 config. Number calculated using details here - https://agenda.infn.it/event/43344/contributions/250126/attachments/130534/194297/Early.Science.ECA.v2.pptx
+  else if ((fEBeam == 10.0 ) && (fHBeam == 250.0) ){
+    fLumi = 0.3259e33;
   }
   else if ((fEBeam == 18.0 ) && (fHBeam == 275.0) ){
     fLumi = 1.54e33;

@@ -149,11 +149,13 @@ extern double fScatElec_E_Hi;
 extern double fScatElec_E_Lo;
 extern double fPSF;
 // SJDK 03/04/23 - New Variables for min/max allowed Q2/W, set by particle type - Add an override in .json file?
+// SJDK 17/07/25 - Added new fT_Max_Default variable
 extern double fQsq_Min;
 extern double fQsq_Max;
 extern double fW_Min;
 extern double fW_Max;
 extern double fT_Max;
+extern double fT_Max_Default;
 
 extern double fMandSConserve;
 extern double fTop_Pion_Mom;
