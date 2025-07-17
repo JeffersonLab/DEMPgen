@@ -191,22 +191,22 @@ void eic(Json::Value obj) {
   if (Ejectile == "pi+" || Ejectile == "Pion+" || Ejectile == "Pi+"){
     fQsq_Min = 3.5; fQsq_Max = 35.0; // Love Preet changed to 3.5 as SigT parameterization starts from Q2 = 3.5
     fW_Min = 2.0; fW_Max = 10.2;
-    fT_Max = 1.3;
+    fT_Max_Default = 1.3;
   }
   else if (Ejectile == "pi0" || Ejectile == "Pion0" || Ejectile == "Pi0"){
     fQsq_Min = 5.0; fQsq_Max = 1000.0;
     fW_Min = 2.0; fW_Max = 10.0;
-    fT_Max = 0.5;
+    fT_Max_Default = 0.5;
   }
   else if (Ejectile == "K+"){
     fQsq_Min = 1.0; fQsq_Max = 35.0;
     fW_Min = 2.0; fW_Max = 10.0;
-    fT_Max = 2.0;
+    fT_Max_Default = 2.0;
   }
   else{
     fQsq_Min = 5.0; fQsq_Max = 35.0;
     fW_Min = 2.0; fW_Max = 10.0;
-    fT_Max = 1.3;
+    fT_Max_Default = 1.3;
   }
 
   // SJDK - 01/06/21
@@ -340,10 +340,28 @@ void eic(Json::Value obj) {
     UseSolve = true;
   }
   else{
-    cout << "! WARNING !" << endl  << "! WARNING !- Calculation method not specified or not recognised, defaulting to Analytical - ! WARNING!" << endl << "! WARNING !" << endl;
+    cout << "! WARNING !" << endl  << "! WARNING !- Calculation method not specified or not recognised, defaulting to Analytical - ! WARNING !" << endl << "! WARNING !" << endl;
     UseSolve = false;
   }
-	
+
+  // 17/07/25 - SJDK - Add new check to get t_max value
+  if (obj.isMember("Kin_tMax")){
+    if( obj["Kin_tMax"].asDouble() < 0 ){
+      cout << "! WARNING !" << endl << "! WARNING ! - Max -t entered as a negative number, taking absolute value! - ! WARNING !"<< endl << "! WARNING !"<< endl;
+      fT_Max = abs(obj["Kin_tMax"].asDouble());
+    }
+    else if (obj["Kin_tMax"].asDouble() == 0 || obj["Kin_tMax"].asDouble() > fT_Max_Default){
+      cout << "! WARNING !" << endl << "! WARNING ! - Max -t set to 0 or exceeding paramaterisation limit for reaction, setting to reaction max! - ! WARNING !"<< endl << "! WARNING !"<< endl;
+      fT_Max = fT_Max_Default;
+    }
+    else{
+      fT_Max = obj["Kin_tMax"].asDouble();
+    }
+  }
+  else{
+     fT_Max = 1.0;
+     cout << "! WARNING !" << endl << "! WARNING ! - Max -t not specified, defaulting to 1! - ! WARNING !"<< endl << "! WARNING !"<< endl;
+  }
   SigPar = ReadCrossSectionPar(Ejectile, RecoilHadron);
 	
   if(Ejectile != "pi0"){ // Default case now
