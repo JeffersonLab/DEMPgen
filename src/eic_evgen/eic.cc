@@ -347,8 +347,14 @@ void eic(Json::Value obj) {
   // 17/07/25 - SJDK - Add new check to get t_max value
   if (obj.isMember("Kin_tMax")){
     if( obj["Kin_tMax"].asDouble() < 0 ){
-      cout << "! WARNING !" << endl << "! WARNING ! - Max -t entered as a negative number, taking absolute value! - ! WARNING !"<< endl << "! WARNING !"<< endl;
-      fT_Max = abs(obj["Kin_tMax"].asDouble());
+      if( abs(obj["Kin_tMax"].asDouble()) > fT_Max_Default){
+	cout << "! WARNING !" << endl << "! WARNING ! - Max -t entered as a negative number and absolute value exceeds limit for reaction, seting to reaction max! - ! WARNING !"<< endl << "! WARNING !"<< endl;
+	fT_Max = fT_Max_Default;
+      }
+      else{
+	cout << "! WARNING !" << endl << "! WARNING ! - Max -t entered as a negative number, taking absolute value! - ! WARNING !"<< endl << "! WARNING !"<< endl;
+	fT_Max = abs(obj["Kin_tMax"].asDouble());
+      }
     }
     else if (obj["Kin_tMax"].asDouble() == 0 || obj["Kin_tMax"].asDouble() > fT_Max_Default){
       cout << "! WARNING !" << endl << "! WARNING ! - Max -t set to 0 or exceeding paramaterisation limit for reaction, setting to reaction max! - ! WARNING !"<< endl << "! WARNING !"<< endl;
@@ -359,8 +365,8 @@ void eic(Json::Value obj) {
     }
   }
   else{
-     fT_Max = 1.0;
-     cout << "! WARNING !" << endl << "! WARNING ! - Max -t not specified, defaulting to 1! - ! WARNING !"<< endl << "! WARNING !"<< endl;
+    fT_Max = 1.0;
+    cout << "! WARNING !" << endl << "! WARNING ! - Max -t not specified, defaulting to 1! - ! WARNING !"<< endl << "! WARNING !"<< endl;
   }
   SigPar = ReadCrossSectionPar(Ejectile, RecoilHadron);
 	
