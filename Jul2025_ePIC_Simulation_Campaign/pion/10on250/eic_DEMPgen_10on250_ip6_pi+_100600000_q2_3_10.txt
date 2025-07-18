@@ -1,0 +1,45 @@
+Seed used for the Random Number Generator                                         32342342
+
+Total events tried                                                               100600000
+Total events cut                                                                 100199900             99.6023 %
+Total events recorded                                                               400100            0.397714 %
+Total events cut + recorded = events tried?                                        Yes! :)
+
+Cut details -                                                         
+Events cut due to ejectile (X) energy NaN                                         10384869             10.3229 %
+Events cut due to conservation law check failure                                  15259399             15.1684 %
+Events cut due to negative Wsq value                                               8573382             8.52225 %
+Events cut due to qsq < 3.5 or qsq > 35.0                                                0                   0 %
+Events cut due to W < 2.0 or W > 10.2                                             31304626             31.1179 %
+Events cut due to -t > 0.5 GeV                                                    34677624             34.4708 %
+Events cut due to -ve cross section value                                                0                   0 %
+Events cut due to -ve weight value                                                       0                   0 %
+
+Conservation law checks details -                                     
+Total events PASSING conservation law check with tolerance 1.00e-05            7.49557e+07
+Events cut due to energy conservation check ONLY                               1.52594e+07             15.1684 %
+Events cut due to momentum conservation check ONLY                                       0                   0 %
+Events cut due to energy AND momentum conservation checks                                0                   0 %
+Events cut due to px conservation law check                                              0                   0 %
+Events cut due to py conservation law check                                              0                   0 %
+Events cut due to pz conservation law check                                              0                   0 %
+Events cut due to px and py conservation law checks                                      0                   0 %
+Events cut due to px and pz conservation law checks                                      0                   0 %
+Events cut due to py and pz conservation law checks                                      0                   0 %
+Events cut due to px, py and pz conservation law checks                                  0                   0 %
+
+Weight correction factors -                                           
+Ratio of phase space factors (fPSF_org/fPSF)                                      0.972633
+Ratio of tried to physical events                                                  1.51546
+ 1. If the first ratio is not ~1.0 (+/- 0.05), check the number of recorded events. If the number of recorded events is < 50,000, increase the number of attempted events to generate more data. If the the ratio does not converge to ~1.0, multiply all individual event weights by this factor during analysis. Alternatively, this number can be treated as a tolerance on weights.
+ 2. If the second ratio is large (> XX), then again, multiply all invidiual event weights by this factor during analysis. Again, this could also be considered as a tolerance on weights.
+
+Energies, angles, and phase space factors -                           
+                                                                              User-defined          Calculated              Actual
+Scattered electron energies (Low)                                                        5                9.98               9.981
+Scattered electron energies (High)                                                      25               10.24             10.2342
+Scattered electron angles (Low)                                                     161.75              161.75              161.75
+Scattered electron angles (High)                                                    169.25              169.25              169.25
+Scattered ejectile angles (Low)                                                          0                 0.8             1.00766
+Scattered ejectile angles (High)                                                       100                17.3             17.2999
+Phase space factors (fPSF fSF_org)                                               0.0151754           0.0147601
