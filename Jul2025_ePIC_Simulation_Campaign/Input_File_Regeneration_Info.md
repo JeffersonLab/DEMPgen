@@ -21,11 +21,11 @@ To reproduce the files used for the July 2025 simulation campaign from DEMPgen, 
 - Once the files are generted with DEMPgen, they are processed through the Monte Carlo Afterburner (https://github.com/eic/afterburner) to incorporate crossing angle, beam  effects, and veterx spread for the EIC.
 
 - This is done by running the following command within the ePIC container/eic-shell. 
-  - abconv 
-    - The first argument is the input file path. The corresponding files are provided in the Afterburner_Filelists directory for each beam energy combination within this folder.
+  - 'abconv' runs the afterburner
+    - The first argument is the input file path.
     - The last argument is the output file name, based on the given input file.
-    - In this case, a specific configuration was enabled using the -p flag
-    - The pion files were processed with the 10x100 hidiv setting, from /work/eic/users/sjdkay/Jul2025_Campaign_Input (within eic-shell) -
+    - In this case, a specific beam energy combination configuration was enabled using the -p flag
+    - The pion files were processed from the /work/eic/users/sjdkay/Jul2025_Campaign_Input directory (within eic-shell) -
       - abconv -p ip6_ep_130x10 Generator_Output/pion/10on130/eic_DEMPgen_10on130_ip6_Pi+_73000000_q2_3_10.hepmc3 -o Afterburner_Output/pion/10on130/DEMPgen_10on130_ip6_Pi+_q2_3_10_10x130
       - abconv -p ip6_ep_130x10 Generator_Output/pion/10on130/eic_DEMPgen_10on130_ip6_Pi+_170600000_q2_10_20.hepmc3 -o Afterburner_Output/pion/10on130/DEMPgen_10on130_ip6_Pi+_q2_10_20_10x130
       - abconv -p ip6_ep_130x10 Generator_Output/pion/10on130/eic_DEMPgen_10on130_ip6_Pi+_350000000_q2_20_35.hepmc3 -o Afterburner_Output/pion/10on130/DEMPgen_10on130_ip6_Pi+_q2_20_35_10x130
