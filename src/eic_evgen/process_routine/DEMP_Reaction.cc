@@ -854,7 +854,6 @@ void DEMP_Reaction::Processing_Event(){
   //             Lab cross section     Phase Space   Conversion     Luminosity                Total events tried
   // Hz        = ub / ( sr^2 * GeV ) * GeV * sr^2 * ( cm^2 / ub ) * ( # / ( cm^2 * sec ) ) / ( # )
 
-  // SJDK 24/06/21 - Explicitly taking the absolute value of the weight such that the value is positive! Shouldn't matter since any -ve cross section events should be dumped above
   //fEventWeight = abs(fSigma_Col * fPSF * fuBcm2 * fLumi / fNEvents);   // in Hz
   fEventWeight = fSigma_Col * fPSF * fuBcm2 * fLumi / fNEvents;   // in Hz // Love Preet removed the abs on the fEventWeight
   
@@ -869,7 +868,6 @@ void DEMP_Reaction::Processing_Event(){
   calculate_psf_max_min( fScatElec_Energy_Col, fScatElec_Energy_Col_max, fScatElec_Energy_Col_min ); // -> Love Preet added to find the max and min values to calculate the actual PSF
   calculate_psf_max_min( fScatElec_Theta_Col,  fScatElec_Theta_Col_max,  fScatElec_Theta_Col_min );
   calculate_psf_max_min( f_Ejectile_Theta_Col, f_Ejectile_Theta_Col_max, f_Ejectile_Theta_Col_min ); 
-   
   if (gOutputType == "Pythia6"){
     DEMPReact_Pythia6_Output();
   }
