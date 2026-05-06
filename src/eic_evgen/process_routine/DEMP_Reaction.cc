@@ -413,7 +413,7 @@ void DEMP_Reaction::Init(){
   }
   // New ES e+p combination as of 05/05/26
   else if ((fEBeam == 9.0 ) && (fHBeam == 130.0) ){
-    fLumi = 0.2629e33;
+    fLumi = 0.05384e33; // Assume factor 5 lower than previous prediction for now
   }
   // 24/03/25 SJDK - Added luminosity for early science 10x130 config. Number calculated using details here - https://agenda.infn.it/event/43344/contributions/250126/attachments/130534/194297/Early.Science.ECA.v2.pptx
   else if ((fEBeam == 10.0 ) && (fHBeam == 250.0) ){
@@ -421,7 +421,7 @@ void DEMP_Reaction::Init(){
   }
   // New ES e+p combination as of 05/05/26
   else if ((fEBeam == 9.0 ) && (fHBeam == 275.0) ){
-    fLumi = 0.3259e33;
+    fLumi = 0.06518e33;  // Assume factor 5 lower than previous prediction for now
   }
   else if ((fEBeam == 18.0 ) && (fHBeam == 275.0) ){
     fLumi = 1.54e33;
