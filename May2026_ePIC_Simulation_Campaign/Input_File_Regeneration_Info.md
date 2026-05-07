@@ -1,4 +1,4 @@
-# Stephen JD Kay (stephen.kay@york.ac.uk)- 06/05/2025 - University of York
+# Stephen JD Kay (stephen.kay@york.ac.uk) - 06/05/2025 - University of York
 
 To reproduce the files used for the May 2026 simulation campaign from DEMPgen, follow the steps below:
 
@@ -16,7 +16,7 @@ To reproduce the files used for the May 2026 simulation campaign from DEMPgen, f
     - pion - pi+ commands, subdivided into each beam energy combo
 
 - The commands above also produce the output in an optional root output format. These files are produced and backed up on multiple systems, but are not included on GitHub.
-  - Contact Stephen Kay (stephen.kay@york.ac.uk) or Love Preet (navisaharan3@gmail.com) for access to these root files
+  - Contact Stephen Kay (stephen.kay@york.ac.uk) for access to these root files
 
 - Once the files are generted with DEMPgen, they are processed through the Monte Carlo Afterburner (https://github.com/eic/afterburner) to incorporate crossing angle, beam  effects, and veterx spread for the EIC.
 
