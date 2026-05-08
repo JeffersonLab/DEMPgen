@@ -26,18 +26,10 @@ To reproduce the files used for the May 2026 simulation campaign from DEMPgen, f
     - The last argument is the output file name, based on the given input file.
     - In this case, a specific beam energy combination configuration was enabled using the -p flag. Note that the configurations below were specified as no dedicated flag for the new beam energy combinations in use here existed
     - The pion files were processed from the /work/eic/users/sjdkay/May2026_Campaign_Input directory (within eic-shell) -
-      - abconv -p ip6_ep_130x10 Generator_Output/pion/9on130/eic_DEMPgen_9on130_ip6_pi+_q2_3_10_76600000.hepmc3 -o Afterburner_Output/pion/9on130/DEMPgen_9on130_ip6_Pi+_q2_3_10_9x130
-      - abconv -p ip6_ep_130x10 Generator_Output/pion/9on130/eic_DEMPgen_9on130_ip6_pi+_q2_10_20_170000000.hepmc3 -o Afterburner_Output/pion/9on130/DEMPgen_9on130_ip6_Pi+_q2_10_20_9x130
-      - abconv -p ip6_ep_130x10 Generator_Output/pion/9on130/eic_DEMPgen_9on130_ip6_pi+_q2_20_35_365000000.hepmc3 -o Afterburner_Output/pion/9on130/DEMPgen_9on130_ip6_Pi+_q2_20_35_9x130
-      - abconv -p ip6_ep_250x10 Generator_Output/pion/9on275/eic_DEMPgen_9on275_ip6_pi+_q2_3_10_120000000.hepmc3 -o Afterburner_Output/pion/9on275/DEMPgen_9on275_ip6_Pi+_q2_3_10_9x275
-      - abconv -p ip6_ep_250x10 Generator_Output/pion/9on275/eic_DEMPgen_9on275_ip6_pi+_q2_10_20_321000000.hepmc3 -o Afterburner_Output/pion/9on275/DEMPgen_9on275_ip6_Pi+_q2_10_20_9x275
-      - abconv -p ip6_ep_250x10 Generator_Output/pion/9on275/eic_DEMPgen_9on275_ip6_pi+_q2_20_35_726000000.hepmc3 -o Afterburner_Output/pion/9on275/DEMPgen_9on275_ip6_Pi+_q2_20_35_9x275
-- The files were then renamed to meet the simulation campaign input naming convention. From the directroy these files are stored in
-  - /work/eic/users/sjdkay/Jul2025_Campaign_Input/Afterburner_Output/pion/9on130
-    - mv DEMPgen_9on130_ip6_Pi+_q2_3_10_9x130.hepmc3.tree.root DEMPgen_v1.2.5_DEMP_Pi+_9x130_q2_3to10.hepmc3.tree.root
-    - mv DEMPgen_9on130_ip6_Pi+_q2_10_20_9x130.hepmc3.tree.root DEMPgen_v1.2.5_DEMP_Pi+_9x130_q2_10to20.hepmc3.tree.root
-    - mv DEMPgen_9on130_ip6_Pi+_q2_20_35_9x130.hepmc3.tree.root DEMPgen_v1.2.5_DEMP_Pi+_9x130_q2_20to35.hepmc3.tree.root
-  - /work/eic/users/sjdkay/Jul2025_Campaign_Input/Afterburner_Output/pion/9on275
-    - mv DEMPgen_9on250_ip6_Pi+_q2_3_10_9x275.hepmc3.tree.root DEMPgen_v1.2.5_DEMP_Pi+_9x275_q2_3to10.hepmc3.tree.root
-    - mv DEMPgen_9on250_ip6_Pi+_q2_10_20_9x275.hepmc3.tree.root DEMPgen_v1.2.5_DEMP_Pi+_9x275_q2_10to20.hepmc3.tree.root
-    - mv DEMPgen_9on250_ip6_Pi+_q2_20_35_9x275.hepmc3.tree.root DEMPgen_v1.2.5_DEMP_Pi+_9x275_q2_20to35.hepmc3.tree.root
+      - abconv -p ip6_ep_130x9 Generator_Output/pion/9on130/eic_DEMPgen_9on130_ip6_pi+_q2_3_10_76600000.hepmc3 -o Afterburner_Output/pion/9on130/DEMPgen_v1.2.5_DEMP_Pi+_9x130_q2_3to10
+      - abconv -p ip6_ep_130x9 Generator_Output/pion/9on130/eic_DEMPgen_9on130_ip6_pi+_q2_10_20_170000000.hepmc3 -o Afterburner_Output/pion/9on130/DEMPgen_v1.2.5_DEMP_Pi+_9x130_q2_10to20
+      - abconv -p ip6_ep_130x9 Generator_Output/pion/9on130/eic_DEMPgen_9on130_ip6_pi+_q2_20_35_365000000.hepmc3 -o Afterburner_Output/pion/9on130/DEMPgen_v1.2.5_DEMP_Pi+_9x130_q2_20to35
+      - abconv -p ip6_ep_275x9 Generator_Output/pion/9on275/eic_DEMPgen_9on275_ip6_pi+_q2_3_10_120000000.hepmc3 -o Afterburner_Output/pion/9on275/DEMPgen_v1.2.5_DEMP_Pi+_9x275_q2_3to10
+      - abconv -p ip6_ep_275x9 Generator_Output/pion/9on275/eic_DEMPgen_9on275_ip6_pi+_q2_10_20_321000000.hepmc3 -o Afterburner_Output/pion/9on275/DEMPgen_v1.2.5_DEMP_Pi+_9x275_q2_10to20
+      - abconv -p ip6_ep_275x9 Generator_Output/pion/9on275/eic_DEMPgen_9on275_ip6_pi+_q2_20_35_726000000.hepmc3 -o Afterburner_Output/pion/9on275/DEMPgen_v1.2.5_DEMP_Pi+_9x275_q2_20to35
+- The latest version of afterburner at time of use (08/05/26) already produces output in the correct hepmc3.tree.root file format
