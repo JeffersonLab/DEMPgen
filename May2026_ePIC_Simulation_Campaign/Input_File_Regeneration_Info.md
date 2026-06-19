@@ -1,4 +1,4 @@
-# Stephen JD Kay (stephen.kay@york.ac.uk) - 06/05/2025 - University of York
+# Stephen JD Kay (stephen.kay@york.ac.uk) - 08/05/2025 - University of York
 
 To reproduce the files used for the May 2026 simulation campaign from DEMPgen, follow the steps below:
 
@@ -32,4 +32,4 @@ To reproduce the files used for the May 2026 simulation campaign from DEMPgen, f
       - abconv -p ip6_hiacc_275x9 Generator_Output/pion/9on275/eic_DEMPgen_9on275_ip6_pi+_q2_3_10_120000000.hepmc3 -o Afterburner_Output/pion/9on275/DEMPgen_v1.2.5_DEMP_Pi+_9x275_q2_3to10
       - abconv -p ip6_hiacc_275x9 Generator_Output/pion/9on275/eic_DEMPgen_9on275_ip6_pi+_q2_10_20_321000000.hepmc3 -o Afterburner_Output/pion/9on275/DEMPgen_v1.2.5_DEMP_Pi+_9x275_q2_10to20
       - abconv -p ip6_hiacc_275x9 Generator_Output/pion/9on275/eic_DEMPgen_9on275_ip6_pi+_q2_20_35_726000000.hepmc3 -o Afterburner_Output/pion/9on275/DEMPgen_v1.2.5_DEMP_Pi+_9x275_q2_20to35
-- The latest version of afterburner at time of use (08/05/26) already produces output in the correct hepmc3.tree.root file format
+- The latest version of afterburner at time of use (08/05/26 - v0.2.1) already produces output in the correct hepmc3.tree.root file format
